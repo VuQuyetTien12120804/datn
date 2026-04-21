@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="teal_primary">#0D9488</color>
+    <color name="surface_muted">#FFF5F5F5</color>
+    <color name="text_secondary">#FF666666</color>
+
+    <!-- Brand theme tokens (dùng chung cho toàn app) -->
+    <color name="brand_primary">#0B84FF</color>
+    <color name="brand_primary_dark">#0668CC</color>
+    <color name="brand_on_primary">#FFFFFFFF</color>
+    <color name="brand_cta_navy">#2E3650</color>
+    <color name="brand_on_cta">#FFFFFFFF</color>
+    <color name="onboarding_dot_active">#FFFFFFFF</color>
+    <color name="onboarding_dot_inactive">#66FFFFFF</color>
+
+    <!-- Home screen service tile colors -->
+    <color name="home_tile_orange">#FB923C</color>
+    <color name="home_tile_blue">#3B82F6</color>
+    <color name="home_tile_purple">#A855F7</color>
+    <color name="home_tile_green">#22C55E</color>
+    <color name="home_tile_pink">#EC4899</color>
+    <color name="home_tile_teal">#14B8A6</color>
+    <color name="home_tile_red">#EF4444</color>
+    <color name="home_tile_amber">#F59E0B</color>
+
+    <color name="home_banner_blue_start">#3BA3FF</color>
+    <color name="home_banner_blue_end">#0B84FF</color>
+    <color name="home_banner_teal_start">#7DD3FC</color>
+    <color name="home_banner_teal_end">#0EA5E9</color>
+    <color name="home_banner_orange_start">#FDBA74</color>
+    <color name="home_banner_orange_end">#F97316</color>
+
+    <color name="home_page_bg">#F3F6FB</color>
+    <color name="home_section_title">#111827</color>
+    <color name="home_section_subtle">#6B7280</color>
+
+    <!-- ===== SEMANTIC TEXT COLORS (tokens dùng chung) ===== -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary_dim">#6B7280</color>
+    <color name="text_muted">#9CA3AF</color>
+    <color name="text_on_brand">#FFFFFFFF</color>
+    <color name="text_on_brand_dim">#DBEEFF</color>
+    <color name="text_link">#0B84FF</color>
+    <color name="divider_line">#E5E7EB</color>
+    <color name="chip_specialty_bg">#E5F1FF</color>
+
+    <!-- ===== DOCTOR PANEL ===== -->
+    <color name="doctor_status_done_bg">#DCFCE7</color>
+    <color name="doctor_status_done_fg">#16A34A</color>
+    <color name="doctor_status_progress_bg">#DBEAFE</color>
+    <color name="doctor_status_progress_fg">#2563EB</color>
+    <color name="doctor_status_wait_bg">#F1F5F9</color>
+    <color name="doctor_status_wait_fg">#64748B</color>
+    <color name="doctor_priority_orange">#F97316</color>
+    <color name="doctor_stat_blue_bg">#EFF6FF</color>
+    <color name="doctor_stat_green_bg">#F0FDF4</color>
+    <color name="doctor_stat_orange_bg">#FFF7ED</color>
+    <color name="doctor_stat_amber_bg">#FEFCE8</color>
+    <color name="doctor_divider">#E5E7EB</color>
+    <color name="doctor_accept_green">#16A34A</color>
+    <color name="doctor_reject_red">#DC2626</color>
+    <color name="doctor_logout_red">#DC2626</color>
+    <color name="doctor_tab_active_bg">#EFF6FF</color>
+    <color name="doctor_current_card_stroke">#2563EB</color>
+    <color name="doctor_work_shift_bg">#DCFCE7</color>
+    <color name="doctor_work_shift_fg">#16A34A</color>
+
+    <!-- Account hub (Medpro-inspired) -->
+    <color name="account_header_blue">#0B84FF</color>
+    <color name="account_header_blue_dark">#0668CC</color>
+    <color name="account_fab_orange">#FF6B35</color>
+    <color name="account_footer_bg">#FFF0F2F5</color>
+    <color name="account_divider">#1A000000</color>
+
+    <color name="icon_bg_teal">#E6F7F5</color>
+    <color name="icon_bg_purple">#EDE7FF</color>
+    <color name="icon_bg_red">#FFE8E6</color>
+    <color name="icon_bg_blue">#E3F2FF</color>
+    <color name="icon_bg_cyan">#E0F7FF</color>
+    <color name="icon_bg_yellow">#FFF8E1</color>
+    <color name="icon_bg_green">#E8F5E9</color>
+    <color name="icon_bg_magenta">#F3E5F5</color>
+    <color name="icon_bg_grey">#EEEEEE</color>
+
+    <!-- Auth (YouMed-inspired) -->
+    <color name="auth_bg">#FFFFFFFF</color>
+    <color name="auth_input_stroke">#FFE0E0E0</color>
+    <color name="auth_input_stroke_focus">#FF1976D2</color>
+    <color name="auth_primary_btn">#FF5E6D82</color>
+    <color name="auth_primary_btn_blue">#FF1976D2</color>
+    <color name="auth_brand_blue">#FF1565C0</color>
+    <color name="auth_brand_green">#FF2E7D32</color>
+    <color name="auth_link">#FF1565C0</color>
+    <color name="auth_terms_text">#FF757575</color>
+    <color name="auth_snackbar_success">#FF2E7D32</color>
+</resources>

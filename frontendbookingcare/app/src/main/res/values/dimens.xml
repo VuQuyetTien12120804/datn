@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Design tokens dùng chung cho toàn app.
+    Muốn chỉnh cỡ chữ / khoảng cách / bo góc → chỉnh tại đây là tất cả layout bắt theo.
+-->
+<resources>
+
+    <!-- ===== TEXT SIZES ===== -->
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_small">13sp</dimen>
+    <dimen name="text_body">15sp</dimen>
+    <dimen name="text_body_lg">16sp</dimen>
+    <dimen name="text_subtitle">18sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    <dimen name="text_headline">22sp</dimen>
+    <dimen name="text_display">26sp</dimen>
+
+    <!-- ===== SPACING ===== -->
+    <dimen name="space_xxs">2dp</dimen>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">12dp</dimen>
+    <dimen name="space_lg">16dp</dimen>
+    <dimen name="space_xl">20dp</dimen>
+    <dimen name="space_xxl">24dp</dimen>
+
+    <!-- ===== CORNER RADIUS ===== -->
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="radius_xl">22dp</dimen>
+    <dimen name="radius_pill">28dp</dimen>
+
+    <!-- ===== HOME TILE ===== -->
+    <dimen name="tile_icon_size">60dp</dimen>
+    <dimen name="tile_icon_text_size">28sp</dimen>
+    <dimen name="tile_min_height">128dp</dimen>
+
+    <!-- ===== SPECIALTY GRID ITEM ===== -->
+    <dimen name="specialty_icon_size">54dp</dimen>
+    <dimen name="specialty_icon_text_size">30sp</dimen>
+    <dimen name="specialty_min_height">118dp</dimen>
+
+    <!-- ===== HOME DOCTOR ROW ===== -->
+    <dimen name="home_doctor_avatar_size">76dp</dimen>
+    <dimen name="home_doctor_avatar_text_size">26sp</dimen>
+
+    <!-- ===== HOME BANNER ===== -->
+    <dimen name="banner_height">190dp</dimen>
+    <dimen name="banner_dot_height">8dp</dimen>
+
+    <!-- ===== HOME HEADER ===== -->
+    <dimen name="home_header_avatar_size">40dp</dimen>
+    <dimen name="home_header_avatar_text_size">18sp</dimen>
+    <dimen name="home_search_radius">28dp</dimen>
+
+</resources>

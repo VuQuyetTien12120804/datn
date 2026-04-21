@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/home_page_bg"
+    android:orientation="vertical">
+
+    <!-- Header cố định: avatar + greeting + bell + search bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/home_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_home_header"
+        android:elevation="4dp"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp">
+
+        <FrameLayout
+            android:id="@+id/home_avatar_wrapper"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_white_trans"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/home_avatar_letter"
+                style="@style/Text.Home.AvatarLetter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="T" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/home_greeting"
+            style="@style/Text.Home.Greeting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginEnd="@dimen/space_md"
+            android:text="@string/home_greeting"
+            app:layout_constraintEnd_toStartOf="@id/home_bell"
+            app:layout_constraintStart_toEndOf="@id/home_avatar_wrapper"
+            app:layout_constraintTop_toTopOf="@id/home_avatar_wrapper" />
+
+        <TextView
+            android:id="@+id/home_user_name"
+            style="@style/Text.Home.UserName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginEnd="@dimen/space_md"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/home_guest_name"
+            app:layout_constraintEnd_toStartOf="@id/home_bell"
+            app:layout_constraintStart_toEndOf="@id/home_avatar_wrapper"
+            app:layout_constraintTop_toBottomOf="@id/home_greeting" />
+
+        <ImageView
+            android:id="@+id/home_bell"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_popup_reminder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/home_avatar_wrapper"
+            app:tint="@color/white" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_search_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/home_user_name">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="@color/home_section_subtle" />
+
+                    <TextView
+                        style="@style/Text.Search.Hint"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_sm"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/home_search_hint" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Phần có thể cuộn: banner, service grid, doctors, specialties -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Banner carousel -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/home_banner_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/home_banner_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:background="@android:color/transparent"
+                    app:tabBackground="@drawable/bg_banner_dot_inactive"
+                    app:tabGravity="center"
+                    app:tabIndicator="@drawable/bg_banner_dot_active"
+                    app:tabIndicatorAnimationMode="elastic"
+                    app:tabIndicatorColor="@color/white"
+                    app:tabIndicatorFullWidth="false"
+                    app:tabIndicatorGravity="center"
+                    app:tabMinWidth="0dp"
+                    app:tabPaddingEnd="4dp"
+                    app:tabPaddingStart="4dp"
+                    app:tabRippleColor="@android:color/transparent" />
+            </FrameLayout>
+
+            <!-- Service grid card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="14dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp">
+
+                <GridLayout
+                    android:id="@+id/home_service_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="3"
+                    android:padding="12dp"
+                    android:useDefaultMargins="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Doctors -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="❇"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="@dimen/text_body_lg" />
+
+                <TextView
+                    style="@style/Text.Section.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:layout_weight="1"
+                    android:text="@string/home_section_doctors" />
+
+                <LinearLayout
+                    android:id="@+id/home_doctors_see_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingTop="@dimen/space_xs"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingBottom="@dimen/space_xs">
+
+                    <TextView
+                        style="@style/Text.Link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/see_all" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="4dp"
+                        android:contentDescription="@null"
+                        android:src="@android:drawable/ic_media_play"
+                        app:tint="@color/brand_primary" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/home_doctors_row"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp" />
+            </HorizontalScrollView>
+
+            <!-- Specialties -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⊞"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="@dimen/text_body_lg" />
+
+                <TextView
+                    style="@style/Text.Section.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:layout_weight="1"
+                    android:text="@string/home_section_specialty_book" />
+            </LinearLayout>
+
+            <GridLayout
+                android:id="@+id/home_specialty_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="4"
+                android:padding="10dp"
+                android:useDefaultMargins="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_see_all_specialties"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="24dp"
+                android:text="@string/home_see_all_specialties"
+                android:textColor="@color/brand_primary"
+                app:cornerRadius="22dp"
+                app:strokeColor="@color/brand_primary" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

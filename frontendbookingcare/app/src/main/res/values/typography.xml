@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Typography tokens. Mỗi style = 1 "vai trò" chữ trên UI.
+    Muốn thay đổi font / size / màu chữ cho một vai trò → chỉ sửa 1 style tại đây
+    là tất cả màn hình dùng style đó cập nhật theo.
+
+    Cách dùng trong layout XML:
+        <TextView style="@style/Text.Body" android:text="..." />
+
+    Có thể override từng view cụ thể nếu cần (ví dụ đổi gravity) nhưng KHÔNG nên
+    override textSize/textColor ở layout — chỉnh ở style để đồng bộ.
+
+    Nếu sau này thêm font TTF:
+        1) Bỏ file TTF vào res/font/roboto.ttf
+        2) Tạo R.font.roboto (IDE tự sinh)
+        3) Sửa item android:fontFamily của Text.Base bên dưới → @font/roboto
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ===== BASE (gốc mọi text style) ===== -->
+    <style name="Text.Base" parent="android:TextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- ===== HEADINGS / TITLES ===== -->
+    <!-- Tiêu đề section ở Home: "Bác sĩ", "Khám theo chuyên khoa", ... -->
+    <style name="Text.Section.Title" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Tiêu đề màn chuyên biệt (toolbar): "Tất cả chuyên khoa", "Chỉnh sửa thông tin"... -->
+    <style name="Text.Screen.Title" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ===== BODY / CAPTION ===== -->
+    <style name="Text.Body" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <style name="Text.Body.Secondary" parent="Text.Body">
+        <item name="android:textColor">@color/text_secondary_dim</item>
+    </style>
+
+    <style name="Text.Caption" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/text_secondary_dim</item>
+    </style>
+
+    <style name="Text.Caption.Muted" parent="Text.Caption">
+        <item name="android:textColor">@color/text_muted</item>
+    </style>
+
+    <!-- ===== LINKS / CTA TEXT ===== -->
+    <!-- "Xem tất cả", "Quên mật khẩu?", ... -->
+    <style name="Text.Link" parent="Text.Base">
+        <item name="android:textColor">@color/text_link</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ===== HOME HEADER (nền xanh brand) ===== -->
+    <style name="Text.Home.Greeting" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand_dim</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="Text.Home.UserName" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Home.AvatarLetter" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textSize">@dimen/home_header_avatar_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Text.Search.Hint" parent="Text.Base">
+        <item name="android:textColor">@color/text_secondary_dim</item>
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <!-- ===== HOME TILES (lưới 6 dịch vụ) ===== -->
+    <style name="Text.Tile.Icon" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textSize">@dimen/tile_icon_text_size</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Text.Tile.Label" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
+    <!-- ===== SPECIALTY GRID ===== -->
+    <style name="Text.Specialty.Icon" parent="Text.Base">
+        <item name="android:textSize">@dimen/specialty_icon_text_size</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Text.Specialty.Label" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+
+    <!-- ===== DOCTOR (row + card list) ===== -->
+    <style name="Text.Doctor.AvatarLetter" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textSize">@dimen/home_doctor_avatar_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Text.Doctor.Name" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Text.Doctor.Title" parent="Text.Base">
+        <item name="android:textColor">@color/text_secondary_dim</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="Text.Doctor.NameLarge" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Doctor.Years" parent="Text.Base">
+        <item name="android:textColor">@color/text_secondary_dim</item>
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <style name="Text.Doctor.Address" parent="Text.Base">
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <style name="Text.Chip.Specialty" parent="Text.Base">
+        <item name="android:textColor">@color/text_link</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <!-- ===== BUTTONS ===== -->
+    <style name="Text.Button" parent="Text.Base">
+        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

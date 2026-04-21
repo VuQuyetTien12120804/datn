@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/home_page_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_md"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:cardElevation="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_lg">
+
+                <TextView
+                    style="@style/Text.Screen.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/doctor_exam_title" />
+
+                <TextView
+                    android:id="@+id/doctor_exam_status"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_doctor_status_wait"
+                    android:drawablePadding="@dimen/space_sm"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingTop="@dimen/space_xs"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingBottom="@dimen/space_xs"
+                    android:text="@string/doctor_exam_status_idle"
+                    android:textColor="@color/doctor_status_wait_fg" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_xs"
+            android:layout_marginEnd="@dimen/space_md"
+            app:cardBackgroundColor="@color/doctor_tab_active_bg"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/doctor_current_card_stroke"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_lg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/bg_tile_blue">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="👤"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_headline" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_md"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/doctor_exam_patient"
+                    style="@style/Text.Doctor.NameLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/doctor_exam_age_gender"
+                            style="@style/Text.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xxs" />
+
+                        <TextView
+                            android:id="@+id/doctor_exam_time"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_sm"
+                            android:background="@drawable/bg_doctor_time_pill"
+                            android:drawablePadding="@dimen/space_xs"
+                            android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                            android:paddingStart="@dimen/space_md"
+                            android:paddingTop="@dimen/space_xs"
+                            android:paddingEnd="@dimen/space_md"
+                            android:paddingBottom="@dimen/space_xs"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/space_md"
+                    android:background="@color/doctor_divider" />
+
+                <TextView
+                    android:id="@+id/doctor_exam_phone"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_md"
+                    android:drawablePadding="@dimen/space_sm"
+                    android:drawableStart="@android:drawable/ic_menu_call" />
+
+                <TextView
+                    android:id="@+id/doctor_exam_address"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:drawablePadding="@dimen/space_sm"
+                    android:drawableStart="@android:drawable/ic_menu_mylocation" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginEnd="@dimen/space_md"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:cardElevation="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_lg">
+
+                <TextView
+                    style="@style/Text.Doctor.NameLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/doctor_exam_notes_title" />
+
+                <EditText
+                    android:id="@+id/doctor_exam_notes"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="@dimen/space_md"
+                    android:background="@color/home_page_bg"
+                    android:gravity="top|start"
+                    android:hint="@string/doctor_exam_notes_hint"
+                    android:inputType="textMultiLine"
+                    android:padding="@dimen/space_md"
+                    android:textColorHint="@color/text_muted" />
+
+                <TextView
+                    android:id="@+id/doctor_exam_start_btn"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_lg"
+                    android:background="@drawable/bg_doctor_book_btn"
+                    android:gravity="center"
+                    android:paddingTop="@dimen/space_md"
+                    android:paddingBottom="@dimen/space_md"
+                    android:text="@string/doctor_exam_start"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_xxl" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

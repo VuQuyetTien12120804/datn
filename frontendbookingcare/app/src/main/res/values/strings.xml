@@ -1,0 +1,288 @@
+<resources>
+    <string name="app_name">BookingCare</string>
+    <string name="cd_navigate_up">Quay lại</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_appointments">Lịch khám</string>
+    <string name="nav_consult">Tư vấn</string>
+    <string name="nav_messages">Tin nhắn</string>
+    <string name="nav_account">Tài khoản</string>
+
+    <string name="home_greeting">Xin chào</string>
+    <string name="home_greeting_morning">Buổi sáng tốt lành!</string>
+    <string name="home_greeting_afternoon">Buổi chiều rực rỡ!</string>
+    <string name="home_greeting_evening">Buổi tối an lành!</string>
+    <string name="home_greeting_night">Chúc bạn nghỉ ngơi tốt!</string>
+    <string name="home_guest_name">Bạn</string>
+    <string name="home_search_hint">Tên bác sĩ, triệu chứng bệnh, chuyên khoa…</string>
+
+    <string name="home_service_book_doctor">Đặt khám bác sĩ</string>
+    <string name="home_service_chat">Chat với bác sĩ</string>
+    <string name="home_service_video">Gọi video với bác sĩ</string>
+    <string name="home_service_records">Hồ sơ sức khoẻ</string>
+    <string name="home_service_vaccine">Đặt lịch tiêm chủng</string>
+    <string name="home_service_specialty">Khám theo chuyên khoa</string>
+
+    <string name="home_section_doctors">Bác sĩ</string>
+    <string name="home_section_specialty_book">Khám theo chuyên khoa</string>
+    <string name="home_see_all_specialties">Xem tất cả các chuyên khoa</string>
+
+    <string name="home_banner_1_title">Chat cùng bác sĩ chuyên khoa</string>
+    <string name="home_banner_1_cta">CHAT NGAY</string>
+    <string name="home_banner_2_title">Tư vấn dinh dưỡng miễn phí</string>
+    <string name="home_banner_2_cta">THAM GIA NGAY</string>
+    <string name="home_banner_3_title">Ưu đãi combo voucher BookingCare</string>
+    <string name="home_banner_3_cta">NHẬN NGAY</string>
+
+    <string name="home_spec_allergy">Dị ứng - miễn dịch</string>
+    <string name="home_spec_traditional">Y học cổ truyền</string>
+    <string name="home_spec_pulmo">Lao - bệnh phổi</string>
+    <string name="home_spec_sport">Y học thể thao</string>
+    <string name="home_spec_ortho">Cơ xương khớp</string>
+    <string name="home_spec_ob">Sản phụ khoa</string>
+    <string name="home_spec_eye">Nhãn khoa</string>
+    <string name="home_spec_uro">Nam khoa</string>
+
+    <string name="home_demo_doctor_1">Bác sĩ Hồng</string>
+    <string name="home_demo_doctor_2">Bác sĩ Trung</string>
+    <string name="home_demo_doctor_3">Bác sĩ Hà</string>
+    <string name="home_demo_doctor_4">Bác sĩ Hiếu</string>
+
+    <string name="doctor_list_search_hint">Tên bác sĩ, triệu chứng, chuyên khoa</string>
+    <string name="doctor_list_filter_all">Tất cả</string>
+    <string name="doctor_list_filter_place">Nơi khám: Bác sĩ</string>
+    <string name="doctor_list_filter_more">Bộ lọc</string>
+    <string name="doctor_book_now">Đặt lịch ngay</string>
+    <string name="doctor_years_fmt">%1$d năm kinh nghiệm</string>
+    <string name="doctor_list_empty">Chưa có bác sĩ nào được hiển thị.</string>
+    <string name="doctor_list_error_fmt">Không thể tải danh sách bác sĩ: %1$s</string>
+    <string name="specialty_list_title">Tất cả chuyên khoa</string>
+    <string name="specialty_list_empty">Chưa có chuyên khoa nào.</string>
+    <string name="specialty_list_error_fmt">Không thể tải chuyên khoa: %1$s</string>
+
+    <!-- ===== DOCTOR PANEL ===== -->
+    <string name="doctor_nav_appointments">Lịch khám</string>
+    <string name="doctor_nav_requests">Yêu cầu</string>
+    <string name="doctor_nav_examining">Khám bệnh</string>
+    <string name="doctor_nav_account">Tài khoản</string>
+
+    <string name="doctor_today">Hôm nay</string>
+    <string name="doctor_work_shift_morning">Ca làm việc: Sáng</string>
+    <string name="doctor_work_shift_afternoon">Ca làm việc: Chiều</string>
+    <string name="doctor_today_count_fmt">Lịch khám hôm nay (%1$d bệnh nhân)</string>
+    <string name="doctor_status_done">Hoàn thành</string>
+    <string name="doctor_status_progress">Đang khám</string>
+    <string name="doctor_status_wait">Chờ khám</string>
+    <string name="doctor_symptom_fmt">Triệu chứng: %1$s</string>
+
+    <string name="doctor_requests_title">Yêu cầu đặt lịch</string>
+    <string name="doctor_requests_pending_fmt">%1$d yêu cầu đang chờ duyệt</string>
+    <string name="doctor_tab_pending">Chờ duyệt</string>
+    <string name="doctor_tab_accepted">Đã chấp nhận</string>
+    <string name="doctor_tab_rejected">Đã từ chối</string>
+    <string name="doctor_priority">Ưu tiên</string>
+    <string name="doctor_request_date_fmt">Ngày: %1$s</string>
+    <string name="doctor_request_time_fmt">Giờ: %1$s</string>
+    <string name="doctor_request_reason_fmt">Lý do khám: %1$s</string>
+    <string name="doctor_action_reject">Từ chối</string>
+    <string name="doctor_action_accept">Chấp nhận</string>
+
+    <string name="doctor_exam_title">Phòng khám bệnh</string>
+    <string name="doctor_exam_status_idle">Chưa bắt đầu</string>
+    <string name="doctor_exam_notes_title">Ghi chú khám bệnh</string>
+    <string name="doctor_exam_notes_hint">Bắt đầu khám để ghi chú</string>
+    <string name="doctor_exam_start">Bắt đầu khám</string>
+    <string name="doctor_age_gender_fmt">%1$d tuổi • %2$s</string>
+
+    <string name="doctor_profile_stat_total">Bệnh nhân đã khám</string>
+    <string name="doctor_profile_stat_today">Đã khám hôm nay</string>
+    <string name="doctor_profile_stat_pending">Chờ duyệt</string>
+    <string name="doctor_profile_stat_rating">Đánh giá</string>
+    <string name="doctor_profile_section_expertise">Thông tin chuyên môn</string>
+    <string name="doctor_profile_section_contact">Thông tin liên hệ</string>
+    <string name="doctor_profile_section_leaderboard">Bảng xếp hạng</string>
+    <string name="doctor_profile_field_specialty">Chuyên khoa:</string>
+    <string name="doctor_profile_field_degree">Trình độ:</string>
+    <string name="doctor_profile_field_license">Số chứng chỉ:</string>
+    <string name="doctor_profile_field_email">Email</string>
+    <string name="doctor_profile_field_phone">Điện thoại</string>
+    <string name="doctor_leaderboard_period_day">Ngày</string>
+    <string name="doctor_leaderboard_period_week">Tuần</string>
+    <string name="doctor_leaderboard_period_month">Tháng</string>
+    <string name="doctor_leaderboard_period_quarter">Quý</string>
+    <string name="doctor_leaderboard_period_year">Năm</string>
+    <string name="doctor_leaderboard_you">Bạn</string>
+    <string name="doctor_leaderboard_rank_fmt">#%1$d/%2$d</string>
+    <string name="doctor_leaderboard_patients_fmt">%1$d BN</string>
+    <string name="doctor_logout">Đăng xuất</string>
+    <string name="section_specialties">Chuyên khoa</string>
+    <string name="section_featured_doctors">Bác sĩ nổi bật</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="book_slot">Đặt lịch</string>
+
+    <string name="appointments_title">Lịch khám của tôi</string>
+    <string name="tab_upcoming">Sắp tới</string>
+    <string name="tab_completed">Hoàn thành</string>
+    <string name="tab_cancelled">Đã hủy</string>
+    <string name="view_detail">Xem chi tiết</string>
+    <string name="cancel_booking">Hủy lịch</string>
+
+    <string name="consult_demo_title">Tư vấn</string>
+    <string name="consult_demo_body">Kết nối bác sĩ / chat sẽ được triển khai sau.</string>
+
+    <string name="messages_demo_title">Tin nhắn</string>
+    <string name="messages_demo_body">Hộp tin nhắn demo — chưa có API.</string>
+
+    <!-- Auth / đăng ký kiểu YouMed (email + OTP) -->
+    <string name="auth_brand_part1">Booking</string>
+    <string name="auth_brand_part2">Care</string>
+    <string name="auth_id_suffix"> ID</string>
+    <string name="auth_login_section_title">Thông tin đăng nhập</string>
+    <string name="auth_hint_email">Nhập email của bạn</string>
+    <string name="auth_hint_password">Nhập mật khẩu</string>
+    <string name="auth_forgot_password">Quên mật khẩu?</string>
+    <string name="auth_register_account_btn">Đăng ký tài khoản</string>
+    <string name="auth_continue">Tiếp tục</string>
+    <string name="auth_confirm">Xác nhận</string>
+    <string name="auth_register_email_title">Nhập email đăng ký</string>
+    <string name="auth_terms_prefix">Bằng việc tiếp tục, bạn đã đồng ý với các </string>
+    <string name="auth_terms_link">Điều khoản, điều kiện sử dụng</string>
+    <string name="auth_terms_suffix"> của chúng tôi.</string>
+    <string name="auth_otp_title">Xác thực OTP</string>
+    <string name="auth_otp_subtitle_fmt">Nhập mã xác thực đã được gửi đến email %1$s</string>
+    <string name="auth_otp_resend_fmt">Gửi lại (%1$ds)</string>
+    <string name="auth_otp_resend_ready">Gửi lại mã OTP</string>
+    <string name="auth_otp_change_email">Thay đổi email khác</string>
+    <string name="auth_create_password_title">Tạo mật khẩu</string>
+    <string name="auth_create_password_desc">Nhập mật khẩu cần ít nhất 6 ký tự để bảo vệ tài khoản và đăng nhập cho các lần sau.</string>
+    <string name="auth_full_name_hint">Họ và tên hiển thị</string>
+    <string name="auth_password_again_hint">Nhập lại mật khẩu</string>
+    <string name="auth_otp_sent">Gửi OTP thành công</string>
+    <string name="auth_otp_dev_hint">Mã OTP (môi trường thử): %1$s</string>
+    <string name="auth_password_mismatch">Mật khẩu nhập lại không khớp</string>
+    <string name="auth_login_missing">Vui lòng nhập email và mật khẩu</string>
+    <string name="auth_register_success">Đăng ký tài khoản thành công</string>
+    <string name="auth_email_exists_title">Email đã được đăng ký</string>
+    <string name="auth_email_exists_message">Email này đã có tài khoản. Bạn có thể đăng nhập hoặc dùng một email khác để tạo tài khoản mới.</string>
+    <string name="auth_email_exists_login">Đăng nhập</string>
+    <string name="auth_email_exists_other_email">Dùng email khác</string>
+    <string name="auth_forgot_flow_title">Quên mật khẩu</string>
+    <string name="auth_forgot_email_subtitle">Nhập email tài khoản. Chúng tôi sẽ gửi mã OTP để bạn đặt lại mật khẩu.</string>
+    <string name="auth_forgot_otp_title">Xác thực OTP</string>
+    <string name="auth_forgot_otp_subtitle_fmt">Nhập mã OTP đã gửi đến email %1$s</string>
+    <string name="auth_forgot_new_password_title">Đặt mật khẩu mới</string>
+    <string name="auth_forgot_new_password_desc">Mật khẩu ít nhất 6 ký tự. Sau khi đặt lại, hãy đăng nhập bằng mật khẩu mới.</string>
+    <string name="auth_forgot_success">Đặt lại mật khẩu thành công</string>
+
+    <!-- Account hub (Medpro-style) -->
+    <string name="account_guest_label">Khách</string>
+    <string name="account_user_default">Người dùng</string>
+    <string name="account_section_quick">Tiện ích</string>
+    <string name="account_section_account">Tài khoản của tôi</string>
+    <string name="account_section_terms">Điều khoản và quy định</string>
+    <string name="account_section_support">Hỗ trợ &amp; cộng đồng</string>
+    <string name="account_menu_profile_detail">Thông tin chi tiết</string>
+    <string name="account_menu_profile_detail_sub">Xem hồ sơ, lịch sử khám</string>
+    <string name="account_menu_health">Xem / lưu thông tin sức khỏe</string>
+    <string name="account_menu_health_sub">Cập nhật triệu chứng, chỉ số</string>
+    <string name="account_menu_health_guest_sub">Đăng nhập để đồng bộ hồ sơ</string>
+    <string name="account_menu_logout_sub">Thoát khỏi thiết bị này</string>
+    <string name="account_menu_terms_use">Quy định sử dụng</string>
+    <string name="account_menu_privacy">Chính sách bảo mật</string>
+    <string name="account_menu_service_terms">Điều khoản dịch vụ</string>
+    <string name="account_menu_support_title">Hỗ trợ tư vấn / đặt khám</string>
+    <string name="account_menu_support_sub">Gọi tổng đài (demo)</string>
+    <string name="account_menu_rate">Đánh giá ứng dụng</string>
+    <string name="account_menu_share">Chia sẻ ứng dụng</string>
+    <string name="account_menu_faq">Câu hỏi thường gặp</string>
+    <string name="account_menu_language">Ngôn ngữ</string>
+    <string name="language_name_vi">Tiếng Việt</string>
+    <string name="language_name_en">English</string>
+    <string name="account_language_dialog_title">Chọn ngôn ngữ</string>
+    <string name="language_changed">Đã đổi ngôn ngữ</string>
+    <string name="account_support_phone_uri">tel:19001234</string>
+    <string name="account_support_call">Gọi hỗ trợ</string>
+    <string name="account_share_text">Đặt lịch khám dễ dàng với BookingCare.</string>
+    <string name="account_version_fmt">Phiên bản %s</string>
+    <string name="account_footer_tagline">Ứng dụng đặt khám — BookingCare (demo)</string>
+    <string name="account_logout_confirm">Bạn có chắc muốn đăng xuất?</string>
+    <string name="account_logged_out_toast">Đã đăng xuất</string>
+    <string name="account_placeholder_terms">Nội dung quy định sử dụng (demo). Ứng dụng thật sẽ hiển thị trang chính sách đầy đủ.</string>
+    <string name="account_placeholder_privacy">Chính sách bảo mật (demo). Chúng tôi cam kết bảo vệ dữ liệu cá nhân theo quy định pháp luật.</string>
+    <string name="account_placeholder_service">Điều khoản dịch vụ (demo).</string>
+    <string name="account_placeholder_faq">Các câu hỏi thường gặp sẽ được cập nhật tại đây.</string>
+
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="email">Nhập email của bạn</string>
+    <string name="password">Nhập mật khẩu</string>
+    <string name="full_name">Họ tên</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="otp">Mã OTP</string>
+    <string name="send_otp">Gửi mã OTP</string>
+    <string name="complete_register">Hoàn tất đăng ký</string>
+    <string name="change_password">Đổi mật khẩu</string>
+    <string name="edit_profile">Chỉnh sửa thông tin</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="old_password">Mật khẩu hiện tại</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="confirm_password">Nhập lại mật khẩu mới</string>
+    <string name="save">Lưu</string>
+    <string name="dob">Ngày sinh</string>
+    <string name="gender">Giới tính</string>
+    <string name="address">Địa chỉ</string>
+    <string name="health_records">Hồ sơ sức khỏe</string>
+    <string name="back">Quay lại</string>
+
+    <string name="error_missing_server_data">Thiếu dữ liệu từ máy chủ</string>
+    <string name="error_network_fmt">Lỗi mạng (%d)</string>
+    <string name="error_login_failed">Đăng nhập thất bại</string>
+    <string name="error_otp_send_failed">Không gửi được OTP</string>
+    <string name="error_password_reset_failed">Đặt lại mật khẩu thất bại</string>
+    <string name="error_verify_failed">Xác thực thất bại</string>
+    <string name="error_register_failed">Đăng ký thất bại</string>
+    <string name="error_not_logged_in">Bạn chưa đăng nhập</string>
+    <string name="error_change_password_failed">Đổi mật khẩu thất bại</string>
+
+    <string name="profile_row_phone">📞 Số điện thoại: %1$s</string>
+    <string name="profile_row_dob">📅 Ngày sinh: %1$s</string>
+    <string name="profile_row_gender">👤 Giới tính: %1$s</string>
+    <string name="profile_row_address">📍 Địa chỉ: %1$s</string>
+    <string name="demo_health_1_title">Khám tổng quát</string>
+    <string name="demo_health_1_date">15/01/2026</string>
+    <string name="demo_health_1_doctor">Bác sĩ: PGS.TS. Lê Văn Hùng</string>
+    <string name="demo_health_1_note">Ghi chú: Cần theo dõi huyết áp thường xuyên, điều chỉnh chế độ ăn uống.</string>
+    <string name="demo_health_2_title">Xét nghiệm máu</string>
+    <string name="demo_health_2_date">20/12/2025</string>
+    <string name="demo_health_2_doctor">Bác sĩ: BS. Nguyễn Thị Lan</string>
+    <string name="demo_health_2_note">Kết quả: demo dữ liệu.</string>
+
+    <string name="home_specialty_internal">Nội khoa</string>
+    <string name="home_specialty_pediatrics">Nhi khoa</string>
+    <string name="home_specialty_ob">Sản khoa</string>
+    <string name="home_specialty_ortho">Cơ xương khớp</string>
+    <string name="home_doctor_1_name">BS. Nguyễn Thị Lan</string>
+    <string name="home_doctor_1_rating">★ 4.9 · 342 đánh giá</string>
+    <string name="home_doctor_2_name">BS. Trần Minh Tuấn</string>
+    <string name="home_doctor_2_rating">★ 4.8 · 120 đánh giá</string>
+
+    <string name="edit_profile_saved_toast">Đã lưu (lưu trên máy, chờ API hồ sơ)</string>
+    <string name="change_pwd_fill_all">Nhập đủ các trường</string>
+    <string name="change_pwd_min_length">Mật khẩu mới ít nhất 6 ký tự</string>
+    <string name="change_pwd_mismatch">Mật khẩu mới không khớp</string>
+    <string name="change_pwd_success">Đổi mật khẩu thành công</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_start">Bắt đầu</string>
+    <string name="onboarding_or_auth">Đăng ký hoặc Đăng nhập</string>
+    <string name="onboarding_1_title">Đặt lịch khám</string>
+    <string name="onboarding_1_desc">Bạn có thể đặt khám bác sĩ, bệnh viện và phòng khám liên kết chính thức với BookingCare để nhận trước số thứ tự và khung giờ khám.</string>
+    <string name="onboarding_2_title">Gọi video với bác sĩ</string>
+    <string name="onboarding_2_desc">Bạn có thể gọi video ngay với bác sĩ hoặc đặt lịch cho cuộc gọi.</string>
+    <string name="onboarding_3_title">Nhắn tin với bác sĩ</string>
+    <string name="onboarding_3_desc">Bạn có thể nhắn tin với bác sĩ đang trực tuyến để được tư vấn về tình trạng sức khỏe, bệnh, thuốc…</string>
+    <string name="onboarding_4_title">Mua sản phẩm y tế</string>
+    <string name="onboarding_4_desc">Bạn có thể mua trực tuyến các sản phẩm thuốc, thực phẩm chức năng, sản phẩm chăm sóc sức khỏe trên ứng dụng BookingCare.</string>
+    <string name="onboarding_5_title">Lưu trữ thông tin y tế</string>
+    <string name="onboarding_5_desc">Bạn sẽ nhận được kết quả khám, toa thuốc, kết quả xét nghiệm trên ứng dụng BookingCare.</string>
+</resources>
