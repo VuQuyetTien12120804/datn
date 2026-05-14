@@ -10,6 +10,9 @@ public interface AuthApiService {
     @POST("api/v1/auth/login")
     Call<ApiEnvelope> login(@Body AuthRequest body);
 
+    @POST("api/v1/auth/refresh")
+    Call<ApiEnvelope> refresh(@Body RefreshRequest body);
+
     @POST("api/v1/auth/register")
     Call<ApiEnvelope> register(@Body RegisterRequest body);
 

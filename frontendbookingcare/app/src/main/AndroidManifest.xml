@@ -33,10 +33,40 @@
             android:name=".ui.doctor_directory.DoctorListActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.doctor_directory.DoctorDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.home.SpecialtyListActivity"
             android:exported="false" />
         <activity
             android:name=".ui.doctor_panel.DoctorMainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Frontendbookingcare.Doctor"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.booking.BookingStep1Activity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.booking.CompleteProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.booking.BookingStep2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.booking.BookingResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.legal.LegalDocumentActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.appointments.AppointmentTicketActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.support.chat.CustomerCareChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

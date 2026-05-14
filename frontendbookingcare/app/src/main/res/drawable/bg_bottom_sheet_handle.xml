@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Thanh kéo (drag handle) hiển thị ở đỉnh bottom sheet — báo cho user
+    biết có thể vuốt để thu/phóng.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#D1D5DB" />
+    <corners android:radius="3dp" />
+    <size
+        android:width="40dp"
+        android:height="5dp" />
+</shape>

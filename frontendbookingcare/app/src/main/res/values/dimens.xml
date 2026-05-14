@@ -45,6 +45,22 @@
     <dimen name="home_doctor_avatar_size">76dp</dimen>
     <dimen name="home_doctor_avatar_text_size">26sp</dimen>
 
+    <!-- ===== BOTTOM NAVIGATION =====
+         Muốn đổi to/nhỏ chỉ cần sửa 3 dim dưới đây, áp dụng cho cả Home
+         (activity_main.xml) và Doctor panel (activity_doctor_main.xml). -->
+    <dimen name="bottom_nav_icon_size">28dp</dimen>
+    <dimen name="bottom_nav_label_size">14sp</dimen>
+    <dimen name="bottom_nav_label_size_active">14sp</dimen>
+    <dimen name="bottom_nav_min_height">75dp</dimen>
+
+    <!-- ===== DOCTOR LIST CARD (màn danh bạ bác sĩ) ===== -->
+    <!-- Avatar trong card danh sách bác sĩ to hơn home để nhìn rõ, giống tham chiếu YouMed. -->
+    <dimen name="doctor_list_avatar_size">88dp</dimen>
+    <dimen name="doctor_list_avatar_text_size">32sp</dimen>
+    <dimen name="doctor_list_card_padding">20dp</dimen>
+    <dimen name="doctor_list_card_gap">12dp</dimen>
+    <dimen name="doctor_list_book_btn_padding">14dp</dimen>
+
     <!-- ===== HOME BANNER ===== -->
     <dimen name="banner_height">190dp</dimen>
     <dimen name="banner_dot_height">8dp</dimen>
@@ -53,5 +69,12 @@
     <dimen name="home_header_avatar_size">40dp</dimen>
     <dimen name="home_header_avatar_text_size">18sp</dimen>
     <dimen name="home_search_radius">28dp</dimen>
+
+    <!-- ===== HEADER TOOLBAR (YouMed-like) ===== -->
+    <!-- Chỉnh 1 chỗ để áp cho mọi màn toolbar xanh (Tin nhắn/Lịch khám/Tư vấn/...) -->
+    <dimen name="header_toolbar_height">60dp</dimen>
+    <dimen name="header_toolbar_padding_horizontal">8dp</dimen>
+    <!-- Tách khoảng dưới title so với mép dưới -->
+    <dimen name="header_toolbar_padding_bottom">6dp</dimen>
 
 </resources>

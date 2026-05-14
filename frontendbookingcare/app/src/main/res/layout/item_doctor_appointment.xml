@@ -14,26 +14,22 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="@dimen/space_md">
+        android:paddingTop="@dimen/space_sm">
 
-        <FrameLayout
-            android:id="@+id/appt_dot"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_doctor_status_wait">
-
-            <TextView
-                android:id="@+id/appt_dot_icon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="🕐"
-                android:textSize="@dimen/text_body_lg" />
-        </FrameLayout>
+        <TextView
+            android:id="@+id/appt_initial"
+            style="@style/Text.Doctor.AvatarLetter"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textSize="@dimen/text_body_lg" />
 
         <View
+            android:id="@+id/appt_timeline_line"
             android:layout_width="2dp"
             android:layout_height="0dp"
+            android:layout_marginTop="@dimen/space_xs"
             android:layout_weight="1"
             android:background="@color/doctor_divider" />
     </LinearLayout>
@@ -43,11 +39,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_md"
-        android:layout_marginTop="@dimen/space_sm"
-        android:layout_marginBottom="@dimen/space_sm"
+        android:layout_marginTop="@dimen/space_xs"
+        android:layout_marginBottom="@dimen/space_xs"
         android:layout_weight="1"
-        app:cardCornerRadius="@dimen/radius_md"
-        app:cardElevation="1dp">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:strokeColor="@color/doctor_stat_card_stroke"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,7 +63,8 @@
                     android:id="@+id/appt_time"
                     style="@style/Text.Doctor.NameLarge"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/doctor_brand_primary" />
 
                 <TextView
                     android:id="@+id/appt_status"
@@ -73,10 +72,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_md"
+                    android:letterSpacing="0.02"
                     android:paddingStart="@dimen/space_md"
                     android:paddingTop="@dimen/space_xs"
                     android:paddingEnd="@dimen/space_md"
                     android:paddingBottom="@dimen/space_xs"
+                    android:textAllCaps="true"
+                    android:textSize="@dimen/text_small"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -85,16 +87,15 @@
                 style="@style/Text.Doctor.NameLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_md"
-                android:drawablePadding="@dimen/space_sm"
-                android:drawableStart="@android:drawable/ic_menu_myplaces" />
+                android:layout_marginTop="@dimen/space_md" />
 
             <TextView
                 android:id="@+id/appt_symptom"
                 style="@style/Text.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_sm" />
+                android:layout_marginTop="@dimen/space_sm"
+                android:lineSpacingMultiplier="1.15" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

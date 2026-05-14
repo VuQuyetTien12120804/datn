@@ -1,78 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/doctor_appt_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/home_page_bg"
-    android:orientation="vertical">
+    android:background="@color/doctor_surface_bg">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/doctor_appt_header"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/space_md"
-        app:cardCornerRadius="@dimen/radius_md"
-        app:cardElevation="1dp">
+        android:layout_height="match_parent"
+        android:background="@color/doctor_surface_bg"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/doctor_appt_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="@dimen/space_lg">
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginEnd="@dimen/space_md"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:strokeColor="@color/doctor_stat_card_stroke"
+            app:strokeWidth="1dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_doctor_header_top_accent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/space_lg">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Text.Body.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.02"
+                            android:text="@string/doctor_today"
+                            android:textAllCaps="true"
+                            android:textSize="@dimen/text_small" />
+
+                        <TextView
+                            android:id="@+id/doctor_appt_date"
+                            style="@style/Text.Doctor.NameLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xxs"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_title" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/doctor_appt_shift"
+                        style="@style/Text.Chip.Specialty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_doctor_chip_soft"
+                        android:paddingStart="@dimen/space_md"
+                        android:paddingTop="@dimen/space_sm"
+                        android:paddingEnd="@dimen/space_md"
+                        android:paddingBottom="@dimen/space_sm"
+                        android:text="@string/doctor_work_shift_morning"
+                        android:textColor="@color/doctor_work_shift_fg"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/doctor_appt_count"
+            style="@style/Text.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_lg"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginEnd="@dimen/space_lg" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/doctor_appt_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/space_sm"
+                android:paddingTop="@dimen/space_sm"
+                android:paddingEnd="@dimen/space_sm"
+                android:paddingBottom="@dimen/space_xl"
+                tools:listitem="@layout/item_doctor_appointment" />
+
+            <LinearLayout
+                android:id="@+id/doctor_appt_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/space_xl"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Text.Body.Secondary"
-                    android:text="@string/doctor_today" />
+                    android:text="📅"
+                    android:textSize="56sp" />
 
                 <TextView
-                    android:id="@+id/doctor_appt_date"
                     style="@style/Text.Doctor.NameLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_xxs" />
+                    android:layout_marginTop="@dimen/space_md"
+                    android:gravity="center"
+                    android:text="@string/doctor_empty_schedule_title"
+                    android:textAlignment="center" />
+
+                <TextView
+                    style="@style/Text.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_sm"
+                    android:gravity="center"
+                    android:text="@string/doctor_empty_schedule_hint"
+                    android:textAlignment="center" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/doctor_appt_shift"
-                style="@style/Text.Chip.Specialty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_doctor_chip_soft"
-                android:paddingStart="@dimen/space_md"
-                android:paddingTop="@dimen/space_sm"
-                android:paddingEnd="@dimen/space_md"
-                android:paddingBottom="@dimen/space_sm"
-                android:text="@string/doctor_work_shift_morning"
-                android:textColor="@color/doctor_work_shift_fg" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:id="@+id/doctor_appt_count"
-        style="@style/Text.Body.Secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_lg"
-        android:layout_marginTop="@dimen/space_xs"
-        android:layout_marginEnd="@dimen/space_lg" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/doctor_appt_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/space_sm"
-        android:paddingTop="@dimen/space_sm"
-        android:paddingEnd="@dimen/space_sm"
-        android:paddingBottom="@dimen/space_lg" />
-</LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

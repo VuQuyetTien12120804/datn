@@ -4,96 +4,121 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/divider_line"
+    app:cardBackgroundColor="@color/white">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/appt_status_row"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/appt_stt">
 
-            <ImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@color/surface_muted"
-                android:contentDescription="@null"
-                android:src="@android:drawable/ic_menu_gallery" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/appt_doctor_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BS. Nguyễn Thị Lan"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/appt_specialty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nội khoa"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_appt_status_dot" />
 
             <TextView
-                android:id="@+id/appt_status"
+                android:id="@+id/appt_status_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/teal_primary"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:text="@string/tab_upcoming"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_caption" />
+                android:layout_marginStart="8dp"
+                android:text="@string/appt_status_booked"
+                android:textColor="@color/doctor_status_done_fg"
+                style="@style/Text.Caption" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/appt_date"
-            android:layout_width="match_parent"
+            android:id="@+id/appt_stt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="📅 Thứ Năm, 05/02/2026" />
+            android:text="STT 23"
+            style="@style/Text.Caption.Muted"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/appt_doctor_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Nguyễn Thị Bích Đào"
+            style="@style/Text.Section.Title"
+            app:layout_constraintTop_toBottomOf="@id/appt_status_row"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/appt_doctor_avatar" />
+
+        <ImageView
+            android:id="@+id/appt_doctor_avatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:contentDescription="@null"
+            android:background="@color/doctor_stat_blue_bg"
+            app:layout_constraintTop_toBottomOf="@id/appt_status_row"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/appt_time"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="🕘 09:00" />
+            android:layout_marginTop="10dp"
+            android:text="17:30-19:00 - 23/04/2026"
+            style="@style/Text.Body.Secondary"
+            app:layout_constraintTop_toBottomOf="@id/appt_doctor_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/appt_patient"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="6dp"
+            android:text="Bệnh nhân: Tien"
+            style="@style/Text.Caption"
+            app:layout_constraintTop_toBottomOf="@id/appt_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/appt_detail"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/view_detail" />
+        <TextView
+            android:id="@+id/appt_specialty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text=""
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/appt_cancel"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cancel_booking"
-                android:textColor="@android:color/holo_red_dark" />
-        </LinearLayout>
-    </LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/appt_detail"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/view_detail"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/appt_cancel"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel_booking"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/appt_detail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

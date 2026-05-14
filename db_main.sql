@@ -1,7 +1,34 @@
-﻿IF DB_ID(N'clinic_db') IS NULL
-  CREATE DATABASE clinic_db;
+/*
+  BookingCare Clinic DB - MAIN SCHEMA (SQL Server)
+  Run this file first.
+
+  What it does:
+  - Drops and recreates database `clinic_db`
+  - Creates all tables, constraints, procedures, and indexes
+
+  Tested with SQL Server 2019+.
+*/
+
+SET NOCOUNT ON;
 GO
+
+IF DB_ID(N'clinic_db') IS NOT NULL
+BEGIN
+  ALTER DATABASE clinic_db SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+  DROP DATABASE clinic_db;
+END
+GO
+
+CREATE DATABASE clinic_db;
+GO
+
 USE clinic_db;
+GO
+
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+SET ANSI_WARNINGS ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
 GO
 
 /*
@@ -21,6 +48,18 @@ CREATE TABLE dbo.clinics (
   timezone nvarchar(64) NOT NULL CONSTRAINT DF_clinics_timezone DEFAULT N'Asia/Ho_Chi_Minh',
   created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_clinics_created_at DEFAULT SYSDATETIMEOFFSET(),
   updated_at datetimeoffset(0) NOT NULL CONSTRAINT DF_clinics_updated_at DEFAULT SYSDATETIMEOFFSET()
+);
+GO
+
+/* ===== App legal documents (terms/policies) ===== */
+CREATE TABLE dbo.app_legal_documents (
+  id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_app_legal_documents PRIMARY KEY,
+  code nvarchar(32) NOT NULL CONSTRAINT UQ_app_legal_documents_code UNIQUE,
+  title nvarchar(255) NOT NULL,
+  body_html nvarchar(max) NOT NULL,
+  version int NOT NULL CONSTRAINT DF_app_legal_documents_version DEFAULT 1,
+  created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_app_legal_documents_created_at DEFAULT SYSDATETIMEOFFSET(),
+  updated_at datetimeoffset(0) NOT NULL CONSTRAINT DF_app_legal_documents_updated_at DEFAULT SYSDATETIMEOFFSET()
 );
 GO
 
@@ -77,6 +116,12 @@ CREATE TABLE dbo.doctors (
   license_no nvarchar(100) NULL,
   bio nvarchar(max) NULL,
   avatar_url nvarchar(500) NULL,
+  rating decimal(2,1) NOT NULL CONSTRAINT DF_doctors_rating DEFAULT (4.8),
+  visits_count int NOT NULL CONSTRAINT DF_doctors_visits_count DEFAULT (0),
+  room_location nvarchar(255) NULL,
+  schedule_text nvarchar(255) NULL,
+  education_json nvarchar(max) NULL,
+  certificates_json nvarchar(max) NULL,
   created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_doctors_created_at DEFAULT SYSDATETIMEOFFSET(),
   updated_at datetimeoffset(0) NOT NULL CONSTRAINT DF_doctors_updated_at DEFAULT SYSDATETIMEOFFSET(),
   CONSTRAINT CK_doctors_gender CHECK (gender IN (N'unknown', N'male', N'female', N'other')),
@@ -142,21 +187,25 @@ CREATE TABLE dbo.rooms (
 GO
 
 /* ===== 5) scheduling ===== */
-CREATE TABLE dbo.doctor_working_hours (
-  id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_doctor_working_hours PRIMARY KEY,
+/*
+  Weekly schedule source-of-truth for slot generation.
+  day_of_week uses "Thứ" numbering: 2=Monday, 3=Tuesday, ..., 7=Saturday, 8=Sunday.
+*/
+CREATE TABLE dbo.doctor_weekly_schedules (
+  id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_doctor_weekly_schedules PRIMARY KEY,
   doctor_id int NOT NULL,
   room_id int NULL,
   day_of_week tinyint NOT NULL,
   start_time time(0) NOT NULL,
   end_time time(0) NOT NULL,
-  slot_minutes int NOT NULL CONSTRAINT DF_dwh_slot_minutes DEFAULT 15,
-  is_active bit NOT NULL CONSTRAINT DF_dwh_is_active DEFAULT 1,
-  created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_dwh_created_at DEFAULT SYSDATETIMEOFFSET(),
-  CONSTRAINT CK_dwh_day CHECK (day_of_week BETWEEN 0 AND 6),
-  CONSTRAINT CK_dwh_slot_minutes CHECK (slot_minutes BETWEEN 5 AND 240),
-  CONSTRAINT CK_dwh_time_range CHECK (start_time < end_time),
-  CONSTRAINT FK_dwh_doctor FOREIGN KEY (doctor_id) REFERENCES dbo.doctors(id) ON DELETE CASCADE,
-  CONSTRAINT FK_dwh_room FOREIGN KEY (room_id) REFERENCES dbo.rooms(id) ON DELETE SET NULL
+  slot_minutes int NOT NULL CONSTRAINT DF_dws_slot_minutes DEFAULT 30,
+  is_active bit NOT NULL CONSTRAINT DF_dws_is_active DEFAULT 1,
+  created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_dws_created_at DEFAULT SYSDATETIMEOFFSET(),
+  CONSTRAINT CK_dws_day CHECK (day_of_week BETWEEN 2 AND 8),
+  CONSTRAINT CK_dws_slot_minutes CHECK (slot_minutes BETWEEN 5 AND 240),
+  CONSTRAINT CK_dws_time_range CHECK (start_time < end_time),
+  CONSTRAINT FK_dws_doctor FOREIGN KEY (doctor_id) REFERENCES dbo.doctors(id) ON DELETE CASCADE,
+  CONSTRAINT FK_dws_room FOREIGN KEY (room_id) REFERENCES dbo.rooms(id) ON DELETE SET NULL
 );
 GO
 
@@ -222,7 +271,6 @@ CREATE TABLE dbo.appointments (
   CONSTRAINT FK_appt_created_by_account FOREIGN KEY (created_by_account_id) REFERENCES dbo.accounts(id) ON DELETE SET NULL
 );
 GO
-
 
 /* ===== 7) invoices / payments ===== */
 CREATE TABLE dbo.invoices (
@@ -333,34 +381,28 @@ CREATE TABLE dbo.chatbot_feedback (
 GO
 
 /* ===== EmailVerificationOtp (OTP email; account_id NULL = trước khi đăng ký) ===== */
-
 CREATE TABLE dbo.email_verification_otp (
   id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_email_verification_otp PRIMARY KEY,
   account_id int NULL,
   email nvarchar(255) NOT NULL,
   purpose nvarchar(32) NOT NULL CONSTRAINT DF_EVO_purpose DEFAULT N'REGISTER',
-
-  otp_hash nvarchar(255) NOT NULL,            -- lưu HASH OTP, không lưu OTP plain
+  otp_hash nvarchar(255) NOT NULL,
   expires_at datetimeoffset(0) NOT NULL,
   consumed_at datetimeoffset(0) NULL,
-
   created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_EVO_created_at DEFAULT SYSDATETIMEOFFSET(),
-
   CONSTRAINT FK_EVO_account FOREIGN KEY (account_id) REFERENCES dbo.accounts(id) ON DELETE CASCADE,
   CONSTRAINT CK_EVO_expires CHECK (expires_at > created_at)
 );
 GO
+
 /* ===== RefreshToken ===== */
 CREATE TABLE dbo.refresh_tokens (
   id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_refresh_tokens PRIMARY KEY,
   account_id int NOT NULL,
-
-  token_hash nvarchar(255) NOT NULL,          -- lưu HASH refresh token
+  token_hash nvarchar(255) NOT NULL,
   expires_at datetimeoffset(0) NOT NULL,
   revoked_at datetimeoffset(0) NULL,
-
   created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_RT_created_at DEFAULT SYSDATETIMEOFFSET(),
-
   CONSTRAINT FK_RT_account FOREIGN KEY (account_id) REFERENCES dbo.accounts(id) ON DELETE CASCADE,
   CONSTRAINT CK_RT_expires CHECK (expires_at > created_at)
 );
@@ -398,14 +440,11 @@ BEGIN
   IF (@starts_at >= @ends_at)
     THROW 50001, 'Invalid time range', 1;
 
-  -- Serializable để tránh race condition khi 2 người đặt cùng lúc
   SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
   BEGIN TRANSACTION;
 
-  -- Nếu dùng slot_id (capacity=1) thì khóa slot để tránh double booking
   IF (@slot_id IS NOT NULL)
   BEGIN
-    -- lock row slot
     SELECT 1
     FROM dbo.appointment_slots WITH (UPDLOCK, HOLDLOCK)
     WHERE id = @slot_id AND doctor_id = @doctor_id AND starts_at = @starts_at AND ends_at = @ends_at;
@@ -416,7 +455,6 @@ BEGIN
       THROW 50002, 'Slot not found or mismatch', 1;
     END
 
-    -- slot_id unique ở appointments => chỉ cần check tồn tại
     IF EXISTS (SELECT 1 FROM dbo.appointments WITH (UPDLOCK, HOLDLOCK) WHERE slot_id = @slot_id AND status IN (N'pending',N'confirmed',N'checked_in'))
     BEGIN
       ROLLBACK TRANSACTION;
@@ -424,7 +462,6 @@ BEGIN
     END
   END
 
-  -- Chặn trùng giờ theo doctor (các trạng thái còn hiệu lực)
   IF EXISTS (
     SELECT 1
     FROM dbo.appointments WITH (UPDLOCK, HOLDLOCK)
@@ -454,38 +491,37 @@ END
 GO
 
 /* ===== Indexes (all indexes at the end) ===== */
-SET QUOTED_IDENTIFIER ON;
-SET ANSI_NULLS ON;
-SET ANSI_PADDING ON;
-SET ANSI_WARNINGS ON;
-SET CONCAT_NULL_YIELDS_NULL ON;
-SET ARITHABORT ON;
-GO
-
 /* roles */
 CREATE INDEX IX_roles_active_not_deleted ON dbo.roles(is_deleted, is_active) INCLUDE (code);
 GO
 
 /* accounts */
 CREATE UNIQUE INDEX UX_accounts_email ON dbo.accounts(email) WHERE email IS NOT NULL;
+GO
 CREATE UNIQUE INDEX UX_accounts_phone ON dbo.accounts(phone) WHERE phone IS NOT NULL;
+GO
 CREATE INDEX IX_accounts_role_id ON dbo.accounts(role_id);
 GO
 
 /* specialties */
 CREATE UNIQUE INDEX UX_specialties_name ON dbo.specialties(name);
+GO
 CREATE UNIQUE INDEX UX_specialties_code ON dbo.specialties(code) WHERE code IS NOT NULL;
 GO
 
 /* doctors */
 CREATE UNIQUE INDEX UX_doctors_account_id ON dbo.doctors(account_id) WHERE account_id IS NOT NULL;
+GO
 CREATE UNIQUE INDEX UX_doctors_email ON dbo.doctors(email) WHERE email IS NOT NULL;
+GO
 CREATE UNIQUE INDEX UX_doctors_phone ON dbo.doctors(phone) WHERE phone IS NOT NULL;
 GO
 
 /* patients */
 CREATE UNIQUE INDEX UX_patients_account_id ON dbo.patients(account_id) WHERE account_id IS NOT NULL;
+GO
 CREATE UNIQUE INDEX UX_patients_email ON dbo.patients(email) WHERE email IS NOT NULL;
+GO
 CREATE UNIQUE INDEX UX_patients_phone ON dbo.patients(phone) WHERE phone IS NOT NULL;
 GO
 
@@ -495,18 +531,22 @@ GO
 
 /* services */
 CREATE UNIQUE INDEX UX_services_name ON dbo.services(name);
+GO
 CREATE UNIQUE INDEX UX_services_code ON dbo.services(code) WHERE code IS NOT NULL;
+GO
 CREATE INDEX IX_services_specialty ON dbo.services(specialty_id);
 GO
 
 /* rooms */
 CREATE UNIQUE INDEX UX_rooms_name ON dbo.rooms(name);
+GO
 CREATE UNIQUE INDEX UX_rooms_code ON dbo.rooms(code) WHERE code IS NOT NULL;
 GO
 
-/* doctor_working_hours */
-CREATE UNIQUE INDEX UX_dwh_unique ON dbo.doctor_working_hours(doctor_id, day_of_week, start_time, end_time);
-CREATE INDEX IX_dwh_room_id ON dbo.doctor_working_hours(room_id) WHERE room_id IS NOT NULL;
+/* doctor_weekly_schedules */
+CREATE UNIQUE INDEX UX_dws_unique ON dbo.doctor_weekly_schedules(doctor_id, day_of_week, start_time, end_time);
+GO
+CREATE INDEX IX_dws_room_id ON dbo.doctor_weekly_schedules(room_id) WHERE room_id IS NOT NULL;
 GO
 
 /* doctor_time_off */
@@ -515,38 +555,51 @@ GO
 
 /* appointment_slots */
 CREATE UNIQUE INDEX UX_slots_doctor_time ON dbo.appointment_slots(doctor_id, starts_at, ends_at);
+GO
 CREATE INDEX IX_slots_doctor_starts ON dbo.appointment_slots(doctor_id, starts_at);
+GO
 CREATE INDEX IX_slots_room_starts ON dbo.appointment_slots(room_id, starts_at) WHERE room_id IS NOT NULL;
 GO
 
 /* appointments */
 CREATE UNIQUE INDEX UX_appointments_slot_id ON dbo.appointments(slot_id) WHERE slot_id IS NOT NULL;
+GO
 CREATE INDEX IX_appointments_patient_time ON dbo.appointments(patient_id, starts_at DESC);
+GO
 CREATE INDEX IX_appointments_doctor_time ON dbo.appointments(doctor_id, starts_at DESC);
+GO
 CREATE INDEX IX_appointments_status ON dbo.appointments(status);
+GO
 CREATE INDEX IX_appointments_doctor_status_time ON dbo.appointments(doctor_id, status, starts_at);
+GO
 CREATE INDEX IX_appointments_room_time ON dbo.appointments(room_id, starts_at DESC) WHERE room_id IS NOT NULL;
+GO
 CREATE INDEX IX_appointments_service_time ON dbo.appointments(service_id, starts_at DESC) WHERE service_id IS NOT NULL;
 GO
 
 /* invoices */
 CREATE UNIQUE INDEX UX_invoices_appointment_id ON dbo.invoices(appointment_id) WHERE appointment_id IS NOT NULL;
+GO
 CREATE INDEX IX_invoices_created_at ON dbo.invoices(created_at DESC);
 GO
 
 /* invoice_items */
 CREATE INDEX IX_invoice_items_invoice ON dbo.invoice_items(invoice_id);
+GO
 CREATE INDEX IX_invoice_items_service ON dbo.invoice_items(service_id) WHERE service_id IS NOT NULL;
 GO
 
 /* payments */
 CREATE UNIQUE INDEX UX_payments_provider_txn ON dbo.payments(provider, provider_txn_id) WHERE provider_txn_id IS NOT NULL;
+GO
 CREATE INDEX IX_payments_invoice_id ON dbo.payments(invoice_id);
+GO
 CREATE INDEX IX_payments_status_paid_at ON dbo.payments(status, paid_at DESC) INCLUDE (provider, amount_cents);
 GO
 
 /* chatbot */
 CREATE INDEX IX_chatbot_sessions_account ON dbo.chatbot_sessions(account_id, created_at DESC);
+GO
 CREATE INDEX IX_chatbot_sessions_patient ON dbo.chatbot_sessions(patient_id, created_at DESC) WHERE patient_id IS NOT NULL;
 GO
 CREATE INDEX IX_chatbot_messages_session ON dbo.chatbot_messages(session_id, created_at);
@@ -568,10 +621,13 @@ GO
 
 /* refresh_tokens */
 CREATE UNIQUE INDEX UX_RT_token_hash ON dbo.refresh_tokens(token_hash);
+GO
 CREATE INDEX IX_RT_account_valid ON dbo.refresh_tokens(account_id, expires_at) INCLUDE (revoked_at, created_at);
 GO
 
 /* access_token_blacklist */
 CREATE UNIQUE INDEX UX_atb_jti ON dbo.access_token_blacklist(jti);
+GO
 CREATE INDEX IX_atb_expires_at ON dbo.access_token_blacklist(expires_at);
 GO
+

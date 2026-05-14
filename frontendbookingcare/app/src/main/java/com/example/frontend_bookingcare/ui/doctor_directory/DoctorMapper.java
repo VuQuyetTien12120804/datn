@@ -25,8 +25,11 @@ public final class DoctorMapper {
             String key = d.doctorId != null ? ("id:" + d.doctorId) : ("name:" + (d.fullName == null ? "" : d.fullName));
             Accumulator acc = grouped.get(key);
             if (acc == null) {
-                acc = new Accumulator(d.fullName);
+                acc = new Accumulator(d.doctorId, d.fullName, d.bio);
                 grouped.put(key, acc);
+            } else if ((acc.bio == null || acc.bio.isEmpty()) && d.bio != null && !d.bio.isEmpty()) {
+                // bio có thể xuất hiện ở row bất kỳ do LEFT JOIN — giữ bio đầu tiên khác rỗng
+                acc.bio = d.bio;
             }
             if (d.specialty != null && !d.specialty.trim().isEmpty() && !acc.specialties.contains(d.specialty.trim())) {
                 acc.specialties.add(d.specialty.trim());
@@ -43,7 +46,9 @@ public final class DoctorMapper {
                     null,
                     acc.specialties,
                     null,
-                    DoctorDetail.avatarBgForIndex(i)
+                    DoctorDetail.avatarBgForIndex(i),
+                    acc.doctorId,
+                    acc.bio
             ));
             i++;
         }
@@ -51,11 +56,15 @@ public final class DoctorMapper {
     }
 
     private static final class Accumulator {
+        final Integer doctorId;
         final String fullName;
+        String bio;
         final List<String> specialties = new ArrayList<>();
 
-        Accumulator(String fullName) {
+        Accumulator(Integer doctorId, String fullName, String bio) {
+            this.doctorId = doctorId;
             this.fullName = fullName;
+            this.bio = bio;
         }
     }
 }

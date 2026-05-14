@@ -47,6 +47,13 @@
     <color name="chip_specialty_bg">#E5F1FF</color>
 
     <!-- ===== DOCTOR PANEL ===== -->
+    <!-- Doctor brand (different from patient role) -->
+    <color name="doctor_brand_primary">#6D28D9</color>
+    <color name="doctor_brand_primary_dark">#5B21B6</color>
+    <color name="doctor_brand_on_primary">#FFFFFFFF</color>
+    <color name="doctor_surface_bg">#F6F7FF</color>
+    <color name="doctor_nav_bg">#FFFFFFFF</color>
+
     <color name="doctor_status_done_bg">#DCFCE7</color>
     <color name="doctor_status_done_fg">#16A34A</color>
     <color name="doctor_status_progress_bg">#DBEAFE</color>
@@ -58,6 +65,7 @@
     <color name="doctor_stat_green_bg">#F0FDF4</color>
     <color name="doctor_stat_orange_bg">#FFF7ED</color>
     <color name="doctor_stat_amber_bg">#FEFCE8</color>
+    <color name="doctor_stat_card_stroke">#E9D5FF</color>
     <color name="doctor_divider">#E5E7EB</color>
     <color name="doctor_accept_green">#16A34A</color>
     <color name="doctor_reject_red">#DC2626</color>
@@ -66,6 +74,12 @@
     <color name="doctor_current_card_stroke">#2563EB</color>
     <color name="doctor_work_shift_bg">#DCFCE7</color>
     <color name="doctor_work_shift_fg">#16A34A</color>
+    <color name="doctor_request_section_need_bg">#F5F3FF</color>
+    <color name="doctor_request_section_overdue_bg">#FEF2F2</color>
+    <color name="doctor_request_section_stroke_need">#DDD6FE</color>
+    <color name="doctor_request_section_stroke_overdue">#FECACA</color>
+    <color name="doctor_request_card_overdue_bg">#FFFBFB</color>
+    <color name="doctor_request_card_overdue_stroke">#F87171</color>
 
     <!-- Account hub (Medpro-inspired) -->
     <color name="account_header_blue">#0B84FF</color>
@@ -83,6 +97,11 @@
     <color name="icon_bg_green">#E8F5E9</color>
     <color name="icon_bg_magenta">#F3E5F5</color>
     <color name="icon_bg_grey">#EEEEEE</color>
+    <color name="icon_bg_terms_mint">#DFF5F0</color>
+    <color name="icon_bg_terms_lilac">#EDE7FF</color>
+    <color name="icon_bg_terms_peach">#FFE5DA</color>
+    <color name="account_terms_icon_blue">#0B84FF</color>
+    <color name="account_terms_icon_amber">#E8A317</color>
 
     <!-- Auth (YouMed-inspired) -->
     <color name="auth_bg">#FFFFFFFF</color>

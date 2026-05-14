@@ -17,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/\"")
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8085/\"")
     }
 
     buildTypes {
@@ -46,10 +46,12 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.recyclerview)
     implementation(libs.coordinatorlayout)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation("com.google.zxing:core:3.5.3")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

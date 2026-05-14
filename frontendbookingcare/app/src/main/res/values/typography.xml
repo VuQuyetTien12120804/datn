@@ -120,7 +120,7 @@
 
     <!-- ===== DOCTOR (row + card list) ===== -->
     <style name="Text.Doctor.AvatarLetter" parent="Text.Base">
-        <item name="android:textColor">@color/text_on_brand</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">@dimen/home_doctor_avatar_text_size</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
@@ -162,6 +162,21 @@
         <item name="android:textColor">@color/text_on_brand</item>
         <item name="android:textSize">@dimen/text_body</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ===== BOTTOM NAVIGATION =====
+         Mặc định Material dùng textSize ~12sp (active) / ~11sp (inactive) —
+         nhỏ so với màn hình điện thoại hiện đại. Bump lên 13sp inactive /
+         14sp active + bold cho label đang chọn để dễ đọc hơn. -->
+    <style name="Text.BottomNav.Inactive" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">@dimen/bottom_nav_label_size</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Text.BottomNav.Active" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">@dimen/bottom_nav_label_size_active</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
 </resources>

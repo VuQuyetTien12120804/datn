@@ -18,6 +18,7 @@ import com.example.frontend_bookingcare.api.RegisterRequest;
 import com.example.frontend_bookingcare.api.RequestEmailOtpRequest;
 import com.example.frontend_bookingcare.api.RetrofitClient;
 import com.example.frontend_bookingcare.api.VerifyEmailOtpRequest;
+import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.google.gson.Gson;
@@ -104,6 +105,14 @@ public class AuthRepository {
                     AuthResponse dto = parseAuthData(body.data);
                     AuthSession session = toSession(dto);
                     sessionManager.saveSession(session);
+                    // Auto-nạp ProfileExtras từ DB để logout/login không cần nhập lại.
+                    try {
+                        ProfileExtras ex = new PatientProfileRepository().meSync("Bearer " + session.accessToken);
+                        if (ex != null) {
+                            sessionManager.saveProfileExtras(ex);
+                        }
+                    } catch (Exception ignored) {
+                    }
                     postMain(() -> cb.onDone(session, null));
                 } else {
                     String msg = body != null && !body.success ? body.message : readHttpError(response);
@@ -209,6 +218,13 @@ public class AuthRepository {
                     AuthResponse dto = parseAuthData(body.data);
                     AuthSession session = toSession(dto);
                     sessionManager.saveSession(session);
+                    try {
+                        ProfileExtras ex = new PatientProfileRepository().meSync("Bearer " + session.accessToken);
+                        if (ex != null) {
+                            sessionManager.saveProfileExtras(ex);
+                        }
+                    } catch (Exception ignored) {
+                    }
                     postMain(() -> cb.onDone(session, null));
                 } else {
                     String msg = body != null && !body.success ? body.message : readHttpError(response);
@@ -241,6 +257,13 @@ public class AuthRepository {
                     AuthResponse dto = parseAuthData(body.data);
                     AuthSession session = toSession(dto);
                     sessionManager.saveSession(session);
+                    try {
+                        ProfileExtras ex = new PatientProfileRepository().meSync("Bearer " + session.accessToken);
+                        if (ex != null) {
+                            sessionManager.saveProfileExtras(ex);
+                        }
+                    } catch (Exception ignored) {
+                    }
                     postMain(() -> cb.onDone(session, null));
                 } else {
                     String msg = body != null && !body.success ? body.message : readHttpError(r);

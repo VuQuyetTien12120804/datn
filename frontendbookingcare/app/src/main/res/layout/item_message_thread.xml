@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="12dp">
+
+    <FrameLayout
+        android:id="@+id/thread_avatar_bg"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_detail_chat_pill"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/thread_avatar_letter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="B"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/thread_unread_badge"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="@color/white"
+        android:textSize="11sp"
+        android:background="@drawable/bg_unread_badge"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/thread_avatar_bg"
+        app:layout_constraintEnd_toEndOf="@id/thread_avatar_bg" />
+
+    <LinearLayout
+        android:id="@+id/thread_texts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+        app:layout_constraintStart_toEndOf="@id/thread_avatar_bg"
+        app:layout_constraintEnd_toStartOf="@id/thread_time"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        <TextView
+            android:id="@+id/thread_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bác sĩ ..."
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/thread_sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Tien"
+            android:textColor="@color/text_secondary_dim"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/thread_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="Bạn có lịch hẹn khám..."
+            android:textColor="@color/text_secondary_dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/thread_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5 ngày"
+        android:textColor="@color/text_muted"
+        android:textSize="11sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/thread_lock"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_lock_small"
+        android:visibility="gone"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toBottomOf="@id/thread_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="6dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.account.AccountFlowListener;
 import com.example.frontend_bookingcare.data.AuthRepository;
+import com.example.frontend_bookingcare.data.PatientProfileRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.SessionManager;
@@ -35,6 +36,8 @@ public class ProfileFragment extends Fragment {
         MaterialToolbar toolbar = view.findViewById(R.id.profile_toolbar);
         AccountUiHelper.bindToolbarBack(this, toolbar);
         bindProfile(view);
+        // Sync ngay khi mở màn (đừng chờ onResume), để chắc chắn lấy data từ DB.
+        syncProfileFromServer(view);
         AccountFragment parent = (AccountFragment) getParentFragment();
         if (parent == null) return;
         AccountFlowListener flow = parent;
@@ -62,7 +65,10 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         View v = getView();
-        if (v != null) bindProfile(v);
+        if (v != null) {
+            bindProfile(v);
+            syncProfileFromServer(v);
+        }
     }
 
     private void bindProfile(View view) {
@@ -93,6 +99,34 @@ public class ProfileFragment extends Fragment {
                 getString(R.string.demo_health_2_date),
                 getString(R.string.demo_health_2_doctor),
                 getString(R.string.demo_health_2_note));
+    }
+
+    /**
+     * ProfileFragment trước đây chỉ đọc ProfileExtras local nên nếu app bị clear data /
+     * logout-login / đổi máy thì UI vẫn là "—" dù DB đã có.
+     * Giờ sẽ sync từ API /api/v1/patient/profile khi đang đăng nhập.
+     */
+    private void syncProfileFromServer(View view) {
+        AccountFragment parent = (AccountFragment) getParentFragment();
+        if (parent == null) return;
+        SessionManager sm = parent.getSessionManager();
+        AuthSession s = sm.getSession();
+        if (s == null || s.accessToken == null || s.accessToken.isEmpty()) return;
+
+        String bearer = "Bearer " + s.accessToken;
+        new PatientProfileRepository().fetchMe(bearer, (extras, err) -> {
+            if (!isAdded()) return;
+            requireActivity().runOnUiThread(() -> {
+                if (extras == null) {
+                    if (err != null && !err.isEmpty()) {
+                        Toast.makeText(requireContext(), "Không tải được hồ sơ: " + err, Toast.LENGTH_SHORT).show();
+                    }
+                    return;
+                }
+                sm.saveProfileExtras(extras);
+                bindProfile(view);
+            });
+        });
     }
 
     private static void addHealthCard(LayoutInflater inf, LinearLayout parent, String title, String date, String doctor, String note) {

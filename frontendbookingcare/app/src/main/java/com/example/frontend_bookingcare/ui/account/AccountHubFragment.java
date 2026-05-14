@@ -24,6 +24,7 @@ import com.example.frontend_bookingcare.locale.LocaleStore;
 import com.example.frontend_bookingcare.data.AuthRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
+import com.example.frontend_bookingcare.ui.legal.LegalDocumentActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -149,9 +150,12 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
         }
 
         list.add(AccountListItem.section(getString(R.string.account_section_terms)));
-        list.add(AccountListItem.row(ROW_TERMS, getString(R.string.account_menu_terms_use), null, null, "🛡", R.color.icon_bg_teal));
-        list.add(AccountListItem.row(ROW_PRIVACY, getString(R.string.account_menu_privacy), null, null, "🔒", R.color.icon_bg_purple));
-        list.add(AccountListItem.row(ROW_SERVICE, getString(R.string.account_menu_service_terms), null, null, "✋", R.color.icon_bg_red));
+        list.add(AccountListItem.rowWithVectorIcon(ROW_TERMS, getString(R.string.account_menu_terms_use), null, null,
+                R.drawable.ic_account_policy_shield, R.color.icon_bg_terms_mint));
+        list.add(AccountListItem.rowWithVectorIcon(ROW_PRIVACY, getString(R.string.account_menu_privacy), null, null,
+                R.drawable.ic_account_policy_lock, R.color.icon_bg_terms_lilac));
+        list.add(AccountListItem.rowWithVectorIcon(ROW_SERVICE, getString(R.string.account_menu_service_terms), null, null,
+                R.drawable.ic_account_policy_hand, R.color.icon_bg_terms_peach));
 
         list.add(AccountListItem.section(getString(R.string.account_section_support)));
         list.add(AccountListItem.row(ROW_SUPPORT, getString(R.string.account_menu_support_title),
@@ -207,13 +211,13 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
                 }
                 break;
             case ROW_TERMS:
-                showInfoDialog(R.string.account_menu_terms_use, R.string.account_placeholder_terms);
+                LegalDocumentActivity.start(this, LegalDocumentActivity.CODE_TERMS);
                 break;
             case ROW_PRIVACY:
-                showInfoDialog(R.string.account_menu_privacy, R.string.account_placeholder_privacy);
+                LegalDocumentActivity.start(this, LegalDocumentActivity.CODE_PRIVACY);
                 break;
             case ROW_SERVICE:
-                showInfoDialog(R.string.account_menu_service_terms, R.string.account_placeholder_service);
+                LegalDocumentActivity.start(this, LegalDocumentActivity.CODE_SERVICE);
                 break;
             case ROW_SUPPORT:
                 dialSupport();

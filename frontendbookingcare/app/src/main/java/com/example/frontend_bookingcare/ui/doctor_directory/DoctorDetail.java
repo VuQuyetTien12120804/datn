@@ -34,15 +34,29 @@ public final class DoctorDetail {
     public final String address;
     @DrawableRes
     public final int avatarBg;
+    /** ID bác sĩ trong DB (có thể null nếu seed data không có). Dùng cho màn chi tiết. */
+    @Nullable
+    public final Integer doctorId;
+    /** Tiểu sử/bio lấy từ backend (DoctorDto.bio). */
+    @Nullable
+    public final String bio;
 
     public DoctorDetail(@Nullable String title, String name, @Nullable Integer yearsExp,
                         List<String> specialties, @Nullable String address, @DrawableRes int avatarBg) {
+        this(title, name, yearsExp, specialties, address, avatarBg, null, null);
+    }
+
+    public DoctorDetail(@Nullable String title, String name, @Nullable Integer yearsExp,
+                        List<String> specialties, @Nullable String address, @DrawableRes int avatarBg,
+                        @Nullable Integer doctorId, @Nullable String bio) {
         this.title = title;
         this.name = name;
         this.yearsExp = yearsExp;
         this.specialties = specialties != null ? specialties : new ArrayList<>();
         this.address = address;
         this.avatarBg = avatarBg;
+        this.doctorId = doctorId;
+        this.bio = bio;
     }
 
     public String lastNameInitial() {

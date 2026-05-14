@@ -6,6 +6,7 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -18,6 +19,7 @@ import com.example.frontend_bookingcare.ui.appointments.AppointmentsFragment;
 import com.example.frontend_bookingcare.ui.consult.ConsultFragment;
 import com.example.frontend_bookingcare.ui.home.HomeFragment;
 import com.example.frontend_bookingcare.ui.messages.MessagesFragment;
+import com.example.frontend_bookingcare.ui.support.SupportBottomSheetDialogFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
     private Fragment current;
+    private int lastNonConsultMenuId = R.id.nav_home;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Draw behind status bar to match YouMed (fragments handle insets).
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         setContentView(R.layout.activity_main);
         bottomNav = findViewById(R.id.bottom_nav);
         FragmentManager fm = getSupportFragmentManager();
@@ -58,11 +64,13 @@ public class MainActivity extends AppCompatActivity {
                 fm.beginTransaction().add(R.id.fragment_container, account, TAG_ACCOUNT).commit();
                 current = account;
                 bottomNav.setSelectedItemId(R.id.nav_account);
+                lastNonConsultMenuId = R.id.nav_account;
             } else {
                 HomeFragment home = new HomeFragment();
                 fm.beginTransaction().add(R.id.fragment_container, home, TAG_HOME).commit();
                 current = home;
                 bottomNav.setSelectedItemId(R.id.nav_home);
+                lastNonConsultMenuId = R.id.nav_home;
             }
         } else {
             String tag = savedInstanceState.getString(STATE_CURRENT_TAG, TAG_HOME);
@@ -72,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
                 fm.beginTransaction().add(R.id.fragment_container, current, TAG_HOME).commit();
             }
             bottomNav.setSelectedItemId(tagToMenuId(tag));
+            int restored = tagToMenuId(tag);
+            lastNonConsultMenuId = (restored == R.id.nav_consult) ? R.id.nav_home : restored;
         }
 
         bottomNav.setOnItemSelectedListener(this::onBottomItemSelected);
@@ -94,6 +104,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean onBottomItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.nav_consult) {
+            // YouMed-like: open support bottom sheet, keep current tab
+            SupportBottomSheetDialogFragment.newInstance()
+                    .show(getSupportFragmentManager(), "support_sheet_bottom_nav");
+            // returning false keeps previous selected item
+            bottomNav.setSelectedItemId(lastNonConsultMenuId);
+            return false;
+        }
+
+        lastNonConsultMenuId = item.getItemId();
         String tag = menuIdToTag(item.getItemId());
         FragmentManager fm = getSupportFragmentManager();
         Fragment next = fm.findFragmentByTag(tag);
@@ -140,5 +160,14 @@ public class MainActivity extends AppCompatActivity {
                 ((HomeFragment) home).refreshUserHeader();
             }
         });
+    }
+
+    /**
+     * Cho phép Fragment con (vd. HomeFragment) chuyển sang tab khác trên bottom nav
+     * mà không cần biết chi tiết FragmentManager.
+     */
+    public void switchToTab(int menuId) {
+        if (bottomNav == null) return;
+        bottomNav.setSelectedItemId(menuId);
     }
 }

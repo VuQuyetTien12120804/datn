@@ -1,5 +1,6 @@
 package com.example.frontend_bookingcare.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.data.SpecialtyRepository;
+import com.example.frontend_bookingcare.ui.doctor_directory.DoctorListActivity;
 
 public class SpecialtyListActivity extends AppCompatActivity {
 
@@ -40,6 +42,23 @@ public class SpecialtyListActivity extends AppCompatActivity {
         RecyclerView recycler = findViewById(R.id.specialty_list_recycler);
         recycler.setLayoutManager(new GridLayoutManager(this, 4));
         adapter = new SpecialtyGridAdapter();
+        adapter.setOnItemClick(specialty -> {
+            if (specialty == null) return;
+            Intent i = new Intent(this, DoctorListActivity.class);
+            // Ưu tiên dùng specialtyId → gọi đúng endpoint /api/v1/doctors/specialty/{id}.
+            if (specialty.specialtyId != null && specialty.specialtyId > 0) {
+                i.putExtra(DoctorListActivity.EXTRA_SPECIALTY_ID, specialty.specialtyId.intValue());
+                if (specialty.name != null) {
+                    i.putExtra(DoctorListActivity.EXTRA_SPECIALTY_NAME, specialty.name);
+                }
+            } else if (specialty.name != null && !specialty.name.isEmpty()) {
+                // Fallback: không có id (lỗi parse) → dùng search.
+                i.putExtra(DoctorListActivity.EXTRA_INITIAL_QUERY, specialty.name);
+            } else {
+                return;
+            }
+            startActivity(i);
+        });
         recycler.setAdapter(adapter);
 
         fetch();

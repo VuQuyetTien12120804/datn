@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/home_page_bg"
+    android:background="@color/doctor_surface_bg"
     android:orientation="vertical">
 
     <LinearLayout
@@ -17,7 +18,9 @@
             style="@style/Text.Screen.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/doctor_requests_title" />
+            android:letterSpacing="-0.02"
+            android:text="@string/doctor_requests_title"
+            android:textColor="@color/text_primary" />
 
         <TextView
             android:id="@+id/doctor_req_subtitle"
@@ -27,60 +30,138 @@
             android:layout_marginTop="@dimen/space_xxs" />
     </LinearLayout>
 
-    <LinearLayout
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/doctor_req_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/space_md"
-        android:paddingTop="@dimen/space_md"
-        android:paddingEnd="@dimen/space_md">
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_md"
+        android:background="@drawable/bg_doctor_segment_track"
+        android:padding="@dimen/space_xxs"
+        app:selectionRequired="true"
+        app:singleSelection="true">
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/doctor_tab_pending"
-            style="@style/Text.Body"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_xs"
             android:layout_weight="1"
-            android:background="@drawable/bg_doctor_tab_active"
-            android:gravity="center"
-            android:paddingTop="@dimen/space_md"
-            android:paddingBottom="@dimen/space_md"
-            android:textColor="@color/doctor_current_card_stroke" />
+            android:checkable="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="46dp"
+            android:textColor="@color/doctor_brand_primary"
+            android:textSize="@dimen/text_small"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/doctor_brand_primary"
+            app:strokeWidth="1dp" />
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/doctor_tab_accepted"
-            style="@style/Text.Body"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_xs"
             android:layout_weight="1"
-            android:background="@drawable/bg_doctor_tab_inactive"
-            android:gravity="center"
-            android:paddingTop="@dimen/space_md"
-            android:paddingBottom="@dimen/space_md"
-            android:textColor="@color/text_primary" />
+            android:checkable="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="46dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_line"
+            app:strokeWidth="0dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/doctor_tab_rejected"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkable="true"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="46dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/divider_line"
+            app:strokeWidth="0dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/doctor_req_tab_legend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_sm"
+        android:layout_marginEnd="@dimen/space_md"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/doctor_stat_blue_bg"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/doctor_stat_card_stroke"
+        app:strokeWidth="1dp">
 
         <TextView
-            android:id="@+id/doctor_tab_rejected"
-            style="@style/Text.Body"
-            android:layout_width="0dp"
+            android:id="@+id/doctor_req_legend_text"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_xs"
-            android:layout_weight="1"
-            android:background="@drawable/bg_doctor_tab_inactive"
-            android:gravity="center"
-            android:paddingTop="@dimen/space_md"
-            android:paddingBottom="@dimen/space_md"
-            android:textColor="@color/text_primary" />
-    </LinearLayout>
+            android:drawablePadding="@dimen/space_sm"
+            android:padding="@dimen/space_md"
+            android:text="@string/doctor_requests_pending_legend"
+            android:textColor="@color/text_primary"
+            app:drawableStartCompat="@android:drawable/ic_menu_info_details"
+            app:drawableTint="@color/doctor_brand_primary" />
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/doctor_req_list"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingTop="@dimen/space_sm"
-        android:paddingBottom="@dimen/space_lg" />
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/doctor_req_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/space_sm"
+            android:paddingBottom="@dimen/space_xl" />
+
+        <LinearLayout
+            android:id="@+id/doctor_req_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/space_xl"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋"
+                android:textSize="56sp" />
+
+            <TextView
+                style="@style/Text.Doctor.NameLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                android:gravity="center"
+                android:text="@string/doctor_empty_requests_title"
+                android:textAlignment="center" />
+
+            <TextView
+                style="@style/Text.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:gravity="center"
+                android:text="@string/doctor_empty_requests_hint"
+                android:textAlignment="center" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

@@ -11,7 +11,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.HorizontalScrollView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.frontend_bookingcare.MainActivity;
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.api.SpecialtyDto;
 import com.example.frontend_bookingcare.data.DoctorRepository;
@@ -27,6 +31,7 @@ import com.example.frontend_bookingcare.data.SpecialtyRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorDetail;
+import com.example.frontend_bookingcare.ui.doctor_directory.DoctorDetailActivity;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorListActivity;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorMapper;
 import com.google.android.material.tabs.TabLayout;
@@ -62,8 +67,18 @@ public class HomeFragment extends Fragment {
 
         View btnSeeAllSpec = view.findViewById(R.id.btn_see_all_specialties);
         if (btnSeeAllSpec != null) {
-            btnSeeAllSpec.setOnClickListener(v -> startActivity(
-                    new Intent(requireContext(), SpecialtyListActivity.class)));
+            btnSeeAllSpec.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), SpecialtyListActivity.class)));
+        }
+
+        // Ô search ở header: bấm vào → mở danh bạ bác sĩ với ô search được focus sẵn
+        View searchCard = view.findViewById(R.id.home_search_card);
+        if (searchCard != null) {
+            searchCard.setOnClickListener(v -> {
+                Intent i = new Intent(requireContext(), DoctorListActivity.class);
+                i.putExtra(DoctorListActivity.EXTRA_FOCUS_SEARCH, true);
+                startActivity(i);
+            });
         }
     }
 
@@ -99,6 +114,24 @@ public class HomeFragment extends Fragment {
         startBannerAutoScroll();
     }
 
+    /**
+     * MainActivity đổi tab bằng {@code hide}/{@code show}: không gọi {@code onResume}/{@code onPause}.
+     * Sau đăng xuất ở tab khác, quay lại Trang chủ phải đọc lại session — nếu không header vẫn hiện tên cũ.
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden && isAdded()) {
+            View v = getView();
+            if (v != null) {
+                refreshUserHeader(v);
+            }
+            startBannerAutoScroll();
+        } else if (hidden) {
+            stopBannerAutoScroll();
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -121,9 +154,9 @@ public class HomeFragment extends Fragment {
         greeting.setText(pickGreeting());
 
         String displayName;
-        if (s != null && s.fullName != null && !s.fullName.isEmpty()) {
+        if (sm.isLoggedIn() && s != null && s.fullName != null && !s.fullName.isEmpty()) {
             displayName = s.fullName;
-        } else if (s != null && s.email != null && !s.email.isEmpty()) {
+        } else if (sm.isLoggedIn() && s != null && s.email != null && !s.email.isEmpty()) {
             displayName = s.email;
         } else {
             displayName = getString(R.string.home_guest_name);
@@ -209,6 +242,9 @@ public class HomeFragment extends Fragment {
             ((TextView) tile.findViewById(R.id.service_icon)).setText(glyphs[i]);
             ((TextView) tile.findViewById(R.id.service_label)).setText(items[i][0]);
 
+            final int action = items[i][2];
+            tile.setOnClickListener(v -> onServiceTileClicked(action));
+
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
             lp.width = 0;
             lp.height = GridLayout.LayoutParams.WRAP_CONTENT;
@@ -216,6 +252,40 @@ public class HomeFragment extends Fragment {
             lp.rowSpec = GridLayout.spec(i / 3, 1);
             tile.setLayoutParams(lp);
             grid.addView(tile);
+        }
+    }
+
+    /**
+     * Điều hướng cho 6 ô dịch vụ trên Home:
+     *  0 - Đặt khám bác sĩ      → DoctorListActivity (xem & đặt lịch).
+     *  1 - Chat với bác sĩ      → tab Tin nhắn (MessagesFragment).
+     *  2 - Gọi video với bác sĩ → "sắp ra mắt" (chưa có module video).
+     *  3 - Hồ sơ sức khoẻ       → tab Tài khoản (AccountFragment có hồ sơ + tiền sử).
+     *  4 - Đặt lịch tiêm chủng  → "sắp ra mắt" (chưa có module tiêm chủng).
+     *  5 - Khám theo chuyên khoa → SpecialtyListActivity.
+     */
+    private void onServiceTileClicked(int action) {
+        switch (action) {
+            case 0:
+                startActivity(new Intent(requireContext(), DoctorListActivity.class));
+                return;
+            case 1:
+                if (requireActivity() instanceof MainActivity) {
+                    ((MainActivity) requireActivity()).switchToTab(R.id.nav_messages);
+                }
+                return;
+            case 3:
+                if (requireActivity() instanceof MainActivity) {
+                    ((MainActivity) requireActivity()).switchToTab(R.id.nav_account);
+                }
+                return;
+            case 5:
+                startActivity(new Intent(requireContext(), SpecialtyListActivity.class));
+                return;
+            case 2:
+            case 4:
+            default:
+                Toast.makeText(requireContext(), R.string.doctor_detail_feature_coming, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -255,9 +325,11 @@ public class HomeFragment extends Fragment {
             ((TextView) card.findViewById(R.id.doctor_name)).setText(displayName);
             ((FrameLayout) card.findViewById(R.id.doctor_avatar_bg)).setBackgroundResource(d.avatarBg);
             ((TextView) card.findViewById(R.id.doctor_avatar_letter)).setText(d.lastNameInitial());
-            card.setOnClickListener(v -> openDoctorList());
+            card.setOnClickListener(v ->
+                    startActivity(DoctorDetailActivity.newIntent(requireContext(), d)));
             row.addView(card);
         }
+        fitHomeDoctorsToThreePerViewport(view);
     }
 
     private void renderFallbackDoctors(@NonNull View view) {
@@ -279,6 +351,53 @@ public class HomeFragment extends Fragment {
             card.setOnClickListener(v -> openDoctorList());
             row.addView(card);
         }
+        fitHomeDoctorsToThreePerViewport(view);
+    }
+
+    /**
+     * Make the home doctor row show exactly 3 full items per viewport.
+     * Still horizontally scrollable for more doctors.
+     */
+    private void fitHomeDoctorsToThreePerViewport(@NonNull View root) {
+        View rowV = root.findViewById(R.id.home_doctors_row);
+        if (!(rowV instanceof LinearLayout)) return;
+        LinearLayout row = (LinearLayout) rowV;
+        View parent = (View) row.getParent();
+        if (!(parent instanceof HorizontalScrollView)) return;
+        HorizontalScrollView hsv = (HorizontalScrollView) parent;
+
+        hsv.post(() -> {
+            if (!isAdded()) return;
+            int viewport = hsv.getWidth();
+            if (viewport <= 0) return;
+
+            int rowPad = row.getPaddingStart() + row.getPaddingEnd();
+            int hsvPad = hsv.getPaddingStart() + hsv.getPaddingEnd();
+            int available = viewport - rowPad - hsvPad;
+            if (available <= 0) return;
+
+            int gap = dp(8);
+            int width = (available - gap * 2) / 3; // 3 items => 2 gaps inside
+            if (width <= 0) return;
+
+            for (int i = 0; i < row.getChildCount(); i++) {
+                View child = row.getChildAt(i);
+                LinearLayout.LayoutParams lp;
+                if (child.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+                    lp = (LinearLayout.LayoutParams) child.getLayoutParams();
+                } else {
+                    lp = new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.WRAP_CONTENT);
+                }
+                lp.width = width;
+                lp.leftMargin = (i == 0) ? gap : gap / 2;
+                lp.rightMargin = (i == row.getChildCount() - 1) ? gap : gap / 2;
+                child.setLayoutParams(lp);
+            }
+        });
+    }
+
+    private int dp(int dp) {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
     }
 
     private void openDoctorList() {
@@ -291,7 +410,7 @@ public class HomeFragment extends Fragment {
         return last.isEmpty() ? "?" : last.substring(0, 1).toUpperCase();
     }
 
-    // ---------- Specialty grid (lấy từ API, fallback demo nếu lỗi) ----------
+    // ---------- Specialty grid: chỉ dữ liệu từ API / DB (không fallback giả) ----------
 
     private static final int HOME_SPECIALTIES_LIMIT = 8;
 
@@ -300,16 +419,44 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadSpecialtiesFromApi(@NonNull View view) {
+        ProgressBar progress = view.findViewById(R.id.home_specialty_progress);
+        TextView status = view.findViewById(R.id.home_specialty_status);
+        if (progress != null) {
+            progress.setVisibility(View.VISIBLE);
+        }
+        if (status != null) {
+            status.setVisibility(View.GONE);
+            status.setText("");
+        }
+
         new SpecialtyRepository().fetchAllSpecialties((data, error) -> {
             if (!isAdded() || getView() == null) return;
-            if (error != null || data == null || data.isEmpty()) {
-                renderFallbackSpecialties(view);
-            } else {
-                java.util.List<SpecialtyDto> visible = data.size() > HOME_SPECIALTIES_LIMIT
-                        ? data.subList(0, HOME_SPECIALTIES_LIMIT)
-                        : data;
-                renderSpecialties(view, visible);
+            View root = getView();
+            ProgressBar p = root.findViewById(R.id.home_specialty_progress);
+            TextView st = root.findViewById(R.id.home_specialty_status);
+            if (p != null) {
+                p.setVisibility(View.GONE);
             }
+
+            if (error != null || data == null || data.isEmpty()) {
+                GridLayout grid = root.findViewById(R.id.home_specialty_grid);
+                grid.removeAllViews();
+                if (st != null) {
+                    st.setVisibility(View.VISIBLE);
+                    st.setText(error != null
+                            ? getString(R.string.specialty_list_error_fmt, error)
+                            : getString(R.string.specialty_list_empty));
+                }
+                return;
+            }
+
+            if (st != null) {
+                st.setVisibility(View.GONE);
+            }
+            List<SpecialtyDto> visible = data.size() > HOME_SPECIALTIES_LIMIT
+                    ? data.subList(0, HOME_SPECIALTIES_LIMIT)
+                    : data;
+            renderSpecialties(root, visible);
         });
     }
 
@@ -323,34 +470,27 @@ public class HomeFragment extends Fragment {
             ((TextView) tile.findViewById(R.id.specialty_icon)).setText(SpecialtyIcons.iconFor(s.code, s.name));
             ((TextView) tile.findViewById(R.id.specialty_label)).setText(s.name != null ? s.name : "");
             tile.setLayoutParams(gridCell(i, 4));
+            tile.setOnClickListener(v -> openDoctorsBySpecialty(s));
             grid.addView(tile);
         }
     }
 
-    private void renderFallbackSpecialties(@NonNull View view) {
-        GridLayout grid = view.findViewById(R.id.home_specialty_grid);
-        grid.removeAllViews();
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-
-        int[] labels = new int[]{
-                R.string.home_spec_allergy,
-                R.string.home_spec_traditional,
-                R.string.home_spec_pulmo,
-                R.string.home_spec_sport,
-                R.string.home_spec_ortho,
-                R.string.home_spec_ob,
-                R.string.home_spec_eye,
-                R.string.home_spec_uro,
-        };
-        String[] glyphs = new String[]{"🛡️", "☯️", "🫁", "🏃", "🦴", "🤰", "👁️", "♂️"};
-
-        for (int i = 0; i < labels.length; i++) {
-            View tile = inf.inflate(R.layout.item_home_specialty, grid, false);
-            ((TextView) tile.findViewById(R.id.specialty_icon)).setText(glyphs[i]);
-            ((TextView) tile.findViewById(R.id.specialty_label)).setText(labels[i]);
-            tile.setLayoutParams(gridCell(i, 4));
-            grid.addView(tile);
+    /**
+     * Mở danh sách bác sĩ lọc theo specialtyId → DoctorListActivity sẽ gọi đúng
+     * endpoint GET /api/v1/doctors/specialty/{id}. Nếu DTO không có id (bất thường),
+     * fallback sang search theo tên.
+     */
+    private void openDoctorsBySpecialty(@NonNull SpecialtyDto s) {
+        Intent intent = new Intent(requireContext(), DoctorListActivity.class);
+        if (s.specialtyId != null && s.specialtyId > 0) {
+            intent.putExtra(DoctorListActivity.EXTRA_SPECIALTY_ID, s.specialtyId.intValue());
+            if (s.name != null) {
+                intent.putExtra(DoctorListActivity.EXTRA_SPECIALTY_NAME, s.name);
+            }
+        } else if (s.name != null && !s.name.isEmpty()) {
+            intent.putExtra(DoctorListActivity.EXTRA_INITIAL_QUERY, s.name);
         }
+        startActivity(intent);
     }
 
     private static GridLayout.LayoutParams gridCell(int index, int columns) {

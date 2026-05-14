@@ -38,20 +38,47 @@
             android:background="@drawable/bg_doctor_search_field"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="10dp">
+            android:paddingStart="14dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="4dp">
 
-            <TextView
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_menu_search"
+                app:tint="#DBEEFF" />
+
+            <EditText
+                android:id="@+id/doctor_list_search_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:ellipsize="end"
+                android:background="@null"
+                android:hint="@string/doctor_list_search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
                 android:maxLines="1"
-                android:text="@string/doctor_list_search_hint"
-                android:textColor="#DBEEFF"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/white"
+                android:textColorHint="#BBDEFB"
+                android:textCursorDrawable="@null"
                 android:textSize="@dimen/text_body" />
+
+            <ImageButton
+                android:id="@+id/doctor_list_search_clear"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/doctor_list_search_clear_cd"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:visibility="gone"
+                app:tint="@color/white" />
         </LinearLayout>
     </LinearLayout>
 

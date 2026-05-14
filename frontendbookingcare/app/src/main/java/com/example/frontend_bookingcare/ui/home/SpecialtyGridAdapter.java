@@ -3,6 +3,7 @@ package com.example.frontend_bookingcare.ui.home;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,17 @@ public class SpecialtyGridAdapter extends RecyclerView.Adapter<SpecialtyGridAdap
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home_specialty, parent, false);
+        // Layout gốc (item_home_specialty) dùng layout_width=0dp vì được share với
+        // GridLayout ở Home (nơi cột có weight). Khi dùng trong RecyclerView +
+        // GridLayoutManager, 0dp sẽ ra 0 pixel → toàn bộ grid bị "trắng". Override
+        // về match_parent để GridLayoutManager tự chia cột theo spanCount.
+        ViewGroup.LayoutParams lp = v.getLayoutParams();
+        if (lp == null) {
+            lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        } else {
+            lp.width = LayoutParams.MATCH_PARENT;
+        }
+        v.setLayoutParams(lp);
         return new Holder(v);
     }
 
@@ -46,7 +58,7 @@ public class SpecialtyGridAdapter extends RecyclerView.Adapter<SpecialtyGridAdap
         holder.icon.setText(SpecialtyIcons.iconFor(s.code, s.name));
         holder.label.setText(s.name != null ? s.name : "");
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onClick(s);
+            if (listener != null && s != null) listener.onClick(s);
         });
     }
 

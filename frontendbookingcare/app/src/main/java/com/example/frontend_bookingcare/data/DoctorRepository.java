@@ -31,9 +31,21 @@ public class DoctorRepository {
     private final Gson gson = RetrofitClient.gson();
 
     public void fetchAllDoctors(ResultCallback<List<DoctorDto>> cb) {
+        executeDoctorCall(api.getAllDoctors(), cb);
+    }
+
+    /**
+     * Gọi đúng endpoint GET /api/v1/doctors/specialty/{id} thay vì lấy tất cả bác sĩ
+     * rồi lọc client-side. Trả về danh sách bác sĩ thuộc chuyên khoa đó.
+     */
+    public void fetchDoctorsBySpecialty(int specialtyId, ResultCallback<List<DoctorDto>> cb) {
+        executeDoctorCall(api.getDoctorsBySpecialty(specialtyId), cb);
+    }
+
+    private void executeDoctorCall(retrofit2.Call<ApiEnvelope> call, ResultCallback<List<DoctorDto>> cb) {
         EXECUTOR.execute(() -> {
             try {
-                Response<ApiEnvelope> response = api.getAllDoctors().execute();
+                Response<ApiEnvelope> response = call.execute();
                 ApiEnvelope body = response.body();
                 if (response.isSuccessful() && body != null && body.success) {
                     List<DoctorDto> list = Collections.emptyList();

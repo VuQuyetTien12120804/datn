@@ -2,6 +2,79 @@
 <resources>
     <string name="app_name">BookingCare</string>
     <string name="cd_navigate_up">Back</string>
+
+    <!-- ===== BOOKING FLOW ===== -->
+    <string name="booking_help">❓ Help</string>
+    <string name="booking_step1_title">Book appointment</string>
+    <string name="booking_step2_title">Confirm details</string>
+    <string name="booking_result_title">Appointment receipt</string>
+    <string name="booking_step1_label">Pick schedule</string>
+    <string name="booking_step2_label">Confirm</string>
+    <string name="booking_step3_label">Receipt</string>
+
+    <string name="booking_specialty_fmt">Specialty: %1$s</string>
+    <string name="booking_notice_title">⚠ Notice</string>
+    <string name="booking_notice_body">Please book at least 1 day in advance and arrive on time so the clinic can serve you best.</string>
+    <string name="booking_step2_notice">Review your details before confirming. If you need help, please contact customer support.</string>
+
+    <string name="booking_section_patient">✓ Booking this for:</string>
+    <string name="booking_section_date">✓ Pick a date</string>
+    <string name="booking_section_time">● Pick a time slot</string>
+    <string name="booking_section_notes">○ Additional info (optional)</string>
+    <string name="booking_section_registration">REGISTRATION</string>
+    <string name="booking_section_patient_info">PATIENT INFO</string>
+    <string name="booking_section_payment">PAYMENT DETAILS</string>
+
+    <string name="booking_label_name">Full name</string>
+    <string name="booking_label_gender">Gender</string>
+    <string name="booking_label_dob">Date of birth</string>
+    <string name="booking_label_phone">Phone number</string>
+    <string name="booking_label_address">Address</string>
+    <string name="booking_label_doctor">Doctor</string>
+    <string name="booking_label_time">Time</string>
+    <string name="booking_label_date">Date</string>
+    <string name="booking_label_code">Appointment code</string>
+    <string name="booking_label_patient_code">Patient code</string>
+    <string name="booking_label_queue">Queue no.</string>
+    <string name="booking_label_fee_exam">Consultation fee</string>
+    <string name="booking_label_fee_convenience">Convenience fee</string>
+    <string name="booking_label_fee_total">Total</string>
+
+    <string name="booking_session_morning">Morning</string>
+    <string name="booking_session_afternoon">Afternoon</string>
+    <string name="booking_continue">Continue</string>
+    <string name="booking_confirm">Confirm booking</string>
+    <string name="booking_submitting">Submitting your booking…</string>
+    <string name="booking_fee_zero">0đ</string>
+    <string name="booking_fee_free">Free</string>
+    <string name="booking_terms_note">By registering / paying you have read and agree to our Terms of Use.</string>
+
+    <string name="booking_day_has_slot">slots</string>
+    <string name="booking_dates_empty">This doctor has no open schedule yet. Please check back later.</string>
+    <string name="booking_dates_error_fmt">Could not load schedule: %1$s</string>
+    <string name="booking_dates_error_doctor">Missing doctor info.</string>
+    <string name="booking_slots_empty">No time slots for this date.</string>
+    <string name="booking_slots_tab_empty">No slots in this session.</string>
+    <string name="booking_slots_error_fmt">Could not load time slots: %1$s</string>
+    <string name="booking_notes_hint">You may add reason of visit, symptoms, medications…</string>
+    <string name="booking_notes_placeholder">Add extra details (optional)…</string>
+
+    <string name="booking_need_pick_slot">Please pick a time slot.</string>
+    <string name="booking_need_login">Please sign in to book an appointment.</string>
+    <string name="booking_need_complete_profile">Please complete your profile before booking.</string>
+    <string name="booking_min_lead_time_fmt">Please choose a slot that starts at least %1$d minutes from now (clinic time).</string>
+    <string name="booking_not_available">Not available</string>
+    <string name="booking_not_updated">Not updated</string>
+    <string name="booking_invalid_draft">Booking details are incomplete, please try again.</string>
+    <string name="booking_book_error_fmt">Booking failed: %1$s</string>
+    <string name="booking_book_error_generic">Booking failed, please try again.</string>
+
+    <string name="booking_result_success">Booked successfully</string>
+    <string name="booking_result_home">Go to home</string>
+    <string name="booking_result_support">💬 Support</string>
+    <string name="booking_result_time_fmt">%1$s (%2$s)</string>
+
+    <string name="doctor_detail_missing_id">Doctor not found for booking.</string>
     <string name="nav_home">Home</string>
     <string name="nav_appointments">Appointments</string>
     <string name="nav_consult">Consult</string>
@@ -34,21 +107,14 @@
     <string name="home_banner_3_title">BookingCare voucher combo</string>
     <string name="home_banner_3_cta">GET NOW</string>
 
-    <string name="home_spec_allergy">Allergy - immunology</string>
-    <string name="home_spec_traditional">Traditional medicine</string>
-    <string name="home_spec_pulmo">Tuberculosis - lungs</string>
-    <string name="home_spec_sport">Sports medicine</string>
-    <string name="home_spec_ortho">Musculoskeletal</string>
-    <string name="home_spec_ob">Obstetrics &amp; gynecology</string>
-    <string name="home_spec_eye">Ophthalmology</string>
-    <string name="home_spec_uro">Urology</string>
-
     <string name="home_demo_doctor_1">Dr. Hong</string>
     <string name="home_demo_doctor_2">Dr. Trung</string>
     <string name="home_demo_doctor_3">Dr. Ha</string>
     <string name="home_demo_doctor_4">Dr. Hieu</string>
 
     <string name="doctor_list_search_hint">Doctor name, symptom, specialty</string>
+    <string name="doctor_list_search_hint_specialty">Search within %1$s</string>
+    <string name="doctor_list_specialty_empty_fmt">No doctors in \"%1$s\" yet.</string>
     <string name="doctor_list_filter_all">All</string>
     <string name="doctor_list_filter_place">Place: Doctor</string>
     <string name="doctor_list_filter_more">Filter</string>
@@ -56,6 +122,9 @@
     <string name="doctor_years_fmt">%1$d years experience</string>
     <string name="doctor_list_empty">No doctors to display yet.</string>
     <string name="doctor_list_error_fmt">Could not load doctors: %1$s</string>
+    <string name="doctor_list_search_clear_cd">Clear search</string>
+    <string name="doctor_list_search_empty_fmt">No doctors match \"%1$s\".</string>
+    <string name="doctor_list_result_count_fmt">%1$d doctors found</string>
     <string name="specialty_list_title">All specialties</string>
     <string name="specialty_list_empty">No specialties available.</string>
     <string name="specialty_list_error_fmt">Could not load specialties: %1$s</string>
@@ -75,7 +144,24 @@
     <string name="doctor_symptom_fmt">Symptoms: %1$s</string>
 
     <string name="doctor_requests_title">Booking requests</string>
-    <string name="doctor_requests_pending_fmt">%1$d pending requests</string>
+    <string name="doctor_requests_subtitle_pending_fmt">%1$d to review</string>
+    <string name="doctor_requests_subtitle_pending_with_overdue_fmt">%1$d to review now · %2$d past slot</string>
+    <string name="doctor_requests_section_need_fmt">Review now (%1$d)</string>
+    <string name="doctor_requests_section_need_hint">Still valid — you can accept or reject.</string>
+    <string name="doctor_requests_section_overdue_title_fmt">Past slot (%1$d)</string>
+    <string name="doctor_requests_section_overdue_hint">Slot or day has passed — cannot accept; reject to clear the list.</string>
+    <string name="doctor_requests_pending_legend">The pending tab count is only in-window requests. Past slots appear below with a red accent and different card background.</string>
+    <string name="doctor_requests_subtitle_accepted_fmt">%1$d accepted</string>
+    <string name="doctor_requests_subtitle_accepted_with_missed_fmt">%1$d on time · %2$d past slot, not seen</string>
+    <string name="doctor_requests_section_accepted_upcoming_fmt">Within appointment time (%1$d)</string>
+    <string name="doctor_requests_section_accepted_upcoming_hint">Accepted — use Schedule or Examining at the booked time.</string>
+    <string name="doctor_requests_section_accepted_missed_title_fmt">Past slot, not examined (%1$d)</string>
+    <string name="doctor_requests_section_accepted_missed_hint">The time has passed but status is not in progress or completed. Follow clinic policy (reschedule, cancel, etc.).</string>
+    <string name="doctor_request_missed_exam_chip">Past slot · not seen</string>
+    <string name="doctor_requests_accepted_missed_legend">Pink cards are accepted visits past their time with no completed exam yet. In-window visits are listed first.</string>
+    <string name="doctor_requests_subtitle_rejected_fmt">%1$d rejected</string>
+    <string name="doctor_request_overdue_chip">Overdue</string>
+    <string name="doctor_request_cannot_accept_past">This slot has already started and cannot be accepted. You can still reject.</string>
     <string name="doctor_tab_pending">Pending</string>
     <string name="doctor_tab_accepted">Accepted</string>
     <string name="doctor_tab_rejected">Rejected</string>
@@ -85,35 +171,55 @@
     <string name="doctor_request_reason_fmt">Reason: %1$s</string>
     <string name="doctor_action_reject">Reject</string>
     <string name="doctor_action_accept">Accept</string>
+    <string name="doctor_panel_session_required">Sign in with a doctor account to view this data.</string>
+    <string name="doctor_panel_load_failed_fmt">Could not load data: %1$s</string>
+    <string name="doctor_panel_action_failed_fmt">Action failed: %1$s</string>
 
     <string name="doctor_exam_title">Consultation room</string>
+    <string name="doctor_exam_header_hint">Shows an in-progress visit first, otherwise the earliest unfinished slot today.</string>
     <string name="doctor_exam_status_idle">Not started</string>
-    <string name="doctor_exam_notes_title">Consultation notes</string>
-    <string name="doctor_exam_notes_hint">Start a consultation to take notes</string>
-    <string name="doctor_exam_start">Start consultation</string>
+    <string name="doctor_exam_notes_title">Clinical notes</string>
+    <string name="doctor_exam_notes_subtitle">Symptoms, findings, advice… (sync to server when the API is available).</string>
+    <string name="doctor_exam_notes_hint">Start the visit to take notes</string>
+    <string name="doctor_exam_start">Start visit</string>
+    <string name="doctor_exam_in_progress_btn">In progress</string>
+    <string name="doctor_exam_overdue_banner">Past the booked time — patient may be late; you can still start when ready.</string>
+    <string name="doctor_exam_booking_reason_fmt">Booking reason: %1$s</string>
+    <string name="doctor_exam_appt_id_fmt">Appt #%1$d</string>
+    <string name="doctor_exam_empty_title">No active visit</string>
+    <string name="doctor_exam_empty_hint">When you have today\'s schedule entries (confirmed, not completed), the next one to see appears here.</string>
     <string name="doctor_age_gender_fmt">%1$d yrs • %2$s</string>
 
-    <string name="doctor_profile_stat_total">Patients seen</string>
     <string name="doctor_profile_stat_today">Seen today</string>
-    <string name="doctor_profile_stat_pending">Pending</string>
-    <string name="doctor_profile_stat_rating">Rating</string>
+    <string name="doctor_profile_stat_pending">Pending review</string>
     <string name="doctor_profile_section_expertise">Professional info</string>
+    <string name="doctor_profile_section_workplace">Workplace &amp; schedule</string>
     <string name="doctor_profile_section_contact">Contact info</string>
-    <string name="doctor_profile_section_leaderboard">Leaderboard</string>
     <string name="doctor_profile_field_specialty">Specialty:</string>
     <string name="doctor_profile_field_degree">Degree:</string>
-    <string name="doctor_profile_field_license">License no:</string>
+    <string name="doctor_profile_field_license">License no.:</string>
+    <string name="doctor_profile_field_room">Clinic room:</string>
+    <string name="doctor_profile_field_unit">Department / unit:</string>
+    <string name="doctor_profile_field_schedule">Consultation hours:</string>
     <string name="doctor_profile_field_email">Email</string>
     <string name="doctor_profile_field_phone">Phone</string>
-    <string name="doctor_leaderboard_period_day">Day</string>
-    <string name="doctor_leaderboard_period_week">Week</string>
-    <string name="doctor_leaderboard_period_month">Month</string>
-    <string name="doctor_leaderboard_period_quarter">Quarter</string>
-    <string name="doctor_leaderboard_period_year">Year</string>
-    <string name="doctor_leaderboard_you">You</string>
-    <string name="doctor_leaderboard_rank_fmt">#%1$d/%2$d</string>
-    <string name="doctor_leaderboard_patients_fmt">%1$d pts</string>
+    <string name="doctor_profile_section_settings">Settings</string>
+    <string name="doctor_profile_language_sub">App display language</string>
+    <string name="doctor_profile_degree_demo">Specialist level II</string>
+    <string name="doctor_profile_specialty_value_demo">Internal medicine</string>
+    <string name="doctor_profile_license_demo">BS-CK2-123456</string>
+    <string name="doctor_profile_room_demo">Clinic room A2 — 3rd floor</string>
+    <string name="doctor_profile_unit_demo">Internal Medicine — General Hospital</string>
+    <string name="doctor_profile_schedule_demo">Mon–Fri: 7:30–11:30; 1:30–4:30 PM · Sat: 7:30–11:30</string>
+    <string name="doctor_profile_phone_demo">0901 234 567</string>
+    <string name="doctor_title_prefix_vi">BS. </string>
+    <string name="doctor_title_prefix_en">Dr. </string>
+    <string name="doctor_profile_name_fallback">Dr. Nguyen Van Minh</string>
     <string name="doctor_logout">Sign out</string>
+    <string name="doctor_empty_schedule_title">No appointments today</string>
+    <string name="doctor_empty_schedule_hint">Pull down to refresh or check back later.</string>
+    <string name="doctor_empty_requests_title">Nothing here</string>
+    <string name="doctor_empty_requests_hint">Try another tab or refresh your requests.</string>
     <string name="section_specialties">Specialties</string>
     <string name="section_featured_doctors">Featured doctors</string>
     <string name="see_all">See all</string>
@@ -208,6 +314,8 @@
     <string name="account_placeholder_privacy">Privacy policy (demo). We are committed to protecting personal data in line with applicable law.</string>
     <string name="account_placeholder_service">Service terms (demo).</string>
     <string name="account_placeholder_faq">Frequently asked questions will appear here.</string>
+    <string name="legal_error_loading">Could not load content. Check your network and backend.</string>
+    <string name="legal_default_title">Terms &amp; policies</string>
 
     <string name="login">Sign in</string>
     <string name="register">Register</string>

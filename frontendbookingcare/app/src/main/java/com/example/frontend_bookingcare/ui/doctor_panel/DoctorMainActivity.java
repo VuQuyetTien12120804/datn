@@ -5,10 +5,12 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.frontend_bookingcare.R;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DoctorMainActivity extends AppCompatActivity {
@@ -83,6 +85,21 @@ public class DoctorMainActivity extends AppCompatActivity {
         }
         current = next;
         return true;
+    }
+
+    /** Badge số yêu cầu chờ xử lý trên tab Requests. */
+    public void setDoctorRequestsPendingCount(int pendingCount) {
+        if (bottomNav == null) return;
+        int menuId = R.id.doctor_nav_requests;
+        if (pendingCount <= 0) {
+            bottomNav.removeBadge(menuId);
+            return;
+        }
+        BadgeDrawable badge = bottomNav.getOrCreateBadge(menuId);
+        badge.setVisible(true);
+        badge.setNumber(Math.min(pendingCount, 99));
+        badge.setBackgroundColor(ContextCompat.getColor(this, R.color.doctor_priority_orange));
+        badge.setBadgeTextColor(ContextCompat.getColor(this, R.color.white));
     }
 
     private String tagFor(int id) {

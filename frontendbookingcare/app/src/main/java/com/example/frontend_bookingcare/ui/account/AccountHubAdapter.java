@@ -3,6 +3,7 @@ package com.example.frontend_bookingcare.ui.account;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -98,6 +99,7 @@ public class AccountHubAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             TextView sub = itemView.findViewById(R.id.row_subtitle);
             TextView val = itemView.findViewById(R.id.row_value);
             TextView glyph = itemView.findViewById(R.id.row_icon_glyph);
+            ImageView iconImg = itemView.findViewById(R.id.row_icon_image);
             MaterialCardView iconCard = itemView.findViewById(R.id.row_icon_card);
             title.setText(item.title);
             if (item.subtitle != null && !item.subtitle.isEmpty()) {
@@ -112,7 +114,15 @@ public class AccountHubAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             } else {
                 val.setVisibility(View.GONE);
             }
-            glyph.setText(item.emoji != null ? item.emoji : "•");
+            if (item.iconRes != 0) {
+                iconImg.setImageResource(item.iconRes);
+                iconImg.setVisibility(View.VISIBLE);
+                glyph.setVisibility(View.GONE);
+            } else {
+                iconImg.setVisibility(View.GONE);
+                glyph.setVisibility(View.VISIBLE);
+                glyph.setText(item.emoji != null ? item.emoji : "•");
+            }
             iconCard.setCardBackgroundColor(itemView.getContext().getColor(item.iconBgRes));
             View area = itemView.findViewById(R.id.row_click_area);
             area.setOnClickListener(v -> listener.onRowClick(item.rowId));

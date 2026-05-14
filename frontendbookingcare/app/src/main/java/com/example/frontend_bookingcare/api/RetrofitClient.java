@@ -1,6 +1,7 @@
 package com.example.frontend_bookingcare.api;
 
 import com.example.frontend_bookingcare.BuildConfig;
+import com.example.frontend_bookingcare.network.TokenAuthInterceptor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,6 +17,11 @@ public final class RetrofitClient {
     private static volatile AuthApiService authApi;
     private static volatile DoctorApiService doctorApi;
     private static volatile SpecialtyApiService specialtyApi;
+    private static volatile BookingApiService bookingApi;
+    private static volatile DoctorPanelApiService doctorPanelApi;
+    private static volatile LegalApiService legalApi;
+    private static volatile PatientAppointmentsApiService patientAppointmentsApi;
+    private static volatile PatientProfileApiService patientProfileApi;
     private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
     private RetrofitClient() {
@@ -33,6 +39,9 @@ public final class RetrofitClient {
                             .connectTimeout(30, TimeUnit.SECONDS)
                             .readTimeout(30, TimeUnit.SECONDS)
                             .writeTimeout(30, TimeUnit.SECONDS)
+                            // Interceptor tự refresh access token khi server trả 401/403 rồi
+                            // replay request gốc — tránh phải đăng nhập lại sau 1 giờ.
+                            .addInterceptor(new TokenAuthInterceptor(BuildConfig.API_BASE_URL, GSON))
                             .build();
                     retrofit = new Retrofit.Builder()
                             .baseUrl(BuildConfig.API_BASE_URL)
@@ -76,5 +85,60 @@ public final class RetrofitClient {
             }
         }
         return specialtyApi;
+    }
+
+    public static BookingApiService bookingApi() {
+        if (bookingApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (bookingApi == null) {
+                    bookingApi = retrofit().create(BookingApiService.class);
+                }
+            }
+        }
+        return bookingApi;
+    }
+
+    public static DoctorPanelApiService doctorPanelApi() {
+        if (doctorPanelApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (doctorPanelApi == null) {
+                    doctorPanelApi = retrofit().create(DoctorPanelApiService.class);
+                }
+            }
+        }
+        return doctorPanelApi;
+    }
+
+    public static LegalApiService legalApi() {
+        if (legalApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (legalApi == null) {
+                    legalApi = retrofit().create(LegalApiService.class);
+                }
+            }
+        }
+        return legalApi;
+    }
+
+    public static PatientAppointmentsApiService patientAppointmentsApi() {
+        if (patientAppointmentsApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (patientAppointmentsApi == null) {
+                    patientAppointmentsApi = retrofit().create(PatientAppointmentsApiService.class);
+                }
+            }
+        }
+        return patientAppointmentsApi;
+    }
+
+    public static PatientProfileApiService patientProfileApi() {
+        if (patientProfileApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (patientProfileApi == null) {
+                    patientProfileApi = retrofit().create(PatientProfileApiService.class);
+                }
+            }
+        }
+        return patientProfileApi;
     }
 }

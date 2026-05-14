@@ -4,11 +4,13 @@
     android:id="@+id/req_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/space_lg"
-    android:layout_marginTop="@dimen/space_md"
-    android:layout_marginEnd="@dimen/space_lg"
-    app:cardCornerRadius="@dimen/radius_md"
-    app:cardElevation="1dp">
+    android:layout_marginStart="@dimen/space_md"
+    android:layout_marginTop="@dimen/space_sm"
+    android:layout_marginEnd="@dimen/space_md"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/doctor_stat_card_stroke"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,6 +45,22 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/req_overdue_chip"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:background="@drawable/bg_doctor_overdue_chip"
+            android:paddingStart="@dimen/space_md"
+            android:paddingTop="@dimen/space_xs"
+            android:paddingEnd="@dimen/space_md"
+            android:paddingBottom="@dimen/space_xs"
+            android:text="@string/doctor_request_overdue_chip"
+            android:textColor="@color/doctor_reject_red"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,19 +68,15 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <FrameLayout
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@drawable/bg_tile_blue">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="👤"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_title" />
-            </FrameLayout>
+            <TextView
+                android:id="@+id/req_avatar_initial"
+                style="@style/Text.Doctor.AvatarLetter"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_title" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -126,35 +140,34 @@
             android:layout_marginTop="@dimen/space_md"
             android:orientation="horizontal">
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/req_btn_reject"
-                style="@style/Text.Body"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/space_sm"
                 android:layout_weight="1"
-                android:background="@drawable/bg_doctor_reject_btn"
-                android:gravity="center"
-                android:paddingTop="@dimen/space_md"
-                android:paddingBottom="@dimen/space_md"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="48dp"
                 android:text="@string/doctor_action_reject"
                 android:textColor="@color/doctor_reject_red"
-                android:textStyle="bold" />
+                app:strokeColor="@color/doctor_reject_red"
+                app:strokeWidth="1dp" />
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/req_btn_accept"
-                style="@style/Text.Body"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_sm"
                 android:layout_weight="1"
-                android:background="@drawable/bg_doctor_accept_btn"
-                android:gravity="center"
-                android:paddingTop="@dimen/space_md"
-                android:paddingBottom="@dimen/space_md"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="48dp"
                 android:text="@string/doctor_action_accept"
                 android:textColor="@color/white"
-                android:textStyle="bold" />
+                app:backgroundTint="@color/doctor_accept_green" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

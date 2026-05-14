@@ -4,17 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/space_md"
-    android:layout_marginTop="@dimen/space_sm"
+    android:layout_marginTop="@dimen/doctor_list_card_gap"
     android:layout_marginEnd="@dimen/space_md"
-    app:cardCornerRadius="@dimen/radius_md"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="@dimen/radius_lg"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/divider_line"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/space_lg">
+        android:paddingStart="@dimen/doctor_list_card_padding"
+        android:paddingTop="@dimen/doctor_list_card_padding"
+        android:paddingEnd="@dimen/doctor_list_card_padding"
+        android:paddingBottom="@dimen/doctor_list_card_padding">
 
+        <!-- Top block: avatar + info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,14 +28,15 @@
 
             <FrameLayout
                 android:id="@+id/doctor_avatar_bg"
-                android:layout_width="@dimen/home_doctor_avatar_size"
-                android:layout_height="@dimen/home_doctor_avatar_size">
+                android:layout_width="@dimen/doctor_list_avatar_size"
+                android:layout_height="@dimen/doctor_list_avatar_size">
 
                 <TextView
                     android:id="@+id/doctor_avatar_letter"
                     style="@style/Text.Doctor.AvatarLetter"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/doctor_list_avatar_text_size" />
             </FrameLayout>
 
             <LinearLayout
@@ -63,15 +70,17 @@
                     android:id="@+id/doctor_specialty_row"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_xs"
+                    android:layout_marginTop="@dimen/space_sm"
                     android:orientation="horizontal" />
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Address row: luôn hiển thị (fallback ở adapter nếu null) -->
         <LinearLayout
+            android:id="@+id/doctor_address_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_lg"
             android:gravity="top"
             android:orientation="horizontal">
 
@@ -87,19 +96,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_xs"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:lineSpacingExtra="2dp"
+                android:textColor="@color/text_primary" />
         </LinearLayout>
 
+        <!-- Book button -->
         <TextView
             android:id="@+id/doctor_book_btn"
             style="@style/Text.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_lg"
             android:background="@drawable/bg_doctor_book_btn"
             android:gravity="center"
-            android:paddingTop="@dimen/space_md"
-            android:paddingBottom="@dimen/space_md"
-            android:text="@string/doctor_book_now" />
+            android:paddingTop="@dimen/doctor_list_book_btn_padding"
+            android:paddingBottom="@dimen/doctor_list_book_btn_padding"
+            android:text="@string/doctor_book_now"
+            android:textSize="@dimen/text_body_lg" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

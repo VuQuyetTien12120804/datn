@@ -15,4 +15,21 @@
         <item name="android:navigationBarColor">@color/brand_primary</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <!-- Doctor role theme: khác màu brand (tím) nhưng giữ cùng typography/spacing system -->
+    <style name="Theme.Frontendbookingcare.Doctor" parent="Base.Theme.Frontendbookingcare">
+        <item name="colorPrimary">@color/doctor_brand_primary</item>
+        <item name="colorPrimaryDark">@color/doctor_brand_primary_dark</item>
+        <item name="colorOnPrimary">@color/doctor_brand_on_primary</item>
+        <item name="android:statusBarColor">@color/doctor_brand_primary</item>
+        <item name="android:navigationBarColor">@color/doctor_nav_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- YouMed-like header toolbar: chỉnh chiều cao/padding ở 1 chỗ -->
+    <style name="Widget.Frontendbookingcare.HeaderToolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:minHeight">@dimen/header_toolbar_height</item>
+        <item name="android:paddingHorizontal">@dimen/header_toolbar_padding_horizontal</item>
+        <item name="android:paddingBottom">@dimen/header_toolbar_padding_bottom</item>
+    </style>
 </resources>

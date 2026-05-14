@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Bàn tay tượng trưng: lòng bàn + ngón (Material-style, đơn giản) -->
+    <path
+        android:fillColor="@color/account_terms_icon_amber"
+        android:pathData="M8,10.5C8,9.67 8.67,9 9.5,9S11,9.67 11,10.5V14h1v-4C12,9.34 12.67,8.5 13.5,8.5S15,9.34 15,10.5V14h1v-3.5C16,9.67 16.67,9 17.5,9S19,9.67 19,10.5V15c0,2.21 -1.79,4 -4,4h-2.5c-1.46,0 -2.79,-0.67 -3.66,-1.73L6.8,14.4c-0.55,-0.68 -0.48,-1.68 0.17,-2.28l0.6,-0.55C8,10.95 8.5,10.5 9,10.5h-1z" />
+</vector>

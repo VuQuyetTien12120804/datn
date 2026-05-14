@@ -29,13 +29,28 @@
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
-            <TextView
-                android:id="@+id/row_icon_glyph"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="📋"
-                android:textSize="@dimen/text_title" />
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/row_icon_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/row_icon_glyph"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="📋"
+                    android:textSize="@dimen/text_title" />
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
@@ -71,17 +86,17 @@
             android:textSize="@dimen/text_small"
             android:visibility="gone" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="›"
-            android:textColor="@color/text_secondary"
-            android:textSize="@dimen/text_headline" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_chevron_end_account" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="74dp"
-        android:background="@color/account_divider" />
+        android:background="@color/divider_line" />
 </LinearLayout>

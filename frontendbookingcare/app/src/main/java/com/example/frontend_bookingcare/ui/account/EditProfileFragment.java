@@ -11,6 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.api.UpdatePatientProfileRequest;
+import com.example.frontend_bookingcare.data.PatientProfileRepository;
+import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -53,9 +56,39 @@ public class EditProfileFragment extends Fragment {
                     text(gender),
                     text(address)
             );
-            sm.saveProfileExtras(next);
-            Toast.makeText(requireContext(), R.string.edit_profile_saved_toast, Toast.LENGTH_SHORT).show();
-            parent.getChildFragmentManager().popBackStack();
+            AuthSession s = sm.getSession();
+            if (s != null && s.accessToken != null && !s.accessToken.isEmpty()) {
+                // Logged-in: lưu cả DB để lần sau không mất.
+                save.setEnabled(false);
+                String bearer = "Bearer " + s.accessToken;
+                new PatientProfileRepository().updateMe(
+                        bearer,
+                        new UpdatePatientProfileRequest(next.phone, next.dob, next.gender, next.address),
+                        new PatientProfileRepository.RepoCallback() {
+                            @Override
+                            public void onSuccess(com.example.frontend_bookingcare.api.ApiEnvelope env) {
+                                requireActivity().runOnUiThread(() -> {
+                                    sm.saveProfileExtras(next);
+                                    Toast.makeText(requireContext(), R.string.edit_profile_saved_toast, Toast.LENGTH_SHORT).show();
+                                    parent.getChildFragmentManager().popBackStack();
+                                });
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                requireActivity().runOnUiThread(() -> {
+                                    save.setEnabled(true);
+                                    Toast.makeText(requireContext(), "Lưu thất bại: " + message, Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        }
+                );
+            } else {
+                // Not logged in: fallback lưu local.
+                sm.saveProfileExtras(next);
+                Toast.makeText(requireContext(), R.string.edit_profile_saved_toast, Toast.LENGTH_SHORT).show();
+                parent.getChildFragmentManager().popBackStack();
+            }
         });
     }
 
