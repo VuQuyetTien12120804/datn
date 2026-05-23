@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">BookingCare</string>
+    <string name="app_name">ClinicBooking</string>
+    <string name="clinic_name">Phòng khám Quyết Tiến</string>
+    <string name="clinic_name_short">Quyết Tiến</string>
     <string name="cd_navigate_up">Quay lại</string>
 
     <!-- ===== BOOKING FLOW (3 bước đặt lịch khám) ===== -->
@@ -34,7 +36,7 @@
     <string name="booking_label_date">Ngày khám</string>
     <string name="booking_label_code">Mã lịch khám</string>
     <string name="booking_label_patient_code">Mã bệnh nhân</string>
-    <string name="booking_label_queue">STT</string>
+    <string name="booking_label_queue">STT khám</string>
     <string name="booking_label_fee_exam">Phí khám</string>
     <string name="booking_label_fee_convenience">Phí tiện ích</string>
     <string name="booking_label_fee_total">Tổng thanh toán</string>
@@ -97,20 +99,19 @@
     <string name="home_service_specialty">Khám theo chuyên khoa</string>
 
     <string name="home_section_doctors">Bác sĩ</string>
+    <string name="home_doctors_empty">Chưa có bác sĩ để hiển thị. Vui lòng thử lại sau.</string>
+    <string name="clinic_default_address">25 P. Láng Hạ, Đống Đa, Hà Nội</string>
     <string name="home_section_specialty_book">Khám theo chuyên khoa</string>
     <string name="home_see_all_specialties">Xem tất cả các chuyên khoa</string>
 
-    <string name="home_banner_1_title">Chat cùng bác sĩ chuyên khoa</string>
+    <string name="home_banner_1_title">Chat với bác sĩ chuyên khoa</string>
     <string name="home_banner_1_cta">CHAT NGAY</string>
-    <string name="home_banner_2_title">Tư vấn dinh dưỡng miễn phí</string>
-    <string name="home_banner_2_cta">THAM GIA NGAY</string>
-    <string name="home_banner_3_title">Ưu đãi combo voucher BookingCare</string>
-    <string name="home_banner_3_cta">NHẬN NGAY</string>
+    <string name="home_banner_2_title">Hỗ trợ đặt khám 24/7</string>
+    <string name="home_banner_2_cta">LIÊN HỆ</string>
+    <string name="home_banner_3_title">Đặt lịch khám nhanh chóng</string>
+    <string name="home_banner_3_cta">ĐẶT NGAY</string>
 
-    <string name="home_demo_doctor_1">Bác sĩ Hồng</string>
-    <string name="home_demo_doctor_2">Bác sĩ Trung</string>
-    <string name="home_demo_doctor_3">Bác sĩ Hà</string>
-    <string name="home_demo_doctor_4">Bác sĩ Hiếu</string>
+    <string name="appt_queue_fmt">STT %1$d</string>
 
     <string name="doctor_list_search_hint">Tên bác sĩ, triệu chứng, chuyên khoa</string>
     <string name="doctor_list_search_hint_specialty">Tìm trong khoa %1$s</string>
@@ -140,13 +141,16 @@
     <string name="doctor_detail_month_fmt">Lịch tháng %1$s</string>
     <string name="doctor_detail_slot_count_fmt">%1$d slot</string>
     <string name="doctor_detail_afternoon">Buổi chiều</string>
+    <string name="doctor_detail_morning">Buổi sáng</string>
+    <string name="doctor_detail_schedule_loading">Đang tải lịch khám…</string>
     <string name="doctor_detail_pick_slot_hint">⏱ Chọn một khung giờ để đặt</string>
+    <string name="doctor_detail_selected_slot_fmt">✓ Đã chọn %1$s · %2$s — bấm “Đặt khám” để tiếp tục</string>
     <string name="doctor_detail_schedule_cta_hint">⏱ Lịch khám ở đây chỉ minh hoạ. Vui lòng bấm “Đặt khám” để chọn lịch thật.</string>
     <string name="doctor_detail_address_default">Chưa có thông tin phòng mạch</string>
     <string name="doctor_detail_open_map">📍 Mở bản đồ</string>
     <string name="doctor_detail_section_intro">👤 Giới thiệu</string>
     <string name="doctor_detail_bio_default">Bác sĩ hiện đang công tác tại phòng khám. Thông tin chi tiết sẽ được cập nhật sớm.</string>
-    <string name="doctor_detail_bio_benefits_title">Các tiện ích khi đặt khám qua BookingCare:</string>
+    <string name="doctor_detail_bio_benefits_title">Các tiện ích khi đặt khám qua ClinicBooking:</string>
     <string name="doctor_detail_bio_benefit_1">•  Đăng ký ngày, giờ khám và lấy số thứ tự sớm.</string>
     <string name="doctor_detail_bio_benefit_2">•  Nhận và lưu trữ hồ sơ y tế.</string>
     <string name="doctor_detail_bio_benefit_3">•  Nhắc lịch khám và lịch tái khám.</string>
@@ -154,7 +158,7 @@
     <string name="doctor_detail_bio_benefit_5">•  Đọc tin y tế chính thống.</string>
     <string name="doctor_detail_section_treats">❄ Chuyên khám</string>
     <string name="doctor_detail_section_work">🏢 Nơi công tác</string>
-    <string name="doctor_detail_work_default">•  Phòng khám BookingCare</string>
+    <string name="doctor_detail_work_default">•  Phòng khám Quyết Tiến</string>
     <string name="doctor_detail_section_training">🎓 Quá trình đào tạo</string>
     <string name="doctor_detail_training_default">•  Tốt nghiệp Đại học Y Dược.</string>
     <string name="doctor_detail_section_experience">🏅 Kinh nghiệm</string>
@@ -163,7 +167,10 @@
     <string name="doctor_detail_video_call">📹 Gọi video</string>
     <string name="doctor_detail_book">Đặt khám</string>
     <string name="doctor_detail_pick_slot_toast">Vui lòng chọn một khung giờ trước khi đặt khám.</string>
-    <string name="doctor_detail_feature_coming">Tính năng sắp ra mắt.</string>
+    <string name="doctor_detail_chat_login_required">Vui lòng đăng nhập để nhắn tin với bác sĩ.</string>
+    <string name="doctor_messages_title">Tin nhắn bệnh nhân</string>
+    <string name="doctor_messages_login_required">Vui lòng đăng nhập lại.</string>
+    <string name="doctor_profile_messages">Tin nhắn bệnh nhân</string>
 
     <string name="specialty_list_title">Tất cả chuyên khoa</string>
     <string name="specialty_list_empty">Chưa có chuyên khoa nào.</string>
@@ -173,6 +180,10 @@
     <string name="doctor_nav_appointments">Lịch khám</string>
     <string name="doctor_nav_requests">Yêu cầu</string>
     <string name="doctor_nav_examining">Khám bệnh</string>
+    <string name="doctor_nav_messages">Tin nhắn</string>
+    <string name="doctor_messages_subtitle">Trao đổi với bệnh nhân</string>
+    <string name="doctor_messages_empty_title">Chưa có tin nhắn</string>
+    <string name="doctor_messages_empty_hint">Khi bệnh nhân nhắn cho bạn, hội thoại sẽ hiện tại đây.</string>
     <string name="doctor_nav_account">Tài khoản</string>
 
     <string name="doctor_today">Hôm nay</string>
@@ -182,9 +193,14 @@
     <string name="doctor_status_done">Hoàn thành</string>
     <string name="doctor_status_progress">Đang khám</string>
     <string name="doctor_status_wait">Chờ khám</string>
+    <string name="doctor_status_pending">Chờ duyệt</string>
+    <string name="doctor_status_confirmed">Đã duyệt</string>
+    <string name="doctor_status_no_show">Không đến</string>
+    <string name="doctor_schedule_pending_hint">Lịch này đang chờ duyệt — hãy xử lý tại tab Yêu cầu.</string>
     <string name="doctor_symptom_fmt">Triệu chứng: %1$s</string>
 
     <string name="doctor_requests_title">Yêu cầu đặt lịch</string>
+    <string name="doctor_requests_subtitle_default">Quản lý yêu cầu từ bệnh nhân</string>
     <string name="doctor_requests_subtitle_pending_fmt">%1$d lịch cần duyệt</string>
     <string name="doctor_requests_subtitle_pending_with_overdue_fmt">%1$d cần duyệt ngay · %2$d quá giờ</string>
     <string name="doctor_requests_section_need_fmt">Cần duyệt ngay (%1$d)</string>
@@ -215,14 +231,26 @@
     <string name="doctor_panel_session_required">Vui lòng đăng nhập bằng tài khoản bác sĩ để xem dữ liệu.</string>
     <string name="doctor_panel_load_failed_fmt">Không tải được dữ liệu: %1$s</string>
     <string name="doctor_panel_action_failed_fmt">Thao tác thất bại: %1$s</string>
+    <string name="doctor_retry">Thử lại</string>
+    <string name="doctor_profile_load_failed_fmt">Không tải được hồ sơ: %1$s</string>
 
     <string name="doctor_exam_title">Phòng khám bệnh</string>
-    <string name="doctor_exam_header_hint">Ưu tiên ca «Đang khám» từ lịch hôm nay; nếu không có thì chọn lịch sớm nhất chưa hoàn thành.</string>
+    <string name="doctor_exam_header_hint">Chọn ca từ «Lịch khám» hoặc xử lý ca ưu tiên tự động từ lịch hôm nay.</string>
     <string name="doctor_exam_status_idle">Chưa bắt đầu</string>
+    <string name="doctor_exam_status_checked_in">Đã check-in · sẵn sàng khám</string>
     <string name="doctor_exam_notes_title">Ghi chú khám bệnh</string>
-    <string name="doctor_exam_notes_subtitle">Ghi lại triệu chứng, chẩn đoán sơ bộ, tư vấn… (lưu server khi API sẵn sàng).</string>
+    <string name="doctor_exam_notes_subtitle">Triệu chứng, chẩn đoán sơ bộ, hướng dẫn điều trị — lưu trực tiếp lên hệ thống.</string>
     <string name="doctor_exam_notes_hint">Bắt đầu khám để ghi chú</string>
     <string name="doctor_exam_start">Bắt đầu khám</string>
+    <string name="doctor_exam_save_notes">Lưu ghi chú</string>
+    <string name="doctor_exam_complete">Hoàn thành khám</string>
+    <string name="doctor_exam_no_show">Không đến khám</string>
+    <string name="doctor_exam_notes_saved">Đã lưu ghi chú</string>
+    <string name="doctor_exam_completed_toast">Đã hoàn thành khám bệnh</string>
+    <string name="doctor_exam_started_toast">Đã bắt đầu phiên khám</string>
+    <string name="doctor_exam_no_show_toast">Đã đánh dấu bệnh nhân không đến</string>
+    <string name="doctor_exam_complete_confirm">Xác nhận hoàn thành khám cho bệnh nhân này?</string>
+    <string name="doctor_exam_no_show_confirm">Xác nhận bệnh nhân không đến khám?</string>
     <string name="doctor_exam_in_progress_btn">Đang khám</string>
     <string name="doctor_exam_overdue_banner">Đã quá giờ hẹn so với lịch — bệnh nhân có thể đến trễ; vẫn có thể bắt đầu khám khi sẵn sàng.</string>
     <string name="doctor_exam_booking_reason_fmt">Lý do đăng ký: %1$s</string>
@@ -246,16 +274,9 @@
     <string name="doctor_profile_field_phone">Điện thoại</string>
     <string name="doctor_profile_section_settings">Cài đặt</string>
     <string name="doctor_profile_language_sub">Giao diện ứng dụng</string>
-    <string name="doctor_profile_degree_demo">Bác sĩ chuyên khoa II</string>
-    <string name="doctor_profile_specialty_value_demo">Nội khoa</string>
-    <string name="doctor_profile_license_demo">BS-CK2-123456</string>
-    <string name="doctor_profile_room_demo">Phòng khám A2 – Tầng 3</string>
-    <string name="doctor_profile_unit_demo">Khoa Nội – Bệnh viện Đa khoa</string>
-    <string name="doctor_profile_schedule_demo">T2–T6: 7:30–11:30; 13:30–16:30 · T7: 7:30–11:30</string>
-    <string name="doctor_profile_phone_demo">0901 234 567</string>
     <string name="doctor_title_prefix_vi">BS. </string>
     <string name="doctor_title_prefix_en">Dr. </string>
-    <string name="doctor_profile_name_fallback">BS. Nguyễn Văn Minh</string>
+    <string name="doctor_profile_name_fallback">Bác sĩ</string>
     <string name="doctor_logout">Đăng xuất</string>
     <string name="doctor_empty_schedule_title">Chưa có lịch khám hôm nay</string>
     <string name="doctor_empty_schedule_hint">Kéo xuống để làm mới hoặc quay lại sau.</string>
@@ -267,9 +288,82 @@
     <string name="book_slot">Đặt lịch</string>
 
     <string name="appointments_title">Lịch khám của tôi</string>
+    <string name="appointments_empty_hint">Chưa có lịch khám nào trong mục này.</string>
+    <string name="appointments_empty_title">Chưa có lịch khám</string>
+    <string name="appointments_error_title">Không tải được lịch khám</string>
+    <string name="session_expired">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</string>
+    <string name="chat_locked_hint">Cuộc trò chuyện đã kết thúc — không thể gửi tin nhắn.</string>
+    <string name="chat_doctor_title_fmt">Bác sĩ %1$s</string>
+    <string name="patient_code_loading">Đang tải mã bệnh nhân…</string>
+    <string name="messages_login_title">Đăng nhập để xem tin nhắn</string>
+    <string name="messages_login_hint">Đăng nhập tài khoản để nhắn tin với bác sĩ và chăm sóc khách hàng.</string>
+    <string name="messages_login_required">Vui lòng đăng nhập để sử dụng tin nhắn.</string>
+    <string name="messages_empty_title">Chưa có tin nhắn</string>
+    <string name="messages_empty_hint">Tin nhắn với bác sĩ hoặc CSKH sẽ hiển thị tại đây.</string>
+    <string name="home_doctors_loading">Đang tải danh sách bác sĩ…</string>
+    <string name="profile_phone_invalid">Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).</string>
+    <string name="profile_dob_hint">dd/MM/yyyy</string>
+    <string name="profile_dob_invalid">Ngày sinh không hợp lệ (dd/MM/yyyy).</string>
+    <string name="messages_title">Tin nhắn</string>
+    <string name="messages_search_hint">Tìm theo tên bác sĩ, nội dung…</string>
+    <string name="support_cskh_title">Chăm Sóc Khách Hàng</string>
+    <string name="chat_login_required">Vui lòng đăng nhập để nhắn tin.</string>
+    <string name="chat_input_hint">Gửi tin nhắn</string>
+    <string name="home_bell_cd">Thông báo</string>
+    <string name="home_bell_hint">Xem thông báo lịch khám</string>
+
+    <string name="notifications_title">Thông báo</string>
+    <string name="notifications_tab_all">Tất cả</string>
+    <string name="notifications_tab_appointments">Lịch khám</string>
+    <string name="notifications_tab_health">Tin Y tế</string>
+    <string name="notifications_empty_title">Bạn chưa có thông báo nào.</string>
+    <string name="notifications_empty_all_hint">Thông báo về lịch khám sẽ được hiển thị tại đây.</string>
+    <string name="notifications_empty_appointments_hint">Lịch khám sắp tới sẽ được hiển thị tại đây.</string>
+    <string name="notifications_empty_health_hint">Thông tin về tin y tế sẽ được hiển thị tại đây</string>
+    <string name="notifications_empty_login_hint">Đăng nhập để xem thông báo lịch khám của bạn.</string>
+    <string name="notifications_error_title">Không tải được thông báo</string>
+    <string name="notification_time_label_fmt">%1$s - %2$s</string>
+    <string name="notification_view_ticket">Xem phiếu khám ›</string>
+    <string name="notification_reminder_title">Nhắc đi khám</string>
+    <string name="notification_booking_success_title">Đặt khám thành công</string>
+    <string name="notification_reminder_body_fmt">Bạn có lịch hẹn khám với %1$s thời gian khám dự kiến vào lúc %2$s ngày %3$s. Nhấn vào đây để xem chi tiết lịch khám.</string>
+    <string name="notification_success_body_fmt">Bạn đã đặt lịch khám với %1$s thời gian khám dự kiến vào lúc %2$s ngày %3$s. Nhấn vào đây để xem chi tiết lịch khám.</string>
+    <string name="notifications_menu_more">Tuỳ chọn</string>
+    <string name="notifications_menu_soon">Tính năng sắp có</string>
+    <string name="appt_patient_fmt">Bệnh nhân: %1$s</string>
+    <string name="ticket_code_copied">Đã copy mã phiếu khám</string>
+    <string name="ticket_hotline_copied">Đã copy hotline</string>
+    <string name="ticket_appt_not_found">Không tìm thấy mã lịch hẹn</string>
+    <string name="ticket_login_required">Bạn cần đăng nhập</string>
+    <string name="ticket_check_in_failed">Check-in thất bại</string>
+    <string name="ticket_cancel_login_required">Bạn cần đăng nhập để huỷ lịch</string>
+    <string name="ticket_cancel_failed_fmt">Huỷ lịch thất bại: %1$s</string>
+    <string name="ticket_cancel_success">Đã huỷ lịch</string>
+    <string name="complete_profile_required">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="complete_profile_saved">Đã lưu hồ sơ</string>
+    <string name="save_failed_fmt">Lưu thất bại: %1$s</string>
+    <string name="profile_load_failed_fmt">Không tải được hồ sơ: %1$s</string>
+    <string name="dash_placeholder">—</string>
+    <string name="search_no_results_title">Không tìm thấy kết quả</string>
+    <string name="search_no_results_hint">Thử từ khóa khác hoặc xóa bộ lọc tìm kiếm.</string>
+    <string name="appt_cancel_confirm_title">Huỷ lịch khám?</string>
+    <string name="appt_cancel_confirm_message">Bạn có chắc muốn huỷ lịch hẹn này? Thao tác này không thể hoàn tác.</string>
+    <string name="appt_queue_pending">—</string>
+    <string name="auth_email_required">Vui lòng nhập email.</string>
+    <string name="auth_otp_required">Vui lòng nhập mã OTP.</string>
+    <string name="auth_full_name_required">Vui lòng nhập họ và tên.</string>
+    <string name="auth_password_required">Vui lòng nhập mật khẩu (tối thiểu 6 ký tự).</string>
     <string name="search_hint_appointments">Tìm theo mã phiếu khám, tên bệnh nhân</string>
     <string name="appointment_ticket_title">Phiếu khám</string>
     <string name="appt_status_booked">Đã đặt lịch</string>
+    <string name="appt_status_confirmed">Đã duyệt</string>
+    <string name="appt_status_checked_in">Đã check-in</string>
+    <string name="appt_status_completed">Đã khám xong</string>
+    <string name="appt_status_cancelled">Đã hủy</string>
+    <string name="appt_status_no_show">Không đến</string>
+    <string name="appt_check_in">Tôi đã đến phòng khám</string>
+    <string name="appt_check_in_success">Check-in thành công — vui lòng chờ bác sĩ gọi</string>
+    <string name="appt_check_in_hint">Check-in trong ngày khám để báo bác sĩ bạn đã có mặt</string>
     <string name="appt_message_doctor">Nhắn tin với bác sĩ</string>
     <string name="appt_support_line">Tổng đài hỗ trợ chăm sóc khách hàng</string>
     <string name="tab_upcoming">Sắp tới</string>
@@ -278,15 +372,9 @@
     <string name="view_detail">Xem chi tiết</string>
     <string name="cancel_booking">Hủy lịch</string>
 
-    <string name="consult_demo_title">Tư vấn</string>
-    <string name="consult_demo_body">Kết nối bác sĩ / chat sẽ được triển khai sau.</string>
-
-    <string name="messages_demo_title">Tin nhắn</string>
-    <string name="messages_demo_body">Hộp tin nhắn demo — chưa có API.</string>
-
     <!-- Auth / đăng ký kiểu YouMed (email + OTP) -->
-    <string name="auth_brand_part1">Booking</string>
-    <string name="auth_brand_part2">Care</string>
+    <string name="auth_brand_part1">Clinic</string>
+    <string name="auth_brand_part2">Booking</string>
     <string name="auth_id_suffix"> ID</string>
     <string name="auth_login_section_title">Thông tin đăng nhập</string>
     <string name="auth_hint_email">Nhập email của bạn</string>
@@ -342,7 +430,7 @@
     <string name="account_menu_privacy">Chính sách bảo mật</string>
     <string name="account_menu_service_terms">Điều khoản dịch vụ</string>
     <string name="account_menu_support_title">Hỗ trợ tư vấn / đặt khám</string>
-    <string name="account_menu_support_sub">Gọi tổng đài (demo)</string>
+    <string name="account_menu_support_sub">Gọi tổng đài 0247 300 8899</string>
     <string name="account_menu_rate">Đánh giá ứng dụng</string>
     <string name="account_menu_share">Chia sẻ ứng dụng</string>
     <string name="account_menu_faq">Câu hỏi thường gặp</string>
@@ -351,17 +439,15 @@
     <string name="language_name_en">English</string>
     <string name="account_language_dialog_title">Chọn ngôn ngữ</string>
     <string name="language_changed">Đã đổi ngôn ngữ</string>
-    <string name="account_support_phone_uri">tel:19001234</string>
+    <string name="account_support_phone_display">0247 300 8899</string>
+    <string name="account_support_phone_uri">tel:02473008899</string>
+    <string name="account_support_call_fmt">Gọi tổng đài %1$s</string>
     <string name="account_support_call">Gọi hỗ trợ</string>
-    <string name="account_share_text">Đặt lịch khám dễ dàng với BookingCare.</string>
+    <string name="account_share_text">Đặt lịch khám dễ dàng với ClinicBooking.</string>
     <string name="account_version_fmt">Phiên bản %s</string>
-    <string name="account_footer_tagline">Ứng dụng đặt khám — BookingCare (demo)</string>
+    <string name="account_footer_tagline">Ứng dụng ClinicBooking — Phòng khám Quyết Tiến</string>
     <string name="account_logout_confirm">Bạn có chắc muốn đăng xuất?</string>
     <string name="account_logged_out_toast">Đã đăng xuất</string>
-    <string name="account_placeholder_terms">Nội dung quy định sử dụng (demo). Ứng dụng thật sẽ hiển thị trang chính sách đầy đủ.</string>
-    <string name="account_placeholder_privacy">Chính sách bảo mật (demo). Chúng tôi cam kết bảo vệ dữ liệu cá nhân theo quy định pháp luật.</string>
-    <string name="account_placeholder_service">Điều khoản dịch vụ (demo).</string>
-    <string name="account_placeholder_faq">Các câu hỏi thường gặp sẽ được cập nhật tại đây.</string>
     <string name="legal_error_loading">Không tải được nội dung. Hãy kiểm tra kết nối và backend.</string>
     <string name="legal_default_title">Điều khoản &amp; chính sách</string>
 
@@ -385,10 +471,64 @@
     <string name="gender">Giới tính</string>
     <string name="address">Địa chỉ</string>
     <string name="health_records">Hồ sơ sức khỏe</string>
+    <string name="health_records_empty">Chưa có lịch khám đã hoàn thành.</string>
+    <string name="health_records_login_required">Đăng nhập để xem lịch sử khám.</string>
+    <string name="health_records_visit">Lần khám</string>
+    <string name="health_record_doctor_fmt">Bác sĩ: %1$s</string>
+    <string name="health_record_no_note">Không có ghi chú từ bác sĩ.</string>
     <string name="back">Quay lại</string>
 
     <string name="error_missing_server_data">Thiếu dữ liệu từ máy chủ</string>
+    <string name="error_network_generic">Lỗi kết nối mạng</string>
     <string name="error_network_fmt">Lỗi mạng (%d)</string>
+    <string name="error_profile_parse_failed">Không đọc được hồ sơ từ máy chủ</string>
+    <string name="gender_male">Nam</string>
+    <string name="gender_female">Nữ</string>
+    <string name="gender_other">Khác</string>
+    <string name="chat_patient_subtitle_age_fmt">Bệnh nhân: %1$s - %2$d tuổi</string>
+    <string name="chat_doctor_subtitle_fmt">Bác sĩ: %1$s</string>
+    <string name="ticket_share_fmt">Phiếu khám: %1$s</string>
+    <string name="share_chooser_title">Chia sẻ</string>
+    <string name="appt_status_pending">Chờ bác sĩ duyệt</string>
+    <string name="ticket_status_label_pending">Trạng thái: Chờ bác sĩ duyệt</string>
+    <string name="ticket_status_label_confirmed">Trạng thái: Đã duyệt — có thể check-in trong ngày khám</string>
+    <string name="ticket_status_label_checked_in">Trạng thái: Đã check-in — đang chờ bác sĩ khám</string>
+    <string name="ticket_status_label_completed">Trạng thái: Đã khám xong</string>
+    <string name="ticket_status_label_cancelled">Trạng thái: Đã hủy</string>
+    <string name="ticket_status_label_no_show">Trạng thái: Không đến khám</string>
+    <string name="ticket_status_label_unknown_fmt">Trạng thái: %1$s</string>
+    <string name="appt_cancel_reason_patient">Bệnh nhân huỷ</string>
+
+    <string name="time_ago_just_now">Vừa xong</string>
+    <string name="time_ago_seconds_fmt">%1$d giây</string>
+    <string name="time_ago_minutes_fmt">%1$d phút</string>
+    <string name="time_ago_hours_fmt">%1$d giờ</string>
+    <string name="time_ago_days_fmt">%1$d ngày</string>
+    <string name="time_ago_weeks_fmt">%1$d tuần</string>
+    <string name="time_ago_months_fmt">%1$d tháng</string>
+    <string name="time_ago_years_fmt">%1$d năm</string>
+    <string name="dow_mon">T2</string>
+    <string name="dow_tue">T3</string>
+    <string name="dow_wed">T4</string>
+    <string name="dow_thu">T5</string>
+    <string name="dow_fri">T6</string>
+    <string name="dow_sat">T7</string>
+    <string name="dow_sun">CN</string>
+    <string name="support_need_help_title">Bạn cần hỗ trợ</string>
+    <string name="support_need_help_body">Nếu bạn cần hỗ trợ đặt lịch khám, tư vấn dịch vụ y tế hoặc hướng dẫn sử dụng hệ thống, vui lòng liên hệ bộ phận Chăm sóc khách hàng trong khung giờ sau:</string>
+    <string name="support_hours_days">Thứ 2 - Thứ 7</string>
+    <string name="support_hours_time">08:00 - 17:30</string>
+    <string name="support_chat_btn">Nhắn tin với CSKH</string>
+    <string name="complete_profile_title">Cập nhật hồ sơ</string>
+    <string name="complete_profile_intro">Vui lòng cung cấp đầy đủ thông tin để đặt lịch khám.</string>
+    <string name="complete_profile_dob_hint">Ngày sinh (dd/MM/yyyy)</string>
+    <string name="booking_complete_profile_btn">Cập nhật hồ sơ để đặt lịch</string>
+    <string name="ticket_patient_info">Thông tin bệnh nhân</string>
+    <string name="ticket_registration_info">Thông tin đăng ký khám</string>
+    <string name="ticket_doctor_address_fmt">Địa chỉ: %1$s</string>
+    <string name="clipboard_label_ticket_code">Mã phiếu khám</string>
+    <string name="clipboard_label_hotline">Hotline</string>
+
     <string name="error_login_failed">Đăng nhập thất bại</string>
     <string name="error_otp_send_failed">Không gửi được OTP</string>
     <string name="error_password_reset_failed">Đặt lại mật khẩu thất bại</string>
@@ -401,25 +541,8 @@
     <string name="profile_row_dob">📅 Ngày sinh: %1$s</string>
     <string name="profile_row_gender">👤 Giới tính: %1$s</string>
     <string name="profile_row_address">📍 Địa chỉ: %1$s</string>
-    <string name="demo_health_1_title">Khám tổng quát</string>
-    <string name="demo_health_1_date">15/01/2026</string>
-    <string name="demo_health_1_doctor">Bác sĩ: PGS.TS. Lê Văn Hùng</string>
-    <string name="demo_health_1_note">Ghi chú: Cần theo dõi huyết áp thường xuyên, điều chỉnh chế độ ăn uống.</string>
-    <string name="demo_health_2_title">Xét nghiệm máu</string>
-    <string name="demo_health_2_date">20/12/2025</string>
-    <string name="demo_health_2_doctor">Bác sĩ: BS. Nguyễn Thị Lan</string>
-    <string name="demo_health_2_note">Kết quả: demo dữ liệu.</string>
 
-    <string name="home_specialty_internal">Nội khoa</string>
-    <string name="home_specialty_pediatrics">Nhi khoa</string>
-    <string name="home_specialty_ob">Sản khoa</string>
-    <string name="home_specialty_ortho">Cơ xương khớp</string>
-    <string name="home_doctor_1_name">BS. Nguyễn Thị Lan</string>
-    <string name="home_doctor_1_rating">★ 4.9 · 342 đánh giá</string>
-    <string name="home_doctor_2_name">BS. Trần Minh Tuấn</string>
-    <string name="home_doctor_2_rating">★ 4.8 · 120 đánh giá</string>
-
-    <string name="edit_profile_saved_toast">Đã lưu (lưu trên máy, chờ API hồ sơ)</string>
+    <string name="edit_profile_saved_toast">Đã lưu hồ sơ</string>
     <string name="change_pwd_fill_all">Nhập đủ các trường</string>
     <string name="change_pwd_min_length">Mật khẩu mới ít nhất 6 ký tự</string>
     <string name="change_pwd_mismatch">Mật khẩu mới không khớp</string>
@@ -430,13 +553,13 @@
     <string name="onboarding_start">Bắt đầu</string>
     <string name="onboarding_or_auth">Đăng ký hoặc Đăng nhập</string>
     <string name="onboarding_1_title">Đặt lịch khám</string>
-    <string name="onboarding_1_desc">Bạn có thể đặt khám bác sĩ, bệnh viện và phòng khám liên kết chính thức với BookingCare để nhận trước số thứ tự và khung giờ khám.</string>
+    <string name="onboarding_1_desc">Bạn có thể đặt khám bác sĩ tại Phòng khám Quyết Tiến qua ClinicBooking để nhận trước số thứ tự và khung giờ khám.</string>
     <string name="onboarding_2_title">Gọi video với bác sĩ</string>
     <string name="onboarding_2_desc">Bạn có thể gọi video ngay với bác sĩ hoặc đặt lịch cho cuộc gọi.</string>
     <string name="onboarding_3_title">Nhắn tin với bác sĩ</string>
     <string name="onboarding_3_desc">Bạn có thể nhắn tin với bác sĩ đang trực tuyến để được tư vấn về tình trạng sức khỏe, bệnh, thuốc…</string>
     <string name="onboarding_4_title">Mua sản phẩm y tế</string>
-    <string name="onboarding_4_desc">Bạn có thể mua trực tuyến các sản phẩm thuốc, thực phẩm chức năng, sản phẩm chăm sóc sức khỏe trên ứng dụng BookingCare.</string>
+    <string name="onboarding_4_desc">Bạn có thể mua trực tuyến các sản phẩm thuốc, thực phẩm chức năng, sản phẩm chăm sóc sức khỏe trên ứng dụng ClinicBooking.</string>
     <string name="onboarding_5_title">Lưu trữ thông tin y tế</string>
-    <string name="onboarding_5_desc">Bạn sẽ nhận được kết quả khám, toa thuốc, kết quả xét nghiệm trên ứng dụng BookingCare.</string>
+    <string name="onboarding_5_desc">Bạn sẽ nhận được kết quả khám, toa thuốc, kết quả xét nghiệm trên ứng dụng ClinicBooking.</string>
 </resources>

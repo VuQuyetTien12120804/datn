@@ -13,6 +13,10 @@
         android:icon="@drawable/ic_nav_doctor_clinic"
         android:title="@string/doctor_nav_examining" />
     <item
+        android:id="@+id/doctor_nav_messages"
+        android:icon="@drawable/ic_nav_doctor_messages"
+        android:title="@string/doctor_nav_messages" />
+    <item
         android:id="@+id/doctor_nav_account"
         android:icon="@drawable/ic_nav_doctor_person"
         android:title="@string/doctor_nav_account" />

@@ -1,26 +1,29 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 import {
   Button,
   Card,
   Descriptions,
+  Dropdown,
   Form,
   Input,
-  InputNumber,
   Modal,
   Select,
   Space,
   Table,
-  Tag,
   Typography,
   message,
 } from 'antd'
+import type { MenuProps } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { DoctorAdmin } from '../api/types'
 import {
   getAppointmentDetail,
   listDoctors,
+  listSlots,
   rescheduleAppointment,
+  searchAllAppointments,
   searchAppointments,
   updateAppointmentStatus,
   type AppointmentStatus,
@@ -31,10 +34,16 @@ import { reYmd } from '../ui/validators'
 import TableCard from '../ui/TableCard'
 import EmptyState from '../ui/EmptyState'
 import TableShell from '../ui/TableShell'
+import {
+  APPOINTMENT_STATUS_OPTIONS,
+  appointmentStatusLabel,
+  appointmentStatusTag,
+  normalizeAppointmentStatus,
+} from '../ui/appointmentStatus'
 
 type FilterValues = {
   doctorId?: number
-  patientId?: any
+  patientId?: string
   status?: AppointmentStatus
   q?: string
   fromDate?: string
@@ -48,21 +57,32 @@ type UpdateValues = {
 }
 
 type RescheduleValues = {
+  resDate: string
   slotId: number
 }
 
-const statusOptions: { value: AppointmentStatus; label: string; color?: string }[] = [
-  { value: 'PENDING', label: 'PENDING', color: 'default' },
-  { value: 'CONFIRMED', label: 'CONFIRMED', color: 'blue' },
-  { value: 'CHECKED_IN', label: 'CHECKED_IN', color: 'cyan' },
-  { value: 'COMPLETED', label: 'COMPLETED', color: 'green' },
-  { value: 'CANCELLED', label: 'CANCELLED', color: 'red' },
-  { value: 'NO_SHOW', label: 'NO_SHOW', color: 'orange' },
-]
+function todayYmd() {
+  return new Date().toISOString().slice(0, 10)
+}
 
-function statusTag(s: AppointmentStatus) {
-  const meta = statusOptions.find((x) => x.value === s)
-  return <Tag color={meta?.color}>{s}</Tag>
+function parseFilterValues(v: FilterValues) {
+  return {
+    doctorId: v.doctorId,
+    patientId:
+      v.patientId !== undefined && v.patientId !== null && String(v.patientId).trim().length > 0
+        ? Number(v.patientId)
+        : undefined,
+    status: v.status,
+    q: v.q?.trim() ? v.q.trim() : undefined,
+    fromDate: v.fromDate?.trim() ? v.fromDate.trim() : undefined,
+    toDate: v.toDate?.trim() ? v.toDate.trim() : undefined,
+  }
+}
+
+async function invalidateAppointmentQueries(qc: QueryClient) {
+  await qc.invalidateQueries({ queryKey: ['admin', 'appointments.search'] })
+  await qc.invalidateQueries({ queryKey: ['admin', 'appointments.detail'] })
+  await qc.invalidateQueries({ queryKey: ['admin', 'reports'] })
 }
 
 export default function AppointmentsPage() {
@@ -75,43 +95,32 @@ export default function AppointmentsPage() {
   const [resOpen, setResOpen] = useState(false)
   const [selected, setSelected] = useState<AppointmentAdminRow | null>(null)
   const [detail, setDetail] = useState<AppointmentAdminDetail | null>(null)
-  const [page, setPage] = useState(1) // antd is 1-based
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({})
+  const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [exporting, setExporting] = useState(false)
 
   const qDoctors = useQuery({
     queryKey: ['admin', 'doctors'],
     queryFn: listDoctors,
   })
 
-  const filters = Form.useWatch([], filterForm) as FilterValues | undefined
-
   const q = useQuery({
-    queryKey: [
-      'admin',
-      'appointments.search',
-      filters?.doctorId,
-      filters?.patientId,
-      filters?.status,
-      filters?.q,
-      filters?.fromDate,
-      filters?.toDate,
-      page,
-      pageSize,
-    ],
+    queryKey: ['admin', 'appointments.search', appliedFilters, page, pageSize],
     queryFn: () =>
       searchAppointments({
-        doctorId: filters?.doctorId,
-        patientId:
-          filters?.patientId !== undefined && filters?.patientId !== null && String(filters?.patientId).trim().length > 0
-            ? Number(filters?.patientId)
-            : undefined,
-        status: filters?.status,
-        q: filters?.q?.trim() ? filters?.q.trim() : undefined,
-        fromDate: filters?.fromDate?.trim() ? filters?.fromDate.trim() : undefined,
-        toDate: filters?.toDate?.trim() ? filters?.toDate.trim() : undefined,
+        ...parseFilterValues(appliedFilters),
         page: page - 1,
         size: pageSize,
       }),
+  })
+
+  const resDate = Form.useWatch('resDate', resForm) as string | undefined
+
+  const qResSlots = useQuery({
+    queryKey: ['admin', 'slots.reschedule', selected?.doctorId, resDate],
+    enabled: resOpen && !!selected?.doctorId && !!resDate && reYmd.test(resDate),
+    queryFn: () => listSlots(selected!.doctorId!, resDate!),
   })
 
   const qDetail = useQuery({
@@ -129,8 +138,7 @@ export default function AppointmentsPage() {
     onSuccess: async () => {
       message.success('Cập nhật trạng thái thành công')
       setUpdateOpen(false)
-      await qc.invalidateQueries({ queryKey: ['admin', 'appointments.search'] })
-      await qc.invalidateQueries({ queryKey: ['admin', 'appointments.detail'] })
+      await invalidateAppointmentQueries(qc)
     },
     onError: (e: any) => {
       message.error(e?.response?.data?.message ?? e?.message ?? 'Không cập nhật được')
@@ -140,13 +148,12 @@ export default function AppointmentsPage() {
   const resMut = useMutation({
     mutationFn: ({ id, slotId }: { id: number; slotId: number }) => rescheduleAppointment(id, slotId),
     onSuccess: async () => {
-      message.success('Đổi slot thành công')
+      message.success('Đổi khung giờ thành công')
       setResOpen(false)
-      await qc.invalidateQueries({ queryKey: ['admin', 'appointments.search'] })
-      await qc.invalidateQueries({ queryKey: ['admin', 'appointments.detail'] })
+      await invalidateAppointmentQueries(qc)
     },
     onError: (e: any) => {
-      message.error(e?.response?.data?.message ?? e?.message ?? 'Không đổi được slot')
+      message.error(e?.response?.data?.message ?? e?.message ?? 'Không đổi được khung giờ')
     },
   })
 
@@ -155,13 +162,93 @@ export default function AppointmentsPage() {
     label: `${d.fullName} (#${d.doctorId})`,
   }))
 
+  const slotOptions = useMemo(
+    () =>
+      (qResSlots.data ?? []).map((s) => ({
+        value: s.slotId,
+        label: `#${s.slotId} · ${formatSlotTime(s.startsAt)}–${formatSlotTime(s.endsAt)} · ${s.bookedCount}/${s.capacity} đã đặt`,
+        disabled: !s.isActive || s.bookedCount >= s.capacity,
+      })),
+    [qResSlots.data],
+  )
+
+  const applyFilters = async () => {
+    try {
+      await filterForm.validateFields()
+      setAppliedFilters(filterForm.getFieldsValue())
+      setPage(1)
+    } catch {
+      /* validation messages */
+    }
+  }
+
+  const resetFilters = () => {
+    filterForm.resetFields()
+    setAppliedFilters({})
+    setPage(1)
+  }
+
+  const exportCsv = async () => {
+    try {
+      await filterForm.validateFields()
+      setExporting(true)
+      const params = parseFilterValues(filterForm.getFieldsValue())
+      const rows = await searchAllAppointments(params)
+      const columns = [
+        { key: 'appointmentId', label: 'Mã lịch' },
+        { key: 'patientId', label: 'Mã BN' },
+        { key: 'patientName', label: 'Bệnh nhân' },
+        { key: 'doctorId', label: 'Mã BS' },
+        { key: 'doctorName', label: 'Bác sĩ' },
+        { key: 'serviceName', label: 'Dịch vụ' },
+        { key: 'roomName', label: 'Phòng' },
+        { key: 'slotId', label: 'Slot' },
+        { key: 'startsAt', label: 'Bắt đầu' },
+        { key: 'endsAt', label: 'Kết thúc' },
+        { key: 'status', label: 'Trạng thái' },
+      ] as const
+      const csv = [
+        columns.map((c) => c.label).join(','),
+        ...rows.map((r) =>
+          columns
+            .map(({ key }) => {
+              const raw = (r as Record<string, unknown>)[key]
+              const val = key === 'status' ? appointmentStatusLabel(String(raw ?? '')) : raw
+              const s = val === null || val === undefined ? '' : String(val)
+              return `"${s.replaceAll('"', '""')}"`
+            })
+            .join(','),
+        ),
+      ].join('\n')
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `lich_hen_${new Date().toISOString().slice(0, 10)}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+      message.success(`Đã xuất CSV (${rows.length} dòng)`)
+    } catch (e: any) {
+      message.error(e?.response?.data?.message ?? e?.message ?? 'Xuất CSV thất bại')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const openReschedule = (row: AppointmentAdminRow) => {
+    setSelected(row)
+    setResOpen(true)
+    const date = row.startsAt?.slice(0, 10) ?? todayYmd()
+    resForm.setFieldsValue({ resDate: date, slotId: undefined })
+  }
+
   const columns: ColumnsType<AppointmentAdminRow> = useMemo(
     () => [
-      { title: 'ID', dataIndex: 'appointmentId', width: 90 },
+      { title: 'Mã', dataIndex: 'appointmentId', width: 80 },
       {
         title: 'Bệnh nhân',
         dataIndex: 'patientName',
-        width: 220,
+        width: 200,
         render: (v, r) => (
           <div>
             <div>{v ?? `#${r.patientId ?? ''}`}</div>
@@ -174,7 +261,7 @@ export default function AppointmentsPage() {
       {
         title: 'Bác sĩ',
         dataIndex: 'doctorName',
-        width: 220,
+        width: 200,
         render: (v, r) => (
           <div>
             <div>{v ?? `#${r.doctorId ?? ''}`}</div>
@@ -184,61 +271,64 @@ export default function AppointmentsPage() {
           </div>
         ),
       },
-      { title: 'Bắt đầu', dataIndex: 'startsAt', width: 210 },
-      { title: 'Kết thúc', dataIndex: 'endsAt', width: 210 },
+      { title: 'Bắt đầu', dataIndex: 'startsAt', width: 180 },
       {
         title: 'Trạng thái',
         dataIndex: 'status',
-        width: 140,
-        render: (s: string) => statusTag((s?.toUpperCase?.() ?? 'PENDING') as AppointmentStatus),
+        width: 130,
+        render: (s: string) => appointmentStatusTag(s),
       },
       {
         title: 'Thao tác',
         key: 'actions',
-        width: 420,
-        render: (_, row) => (
-          <Space>
-            <Button
-              onClick={() => {
-                setSelected(row)
-                setDetail(null)
-                setDetailOpen(true)
-              }}
-            >
-              Chi tiết
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => {
-                setSelected(row)
-                setUpdateOpen(true)
-                updateForm.setFieldsValue({
-                  status: ((row.status ?? 'pending').toUpperCase() as AppointmentStatus) ?? 'PENDING',
-                })
-              }}
-            >
-              Cập nhật
-            </Button>
-            <Button
-              onClick={() => {
-                setSelected(row)
-                setResOpen(true)
-                resForm.setFieldsValue({ slotId: row.slotId ?? undefined } as any)
-              }}
-            >
-              Đổi slot
-            </Button>
-            <Button
-              onClick={() => updateMut.mutate({ id: row.appointmentId, payload: { status: 'CONFIRMED' } })}
-              disabled={(row.status ?? '').toLowerCase() === 'confirmed'}
-            >
-              Xác nhận
-            </Button>
-            <Button danger onClick={() => updateMut.mutate({ id: row.appointmentId, payload: { status: 'CANCELLED', cancelReason: 'Admin từ chối' } })}>
-              Từ chối
-            </Button>
-          </Space>
-        ),
+        width: 280,
+        fixed: 'right',
+        render: (_, row) => {
+          const st = (row.status ?? '').toLowerCase()
+          const quickItems: MenuProps['items'] = [
+            {
+              key: 'confirm',
+              label: 'Xác nhận nhanh',
+              disabled: st === 'confirmed' || st === 'completed' || st === 'cancelled',
+              onClick: () => updateMut.mutate({ id: row.appointmentId, payload: { status: 'CONFIRMED' } }),
+            },
+            {
+              key: 'reject',
+              label: 'Từ chối nhanh',
+              danger: true,
+              disabled: st === 'cancelled' || st === 'completed',
+              onClick: () =>
+                updateMut.mutate({
+                  id: row.appointmentId,
+                  payload: { status: 'CANCELLED', cancelReason: 'Admin từ chối' },
+                }),
+            },
+          ]
+          return (
+            <Space size={4} wrap>
+              <Button size="small" onClick={() => { setSelected(row); setDetail(null); setDetailOpen(true) }}>
+                Chi tiết
+              </Button>
+              <Button
+                size="small"
+                type="primary"
+                onClick={() => {
+                  setSelected(row)
+                  setUpdateOpen(true)
+                  updateForm.setFieldsValue({ status: normalizeAppointmentStatus(row.status) })
+                }}
+              >
+                Trạng thái
+              </Button>
+              <Button size="small" onClick={() => openReschedule(row)}>
+                Đổi giờ
+              </Button>
+              <Dropdown menu={{ items: quickItems }} trigger={['click']}>
+                <Button size="small">⋯</Button>
+              </Dropdown>
+            </Space>
+          )
+        },
       },
     ],
     [resForm, updateForm, updateMut],
@@ -271,26 +361,20 @@ export default function AppointmentsPage() {
             <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
               Lịch hẹn
             </Typography.Title>
-            <Typography.Text type="secondary">Xem và duyệt lịch hẹn (admin)</Typography.Text>
+            <Typography.Text type="secondary">Duyệt và quản lý lịch hẹn từ app bệnh nhân</Typography.Text>
           </div>
-          <Button
-            onClick={() => {
-              qc.invalidateQueries({
-                queryKey: ['admin', 'appointments.search'],
-              })
-            }}
-          >
+          <Button onClick={() => qc.invalidateQueries({ queryKey: ['admin', 'appointments.search'] })}>
             Tải lại
           </Button>
         </Space>
       </Card>
 
       <Card>
-        <Form<FilterValues> form={filterForm} layout="inline">
+        <Form<FilterValues> form={filterForm} layout="inline" onFinish={applyFilters}>
           <Form.Item name="q" label="Tìm kiếm">
-            <Input placeholder="Tên bệnh nhân/bác sĩ/lý do..." style={{ width: 260 }} />
+            <Input placeholder="Tên BN/BS, mã lịch..." style={{ width: 220 }} allowClear />
           </Form.Item>
-          <Form.Item name="doctorId" label="Bác sĩ" style={{ minWidth: 360 }}>
+          <Form.Item name="doctorId" label="Bác sĩ" style={{ minWidth: 280 }}>
             <Select
               allowClear
               showSearch
@@ -298,100 +382,37 @@ export default function AppointmentsPage() {
               options={doctorOptions}
               placeholder="Tất cả"
               loading={qDoctors.isLoading}
+              style={{ minWidth: 240 }}
             />
           </Form.Item>
-          <Form.Item name="patientId" label="Patient ID">
-            <Input placeholder="VD: 12" style={{ width: 140 }} />
+          <Form.Item name="patientId" label="Mã BN">
+            <Input placeholder="VD: 12" style={{ width: 100 }} allowClear />
           </Form.Item>
-          <Form.Item
-            name="fromDate"
-            label="Từ ngày"
-            rules={[{ pattern: reYmd, message: 'yyyy-mm-dd' }]}
-          >
-            <Input placeholder="2026-04-01" style={{ width: 140 }} />
+          <Form.Item name="fromDate" label="Từ ngày" rules={[{ pattern: reYmd, message: 'yyyy-mm-dd' }]}>
+            <Input placeholder="2026-05-01" style={{ width: 130 }} allowClear />
           </Form.Item>
           <Form.Item name="toDate" label="Đến ngày" rules={[{ pattern: reYmd, message: 'yyyy-mm-dd' }]}>
-            <Input placeholder="2026-04-30" style={{ width: 140 }} />
+            <Input placeholder="2026-05-31" style={{ width: 130 }} allowClear />
           </Form.Item>
-          <Form.Item name="status" label="Status" style={{ minWidth: 200 }}>
+          <Form.Item name="status" label="Trạng thái" style={{ minWidth: 180 }}>
             <Select
               allowClear
-              options={statusOptions.map((s) => ({ value: s.value, label: s.label }))}
+              options={APPOINTMENT_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.label }))}
               placeholder="Tất cả"
+              style={{ minWidth: 160 }}
             />
           </Form.Item>
-          <Button
-            onClick={() => {
-              setPage(1)
-              qc.invalidateQueries({ queryKey: ['admin', 'appointments.search'] })
-            }}
-          >
-            Áp dụng
-          </Button>
-          <Button
-            onClick={async () => {
-              try {
-                const v = filterForm.getFieldsValue()
-                const data = await searchAppointments({
-                  doctorId: v.doctorId,
-                  patientId: v.patientId ? Number(v.patientId) : undefined,
-                  status: v.status,
-                  q: v.q?.trim() ? v.q.trim() : undefined,
-                  fromDate: v.fromDate?.trim() ? v.fromDate.trim() : undefined,
-                  toDate: v.toDate?.trim() ? v.toDate.trim() : undefined,
-                  page: 0,
-                  size: 5000,
-                })
-                const rows = data.content ?? []
-                const header = [
-                  'appointmentId',
-                  'patientId',
-                  'patientName',
-                  'doctorId',
-                  'doctorName',
-                  'serviceName',
-                  'roomName',
-                  'slotId',
-                  'startsAt',
-                  'endsAt',
-                  'status',
-                ]
-                const csv = [
-                  header.join(','),
-                  ...rows.map((r) =>
-                    header
-                      .map((k) => {
-                        const val = (r as any)[k]
-                        const s = val === null || val === undefined ? '' : String(val)
-                        const escaped = s.replaceAll('"', '""')
-                        return `"${escaped}"`
-                      })
-                      .join(','),
-                  ),
-                ].join('\n')
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `appointments_${new Date().toISOString().slice(0, 10)}.csv`
-                a.click()
-                URL.revokeObjectURL(url)
-                message.success(`Đã export CSV (${rows.length} dòng)`)
-              } catch (e: any) {
-                message.error(e?.response?.data?.message ?? e?.message ?? 'Export thất bại')
-              }
-            }}
-          >
-            Export CSV
-          </Button>
-          <Button
-            onClick={() => {
-              filterForm.resetFields()
-              setPage(1)
-            }}
-          >
-            Reset
-          </Button>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Áp dụng
+              </Button>
+              <Button loading={exporting} onClick={exportCsv}>
+                Xuất CSV
+              </Button>
+              <Button onClick={resetFilters}>Xóa lọc</Button>
+            </Space>
+          </Form.Item>
         </Form>
       </Card>
 
@@ -402,7 +423,7 @@ export default function AppointmentsPage() {
             loading={false}
             dataSource={q.data?.content ?? []}
             columns={columns}
-            scroll={{ x: 1200, y: 'calc(100vh - 540px)' as any }}
+            scroll={{ x: 1100, y: 'calc(100vh - 540px)' as any }}
             sticky
             pagination={{
               current: page,
@@ -415,40 +436,36 @@ export default function AppointmentsPage() {
               },
             }}
             locale={{
-              emptyText: <EmptyState title="Chưa có lịch hẹn" description="Khi bệnh nhân đặt lịch, lịch hẹn sẽ xuất hiện ở đây." />,
+              emptyText: (
+                <EmptyState title="Chưa có lịch hẹn" description="Khi bệnh nhân đặt lịch, lịch hẹn sẽ xuất hiện ở đây." />
+              ),
             }}
           />
         </TableShell>
       </TableCard>
 
-      <Modal
-        title="Chi tiết lịch hẹn"
-        open={detailOpen}
-        onCancel={() => setDetailOpen(false)}
-        footer={null}
-        destroyOnClose
-        width={760}
-      >
+      <Modal title="Chi tiết lịch hẹn" open={detailOpen} onCancel={() => setDetailOpen(false)} footer={null} destroyOnClose width={760}>
         {detail ? (
           <Descriptions bordered size="small" column={2}>
-            <Descriptions.Item label="Appointment ID">{detail.appointmentId}</Descriptions.Item>
-            <Descriptions.Item label="Status">{statusTag((detail.status as any) ?? 'PENDING')}</Descriptions.Item>
+            <Descriptions.Item label="Mã lịch">{detail.appointmentId}</Descriptions.Item>
+            <Descriptions.Item label="Trạng thái">{appointmentStatusTag(detail.status)}</Descriptions.Item>
             <Descriptions.Item label="Bác sĩ" span={2}>
               {detail.doctorName ?? '—'} (#{detail.doctorId ?? '—'})
             </Descriptions.Item>
             <Descriptions.Item label="Bệnh nhân" span={2}>
-              {detail.patientName ?? '—'} (#{detail.patientId ?? '—'}) — {detail.patientPhone ?? '—'} — {detail.patientEmail ?? '—'}
+              {detail.patientName ?? '—'} (#{detail.patientId ?? '—'}) — {detail.patientPhone ?? '—'} —{' '}
+              {detail.patientEmail ?? '—'}
             </Descriptions.Item>
-            <Descriptions.Item label="Starts">{detail.startsAt ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="Ends">{detail.endsAt ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="Room">{detail.roomName ?? '—'} (#{detail.roomId ?? '—'})</Descriptions.Item>
-            <Descriptions.Item label="Service">
+            <Descriptions.Item label="Bắt đầu">{detail.startsAt ?? '—'}</Descriptions.Item>
+            <Descriptions.Item label="Kết thúc">{detail.endsAt ?? '—'}</Descriptions.Item>
+            <Descriptions.Item label="Phòng">
+              {detail.roomName ?? '—'} (#{detail.roomId ?? '—'})
+            </Descriptions.Item>
+            <Descriptions.Item label="Dịch vụ">
               {detail.serviceName ?? '—'} {detail.serviceDurationMinutes ? `(${detail.serviceDurationMinutes} phút)` : ''}
             </Descriptions.Item>
-            <Descriptions.Item label="Slot ID">{detail.slotId ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="Địa chỉ" span={2}>
-              {detail.patientAddress ?? '—'}
-            </Descriptions.Item>
+            <Descriptions.Item label="Khung giờ (slot)">{detail.slotId ?? '—'}</Descriptions.Item>
+            <Descriptions.Item label="Địa chỉ">{detail.patientAddress ?? '—'}</Descriptions.Item>
             <Descriptions.Item label="Lý do" span={2}>
               {detail.reason ?? '—'}
             </Descriptions.Item>
@@ -477,14 +494,14 @@ export default function AppointmentsPage() {
       >
         <Form<UpdateValues> form={updateForm} layout="vertical">
           <Form.Item name="status" label="Trạng thái" rules={[{ required: true, message: 'Chọn trạng thái' }]}>
-            <Select options={statusOptions.map((s) => ({ value: s.value, label: s.label }))} />
+            <Select options={APPOINTMENT_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.label }))} />
           </Form.Item>
           <Form.Item name="note" label="Ghi chú (tuỳ chọn)">
             <Input.TextArea rows={3} />
           </Form.Item>
           <Form.Item
             name="cancelReason"
-            label="Lý do hủy (chỉ cần khi CANCELLED)"
+            label="Lý do hủy (bắt buộc khi hủy)"
             rules={[
               ({ getFieldValue }) => ({
                 validator(_, value) {
@@ -503,22 +520,46 @@ export default function AppointmentsPage() {
       </Modal>
 
       <Modal
-        title={selected ? `Đổi slot (#${selected.appointmentId})` : 'Đổi slot'}
+        title={selected ? `Đổi khung giờ (#${selected.appointmentId})` : 'Đổi khung giờ'}
         open={resOpen}
         onCancel={() => setResOpen(false)}
-        okText="Đổi"
+        okText="Lưu"
         cancelText="Hủy"
         confirmLoading={resMut.isPending}
         onOk={submitRes}
         destroyOnClose
-        width={520}
+        width={560}
       >
+        {selected ? (
+          <Typography.Paragraph type="secondary" style={{ marginTop: 0 }}>
+            Bác sĩ: {selected.doctorName ?? `#${selected.doctorId}`}
+          </Typography.Paragraph>
+        ) : null}
         <Form<RescheduleValues> form={resForm} layout="vertical">
-          <Form.Item name="slotId" label="Slot ID mới" rules={[{ required: true, message: 'Nhập slotId' }]}>
-            <InputNumber style={{ width: '100%' }} min={1} />
+          <Form.Item
+            name="resDate"
+            label="Ngày khám"
+            rules={[
+              { required: true, message: 'Chọn ngày' },
+              { pattern: reYmd, message: 'Định dạng yyyy-mm-dd' },
+            ]}
+          >
+            <Input placeholder="2026-05-22" onChange={() => resForm.setFieldValue('slotId', undefined)} />
+          </Form.Item>
+          <Form.Item name="slotId" label="Khung giờ mới" rules={[{ required: true, message: 'Chọn khung giờ' }]}>
+            <Select
+              showSearch
+              optionFilterProp="label"
+              placeholder={qResSlots.isLoading ? 'Đang tải slot...' : 'Chọn khung giờ còn chỗ'}
+              options={slotOptions}
+              loading={qResSlots.isLoading}
+              notFoundContent={
+                qResSlots.isLoading ? 'Đang tải...' : 'Không có slot khả dụng — thử ngày khác hoặc tạo slot mới'
+              }
+            />
           </Form.Item>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Lưu ý: slot phải ACTIVE và còn chỗ (booked_count &lt; capacity).
+            Chỉ hiển thị slot đang mở và còn chỗ trống.
           </Typography.Paragraph>
         </Form>
       </Modal>
@@ -526,3 +567,12 @@ export default function AppointmentsPage() {
   )
 }
 
+function formatSlotTime(iso: string) {
+  if (!iso) return ''
+  try {
+    const d = new Date(iso)
+    return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+  } catch {
+    return iso.slice(11, 16)
+  }
+}

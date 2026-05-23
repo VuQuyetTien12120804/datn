@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.frontend_bookingcare.locale.LocaleStore;
+import com.example.frontend_bookingcare.session.SessionExpiredNavigator;
 
 public class BookingCareApp extends Application {
 
@@ -21,6 +22,7 @@ public class BookingCareApp extends Application {
         // làm chữ/màu bị đảo ngược, trông "không đồng bộ".
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         LocaleStore.applySaved(this);
+        SessionExpiredNavigator.install(this);
     }
 
     /**

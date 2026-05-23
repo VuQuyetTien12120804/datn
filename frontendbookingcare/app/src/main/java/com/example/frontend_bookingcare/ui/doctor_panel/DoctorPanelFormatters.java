@@ -89,14 +89,9 @@ final class DoctorPanelFormatters {
     static String formatAppointmentDate(String iso) {
         if (TextUtils.isEmpty(iso)) return "—";
         try {
-            synchronized (ISO_DATE) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(ISO_DATE.parse(iso));
-                synchronized (DISPLAY_DATE) {
-                    return DISPLAY_DATE.format(c.getTime());
-                }
-            }
-        } catch (ParseException e) {
+            LocalDate d = LocalDate.parse(iso.trim());
+            return d.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault()));
+        } catch (DateTimeParseException e) {
             return iso;
         }
     }
@@ -122,6 +117,10 @@ final class DoctorPanelFormatters {
             return s;
         }
         return "—";
+    }
+
+    static String formatTimeHm(JsonElement expectedTime) {
+        return formatTimeLabel(expectedTime);
     }
 
     static String formatTimeAmPm(JsonElement expectedTime) {
@@ -373,5 +372,22 @@ final class DoctorPanelFormatters {
         } catch (ParseException ignored) {
         }
         return null;
+    }
+
+    /** Backend chưa có field priority — đánh dấu PENDING trong 24h tới. */
+    static boolean isPriorityPending(boolean pendingTab, @Nullable Long slotStartMillis) {
+        if (!pendingTab || slotStartMillis == null) return false;
+        long diff = slotStartMillis - System.currentTimeMillis();
+        return diff >= 0 && diff <= 24L * 60L * 60L * 1000L;
+    }
+
+    /** Tách học vị từ fullName (PGS., TS., BS., …). */
+    @Nullable
+    static String extractAcademicTitle(@Nullable String fullName) {
+        if (TextUtils.isEmpty(fullName)) return null;
+        String[] parts = com.example.frontend_bookingcare.ui.doctor_directory.DoctorDetail
+                .splitTitleAndName(fullName.trim());
+        if (parts[0] == null || parts[0].trim().isEmpty()) return null;
+        return parts[0].trim();
     }
 }

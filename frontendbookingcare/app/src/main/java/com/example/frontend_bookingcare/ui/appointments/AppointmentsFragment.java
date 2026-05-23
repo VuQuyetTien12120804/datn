@@ -26,7 +26,10 @@ import com.example.frontend_bookingcare.api.PatientAppointmentDto;
 import com.example.frontend_bookingcare.data.PatientAppointmentsRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
+import com.example.frontend_bookingcare.ui.booking.BookingFormatters;
 import com.example.frontend_bookingcare.ui.common.HeaderInsets;
+import com.example.frontend_bookingcare.ui.common.PatientEmptyUi;
+import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 
@@ -38,6 +41,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 public class AppointmentsFragment extends Fragment {
 
     private LinearLayout cards;
+    private View emptyState;
     private SwipeRefreshLayout refresh;
     private TabLayout tabs;
     private EditText search;
@@ -62,16 +66,19 @@ public class AppointmentsFragment extends Fragment {
         HeaderInsets.applyToToolbar(tb);
 
         cards = view.findViewById(R.id.appointments_cards);
+        emptyState = view.findViewById(R.id.appointments_empty);
         refresh = view.findViewById(R.id.appointments_refresh);
         tabs = view.findViewById(R.id.appointments_tabs);
         search = view.findViewById(R.id.appointments_search);
+        UnicodeInputHelper.enableSingleLineText(search);
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                if (UnicodeInputHelper.isImeComposing(s)) return;
                 query = s != null ? s.toString().trim() : "";
                 fillCards(last, null);
             }
-            @Override public void afterTextChanged(Editable s) {}
         });
         tabs.addTab(tabs.newTab().setText(R.string.tab_upcoming));
         tabs.addTab(tabs.newTab().setText(R.string.tab_completed));
@@ -99,7 +106,6 @@ public class AppointmentsFragment extends Fragment {
             }
         });
         refresh.setOnRefreshListener(this::load);
-        load();
     }
 
     // toolbar insets handled by HeaderInsets
@@ -108,6 +114,22 @@ public class AppointmentsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         load();
+    }
+
+    /**
+     * MainActivity đổi tab bằng hide/show — onResume không chạy lại khi quay lại tab này.
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden && isAdded()) {
+            load();
+        }
+    }
+
+    public void reloadForSessionChange() {
+        last.clear();
+        if (isAdded()) load();
     }
 
     private void load() {
@@ -135,52 +157,47 @@ public class AppointmentsFragment extends Fragment {
 
     private void fillCards(List<PatientAppointmentDto> list, @Nullable String errorOrHint) {
         cards.removeAllViews();
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        SessionManager sm = new SessionManager(requireContext());
-        String patientName = sm.getSession() != null && !TextUtils.isEmpty(sm.getSession().fullName) ? sm.getSession().fullName : "—";
 
         if (errorOrHint != null) {
-            View v = inf.inflate(R.layout.item_appointment_card, cards, false);
-            TextView name = v.findViewById(R.id.appt_doctor_name);
-            TextView spec = v.findViewById(R.id.appt_specialty);
-            TextView time = v.findViewById(R.id.appt_time);
-            TextView st = v.findViewById(R.id.appt_status_text);
-            TextView stt = v.findViewById(R.id.appt_stt);
-            TextView p = v.findViewById(R.id.appt_patient);
-            v.findViewById(R.id.appt_cancel).setVisibility(View.GONE);
-            v.findViewById(R.id.appt_detail).setVisibility(View.GONE);
-            name.setText(getString(R.string.appointments_title));
-            spec.setText("");
-            stt.setText("");
-            time.setText(errorOrHint);
-            p.setText("");
-            st.setText(selectedTab == 1 ? getString(R.string.tab_completed) : (selectedTab == 2 ? getString(R.string.tab_cancelled) : getString(R.string.tab_upcoming)));
-            cards.addView(v);
+            cards.setVisibility(View.GONE);
+            if (emptyState != null) {
+                emptyState.setVisibility(View.VISIBLE);
+                if (getString(R.string.booking_need_login).equals(errorOrHint)) {
+                    PatientEmptyUi.bind(emptyState, android.R.drawable.ic_lock_lock,
+                            R.string.messages_login_title, R.string.booking_need_login);
+                } else {
+                    PatientEmptyUi.bindMessage(emptyState, R.string.appointments_error_title, errorOrHint);
+                }
+            }
             return;
         }
 
         if (list == null || list.isEmpty()) {
-            View v = inf.inflate(R.layout.item_appointment_card, cards, false);
-            TextView name = v.findViewById(R.id.appt_doctor_name);
-            TextView spec = v.findViewById(R.id.appt_specialty);
-            TextView time = v.findViewById(R.id.appt_time);
-            TextView stt = v.findViewById(R.id.appt_stt);
-            TextView p = v.findViewById(R.id.appt_patient);
-            v.findViewById(R.id.appt_cancel).setVisibility(View.GONE);
-            v.findViewById(R.id.appt_detail).setVisibility(View.GONE);
-            name.setText(getString(R.string.appointments_title));
-            spec.setText("");
-            stt.setText("");
-            time.setText(getString(R.string.booking_not_available));
-            p.setText("");
-            cards.addView(v);
+            cards.setVisibility(View.GONE);
+            if (emptyState != null) {
+                emptyState.setVisibility(View.VISIBLE);
+                PatientEmptyUi.bind(emptyState, android.R.drawable.ic_menu_my_calendar,
+                        R.string.appointments_empty_title, R.string.appointments_empty_hint);
+            }
             return;
         }
+
+        if (emptyState != null) emptyState.setVisibility(View.GONE);
+        cards.setVisibility(View.VISIBLE);
+
+        LayoutInflater inf = LayoutInflater.from(requireContext());
+        SessionManager sm = new SessionManager(requireContext());
+        String patientName = sm.getSession() != null && !TextUtils.isEmpty(sm.getSession().fullName) ? sm.getSession().fullName : "—";
 
         for (PatientAppointmentDto a : list) {
             if (!TextUtils.isEmpty(query)) {
                 String needle = query.toLowerCase();
-                String hay = (a.doctorName != null ? a.doctorName : "") + " " + patientName + " " + (a.appointmentDate != null ? a.appointmentDate : "") + " " + (a.appointmentId != null ? a.appointmentId : "");
+                String code = AppointmentCodes.appointmentCode(
+                        a.appointmentId != null ? a.appointmentId : 0, a.appointmentDate);
+                String hay = (a.doctorName != null ? a.doctorName : "") + " " + patientName
+                        + " " + (a.appointmentDate != null ? a.appointmentDate : "")
+                        + " " + (a.appointmentId != null ? a.appointmentId : "")
+                        + " " + code;
                 if (!hay.toLowerCase().contains(needle)) continue;
             }
 
@@ -195,13 +212,18 @@ public class AppointmentsFragment extends Fragment {
             v.findViewById(R.id.appt_detail).setVisibility(View.GONE);
 
             name.setText(a.doctorName != null ? a.doctorName : "—");
-            spec.setText(""); // backend chưa trả specialty trong endpoint này
-            String lineTime = (a.startTime != null ? a.startTime : "") + (a.endTime != null && !TextUtils.isEmpty(a.endTime) ? ("-" + a.endTime) : "");
-            String lineDate = a.appointmentDate != null ? a.appointmentDate : "";
-            time.setText(lineTime + " - " + lineDate);
-            stt.setText("STT " + (a.appointmentId != null ? a.appointmentId : "—"));
-            p.setText("Bệnh nhân: " + patientName);
-            String tabText = selectedTab == 1 ? getString(R.string.tab_completed) : (selectedTab == 2 ? getString(R.string.tab_cancelled) : getString(R.string.tab_upcoming));
+            spec.setText(!TextUtils.isEmpty(a.specialty) ? a.specialty : "");
+            String lineTime = BookingFormatters.timeRange(a.startTime, a.endTime);
+            String lineDate = BookingFormatters.prettyDate(requireContext(), a.appointmentDate);
+            time.setText(lineTime + " · " + lineDate);
+            if (a.queueNumber != null && a.queueNumber > 0) {
+                stt.setText(getString(R.string.appt_queue_fmt, a.queueNumber));
+            } else {
+                stt.setText(AppointmentCodes.appointmentCode(
+                        a.appointmentId != null ? a.appointmentId : 0, a.appointmentDate));
+            }
+            p.setText(getString(R.string.appt_patient_fmt, patientName));
+            String tabText = statusDisplay(a.status, selectedTab);
             st.setText(tabText);
             cards.addView(v);
 
@@ -237,6 +259,37 @@ public class AppointmentsFragment extends Fragment {
                     ));
                 }
             });
+        }
+
+        if (cards.getChildCount() == 0 && !TextUtils.isEmpty(query)) {
+            cards.setVisibility(View.GONE);
+            if (emptyState != null) {
+                emptyState.setVisibility(View.VISIBLE);
+                PatientEmptyUi.bind(emptyState, android.R.drawable.ic_menu_search,
+                        R.string.search_no_results_title, R.string.search_no_results_hint);
+            }
+        }
+    }
+
+    private String statusDisplay(@Nullable String status, int tab) {
+        if (status == null || status.trim().isEmpty()) {
+            return tab == 1 ? getString(R.string.tab_completed) : (tab == 2 ? getString(R.string.tab_cancelled) : getString(R.string.tab_upcoming));
+        }
+        switch (status.trim().toUpperCase(java.util.Locale.ROOT)) {
+            case "PENDING":
+                return getString(R.string.appt_status_booked);
+            case "CONFIRMED":
+                return getString(R.string.appt_status_confirmed);
+            case "CHECKED_IN":
+                return getString(R.string.appt_status_checked_in);
+            case "COMPLETED":
+                return getString(R.string.appt_status_completed);
+            case "CANCELLED":
+                return getString(R.string.appt_status_cancelled);
+            case "NO_SHOW":
+                return getString(R.string.appt_status_no_show);
+            default:
+                return status;
         }
     }
 }

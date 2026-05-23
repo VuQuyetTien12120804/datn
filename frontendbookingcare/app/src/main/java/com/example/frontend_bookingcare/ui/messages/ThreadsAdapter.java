@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.ui.common.PatientAvatarUi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,15 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.VH> {
 
     private final List<MessageThread> items = new ArrayList<>();
     private final OnThreadClick onClick;
+    private final int itemLayout;
 
     public ThreadsAdapter(OnThreadClick onClick) {
+        this(onClick, R.layout.item_message_thread);
+    }
+
+    public ThreadsAdapter(OnThreadClick onClick, int itemLayout) {
         this.onClick = onClick;
+        this.itemLayout = itemLayout;
     }
 
     public void setItems(List<MessageThread> list) {
@@ -36,7 +43,7 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.VH> {
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_thread, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(itemLayout, parent, false);
         return new VH(v);
     }
 
@@ -44,10 +51,11 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int position) {
         MessageThread t = items.get(position);
         h.title.setText(t.title);
-        h.sub.setText(t.patientName);
+        h.sub.setText(t.subtitle);
         h.preview.setText(t.preview);
         h.time.setText(t.timeLabel);
         h.lock.setVisibility(t.locked ? View.VISIBLE : View.GONE);
+        PatientAvatarUi.styleLetterAvatar(h.avatarLetter, t.title, h.itemView.getContext());
         h.avatarLetter.setText(firstLetter(t.title));
         if (t.unreadCount > 0) {
             h.unread.setVisibility(View.VISIBLE);

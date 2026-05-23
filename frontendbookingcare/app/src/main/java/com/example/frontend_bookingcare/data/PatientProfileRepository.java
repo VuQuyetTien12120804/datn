@@ -7,6 +7,7 @@ import com.example.frontend_bookingcare.api.PatientProfileResponseDto;
 import com.example.frontend_bookingcare.api.RetrofitClient;
 import com.example.frontend_bookingcare.api.UpdatePatientProfileRequest;
 import com.example.frontend_bookingcare.session.ProfileExtras;
+import com.example.frontend_bookingcare.util.RepoMessages;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +48,7 @@ public class PatientProfileRepository {
 
             @Override
             public void onFailure(Call<ApiEnvelope> call, Throwable t) {
-                cb.onError(t != null && t.getMessage() != null ? t.getMessage() : "Network error");
+                cb.onError(RepoMessages.networkError());
             }
         });
     }
@@ -87,7 +88,7 @@ public class PatientProfileRepository {
                         && env.data != null && !env.data.isJsonNull()) {
                     PatientProfileResponseDto dto = RetrofitClient.gson().fromJson(env.data, PatientProfileResponseDto.class);
                     if (dto == null) {
-                        cb.onDone(null, "Không parse được hồ sơ");
+                        cb.onDone(null, RepoMessages.profileParseFailed());
                         return;
                     }
                     ProfileExtras ex = new ProfileExtras(
@@ -101,7 +102,7 @@ public class PatientProfileRepository {
                 }
                 cb.onDone(null, extractMsg(response, env));
             } catch (Exception e) {
-                cb.onDone(null, e != null && e.getMessage() != null ? e.getMessage() : "Network error");
+                cb.onDone(null, RepoMessages.networkError());
             }
         });
     }
@@ -124,14 +125,14 @@ public class PatientProfileRepository {
                 }
                 cb.onDone(null, extractMsg(response, env));
             } catch (Exception e) {
-                cb.onDone(null, e != null && e.getMessage() != null ? e.getMessage() : "Network error");
+                cb.onDone(null, RepoMessages.networkError());
             }
         });
     }
 
     private static String extractMsg(Response<ApiEnvelope> response, @Nullable ApiEnvelope env) {
         if (env != null && env.message != null) return env.message;
-        return "HTTP " + response.code();
+        return RepoMessages.httpError(response.code());
     }
 }
 

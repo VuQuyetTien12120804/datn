@@ -33,6 +33,7 @@ public class LegalDocumentActivity extends AppCompatActivity {
     public static final String CODE_TERMS = "TERMS";
     public static final String CODE_PRIVACY = "PRIVACY";
     public static final String CODE_SERVICE = "SERVICE";
+    public static final String CODE_FAQ = "FAQ";
 
     public static void start(@NonNull Fragment fragment, @NonNull String code) {
         Intent i = new Intent(fragment.requireContext(), LegalDocumentActivity.class);
@@ -111,6 +112,7 @@ public class LegalDocumentActivity extends AppCompatActivity {
             case CODE_TERMS -> getString(R.string.account_menu_terms_use);
             case CODE_PRIVACY -> getString(R.string.account_menu_privacy);
             case CODE_SERVICE -> getString(R.string.account_menu_service_terms);
+            case CODE_FAQ -> getString(R.string.account_menu_faq);
             default -> getString(R.string.legal_default_title);
         };
     }

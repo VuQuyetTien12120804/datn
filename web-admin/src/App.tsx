@@ -10,6 +10,7 @@ import AccountsPage from './pages/Accounts'
 import ServicesPage from './pages/Services'
 import RoomsPage from './pages/Rooms'
 import PatientsPage from './pages/Patients'
+import MessagesPage from './pages/Messages'
 import { loadAdminSession } from './auth/storage'
 
 function RequireAdmin({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="slots" element={<SlotsPage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
         <Route path="patients" element={<PatientsPage />} />
+        <Route path="messages" element={<MessagesPage />} />
         <Route path="accounts" element={<AccountsPage />} />
       </Route>
 

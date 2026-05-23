@@ -10,6 +10,7 @@ import com.example.frontend_bookingcare.api.ApiEnvelope;
 import com.example.frontend_bookingcare.api.AuthResponse;
 import com.example.frontend_bookingcare.api.RefreshRequest;
 import com.example.frontend_bookingcare.session.AuthSession;
+import com.example.frontend_bookingcare.session.SessionExpiredBus;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.google.gson.Gson;
 
@@ -25,11 +26,11 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
- * Interceptor tự refresh access token khi backend trả 401/403.
+ * Interceptor tự refresh access token khi backend trả 401 (Unauthorized).
  *
  * Luồng:
  *  1. Gửi request gốc.
- *  2. Nếu HTTP 401/403 và request có Authorization → đọc {@code refreshToken} trong
+ *  2. Nếu HTTP 401 và request có Authorization → đọc {@code refreshToken} trong
  *     {@link SessionManager}, gọi {@code POST /api/v1/auth/refresh} đồng bộ.
  *  3. Nếu refresh thành công: lưu {@code accessToken}/{@code refreshToken} mới rồi
  *     replay request gốc 1 lần với token mới.
@@ -76,7 +77,7 @@ public class TokenAuthInterceptor implements Interceptor {
         String originalAccessToken = stripBearer(original.header(AUTH_HEADER));
         String latestAccess = tryRefreshOnce(originalAccessToken);
         if (latestAccess == null) {
-            // Refresh thất bại → trả nguyên response 401/403 cho caller. Session đã bị clear
+            // Refresh thất bại → trả nguyên response 401 cho caller. Session đã bị clear
             // (nếu refresh token cũng hỏng) để UI biết hiển thị màn login.
             return response;
         }
@@ -91,7 +92,7 @@ public class TokenAuthInterceptor implements Interceptor {
 
     private boolean shouldAttemptRefresh(Request request, Response response) {
         int code = response.code();
-        if (code != 401 && code != 403) return false;
+        if (code != 401) return false;
         if (request.header(AUTH_HEADER) == null) return false;
         if (request.header(RETRY_MARK) != null) return false;
         String path = request.url().encodedPath();
@@ -123,6 +124,8 @@ public class TokenAuthInterceptor implements Interceptor {
             }
 
             if (current.refreshToken == null || current.refreshToken.isEmpty()) {
+                sm.clearAll();
+                SessionExpiredBus.notifyExpired();
                 return null;
             }
 
@@ -130,6 +133,7 @@ public class TokenAuthInterceptor implements Interceptor {
             if (refreshed == null || refreshed.accessToken == null || refreshed.accessToken.isEmpty()) {
                 // Refresh token cũng hết hạn / revoked → xoá session để app điều hướng về login.
                 sm.clearAll();
+                SessionExpiredBus.notifyExpired();
                 return null;
             }
 

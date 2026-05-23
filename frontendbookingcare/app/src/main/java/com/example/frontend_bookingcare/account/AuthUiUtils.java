@@ -17,6 +17,8 @@ public final class AuthUiUtils {
         if (message == null || message.isEmpty()) return false;
         String m = message.toLowerCase(Locale.ROOT);
         return m.contains("email đã được đăng ký")
-                || m.contains("email da duoc dang ky");
+                || m.contains("email da duoc dang ky")
+                || m.contains("email already registered")
+                || m.contains("email is already registered");
     }
 }

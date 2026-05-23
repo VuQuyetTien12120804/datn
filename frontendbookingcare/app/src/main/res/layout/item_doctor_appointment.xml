@@ -27,11 +27,11 @@
 
         <View
             android:id="@+id/appt_timeline_line"
-            android:layout_width="2dp"
+            android:layout_width="3dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/space_xs"
             android:layout_weight="1"
-            android:background="@color/doctor_divider" />
+            android:background="@color/doctor_brand_primary_light" />
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -42,8 +42,8 @@
         android:layout_marginTop="@dimen/space_xs"
         android:layout_marginBottom="@dimen/space_xs"
         android:layout_weight="1"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp"
         app:strokeColor="@color/doctor_stat_card_stroke"
         app:strokeWidth="1dp">
 

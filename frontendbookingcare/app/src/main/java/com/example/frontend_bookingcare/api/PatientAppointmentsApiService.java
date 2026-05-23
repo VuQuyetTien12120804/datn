@@ -14,9 +14,17 @@ public interface PatientAppointmentsApiService {
     Call<ApiEnvelope> myAppointments(@Header("Authorization") String authorization,
                                      @Query("group") String group);
 
+    @GET("api/v1/patient/appointments/{appointmentId}")
+    Call<ApiEnvelope> appointmentDetail(@Header("Authorization") String authorization,
+                                        @Path("appointmentId") int appointmentId);
+
     @POST("api/v1/patient/appointments/{appointmentId}/cancel")
     Call<ApiEnvelope> cancelAppointment(@Header("Authorization") String authorization,
                                         @Path("appointmentId") int appointmentId,
                                         @Body CancelAppointmentRequest body);
+
+    @POST("api/v1/patient/appointments/{appointmentId}/check-in")
+    Call<ApiEnvelope> checkInAppointment(@Header("Authorization") String authorization,
+                                         @Path("appointmentId") int appointmentId);
 }
 

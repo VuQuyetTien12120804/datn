@@ -18,6 +18,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/bottom_nav_min_height"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
         app:itemIconSize="@dimen/bottom_nav_icon_size"
         app:itemTextAppearanceActive="@style/Text.BottomNav.Active"
         app:itemTextAppearanceInactive="@style/Text.BottomNav.Inactive"

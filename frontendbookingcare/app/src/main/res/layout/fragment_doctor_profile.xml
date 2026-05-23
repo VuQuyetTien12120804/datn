@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/doctor_surface_bg"
+    android:background="@drawable/bg_doctor_screen"
     android:orientation="vertical">
 
     <!-- Header cố định — không nằm trong vùng cuộn -->
@@ -75,18 +75,27 @@
         </LinearLayout>
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_weight="1">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/doctor_profile_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/space_md"
-            android:paddingTop="10dp">
+        android:paddingBottom="@dimen/space_xl"
+        android:clipToPadding="false">
 
             <!-- Thống kê (chỉ số có nguồn API) — hơi chồng lên header cho chiều sâu -->
             <LinearLayout
@@ -386,5 +395,12 @@
                 app:strokeColor="@color/doctor_logout_red"
                 app:strokeWidth="1dp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <include
+            layout="@layout/include_doctor_fetch_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 </LinearLayout>

@@ -21,9 +21,10 @@
         <item name="colorPrimary">@color/doctor_brand_primary</item>
         <item name="colorPrimaryDark">@color/doctor_brand_primary_dark</item>
         <item name="colorOnPrimary">@color/doctor_brand_on_primary</item>
-        <item name="android:statusBarColor">@color/doctor_brand_primary</item>
+        <item name="android:statusBarColor">@color/doctor_surface_bg</item>
         <item name="android:navigationBarColor">@color/doctor_nav_bg</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="materialCardViewStyle">@style/Widget.Doctor.Card</item>
     </style>
 
     <!-- YouMed-like header toolbar: chỉnh chiều cao/padding ở 1 chỗ -->

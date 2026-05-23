@@ -7,22 +7,27 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.frontend_bookingcare.MainActivity;
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.api.DoctorProfileDto;
 import com.example.frontend_bookingcare.data.AuthRepository;
 import com.example.frontend_bookingcare.data.DoctorPanelRepository;
 import com.example.frontend_bookingcare.locale.LocaleStore;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Locale;
@@ -32,6 +37,23 @@ public class DoctorProfileFragment extends Fragment {
     private final DoctorPanelRepository doctorPanelRepo = new DoctorPanelRepository();
     @Nullable private TextView pendingStatValue;
     @Nullable private TextView todayStatValue;
+    @Nullable private TextView specialtyValue;
+    @Nullable private TextView degreeValue;
+    @Nullable private TextView licenseValue;
+    @Nullable private TextView roomValue;
+    @Nullable private TextView unitValue;
+    @Nullable private TextView scheduleValue;
+    @Nullable private TextView emailValue;
+    @Nullable private TextView phoneValue;
+    @Nullable private TextView specialtyChip;
+    @Nullable private TextView titleView;
+
+    private SwipeRefreshLayout swipeRefresh;
+    private ProgressBar loading;
+    private View errorPanel;
+    private TextView errorText;
+    private MaterialButton retryBtn;
+    private boolean loadedOnce;
 
     @Nullable
     @Override
@@ -50,7 +72,24 @@ public class DoctorProfileFragment extends Fragment {
         bindContact(view);
         bindLanguage(view);
         bindLogout(view);
+
+        swipeRefresh = view.findViewById(R.id.doctor_profile_refresh);
+        swipeRefresh.setColorSchemeColors(
+                ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary),
+                ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary_light));
+        swipeRefresh.setOnRefreshListener(() -> {
+            refreshLiveProfileStats();
+            loadProfileFromApi(true, true);
+        });
+
+        loading = view.findViewById(R.id.doctor_fetch_loading);
+        errorPanel = view.findViewById(R.id.doctor_fetch_error);
+        errorText = view.findViewById(R.id.doctor_fetch_error_text);
+        retryBtn = view.findViewById(R.id.doctor_fetch_retry);
+        retryBtn.setOnClickListener(v -> loadProfileFromApi(false, false));
+
         refreshLiveProfileStats();
+        loadProfileFromApi(false, false);
     }
 
     @Override
@@ -61,6 +100,80 @@ public class DoctorProfileFragment extends Fragment {
             refreshLanguageValue(v);
         }
         refreshLiveProfileStats();
+        loadProfileFromApi(false, loadedOnce);
+    }
+
+    private void loadProfileFromApi(boolean fromSwipe, boolean silent) {
+        SessionManager sm = new SessionManager(requireContext());
+        AuthSession session = sm.getSession();
+        if (session == null || TextUtils.isEmpty(session.accessToken)) {
+            DoctorPanelStateUi.hide(loading, errorPanel, swipeRefresh);
+            return;
+        }
+
+        if (fromSwipe) {
+            DoctorPanelStateUi.hide(loading, errorPanel, null);
+        } else if (!silent) {
+            DoctorPanelStateUi.showLoading(loading, errorPanel, swipeRefresh);
+        }
+
+        doctorPanelRepo.fetchProfile("Bearer " + session.accessToken, (dto, err) -> {
+            if (!isAdded()) return;
+            if (err != null || dto == null) {
+                String msg = err != null ? err : getString(R.string.booking_not_available);
+                DoctorPanelStateUi.showError(loading, errorPanel, errorText, retryBtn, swipeRefresh,
+                        getString(R.string.doctor_profile_load_failed_fmt, msg),
+                        () -> loadProfileFromApi(false, false));
+                return;
+            }
+            loadedOnce = true;
+            DoctorPanelStateUi.hide(loading, errorPanel, swipeRefresh);
+            applyProfile(dto, session);
+        });
+    }
+
+    private void applyProfile(@NonNull DoctorProfileDto dto, @NonNull AuthSession session) {
+        String specialty = displayOrEmpty(dto.specialty);
+        if (specialtyChip != null) specialtyChip.setText(specialty);
+        if (specialtyValue != null) specialtyValue.setText(specialty);
+
+        String fullName = !TextUtils.isEmpty(dto.fullName) ? dto.fullName : session.fullName;
+        String academicTitle = DoctorPanelFormatters.extractAcademicTitle(fullName);
+        if (degreeValue != null) {
+            degreeValue.setText(!TextUtils.isEmpty(academicTitle)
+                    ? academicTitle
+                    : displayOrEmpty(dto.bio));
+        }
+        if (licenseValue != null) licenseValue.setText(displayOrEmpty(dto.licenseNo));
+        if (roomValue != null) roomValue.setText(displayOrEmpty(dto.roomLocation));
+        if (scheduleValue != null) scheduleValue.setText(displayOrEmpty(dto.scheduleText));
+
+        if (titleView != null) {
+            titleView.setText(displayOrEmpty(dto.clinicName));
+        }
+
+        if (emailValue != null) {
+            String email = !TextUtils.isEmpty(dto.email) ? dto.email : session.email;
+            emailValue.setText(displayOrEmpty(email));
+        }
+        if (phoneValue != null) {
+            phoneValue.setText(displayOrEmpty(dto.phone));
+        }
+
+        String unit = displayOrEmpty(dto.clinicName);
+        if (!TextUtils.isEmpty(dto.specialty) && !TextUtils.isEmpty(dto.clinicName)) {
+            unit = dto.specialty + " — " + dto.clinicName;
+        } else if (!TextUtils.isEmpty(dto.specialty)) {
+            unit = dto.specialty;
+        }
+        if (unitValue != null) unitValue.setText(unit);
+    }
+
+    private String displayOrEmpty(@Nullable String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return getString(R.string.booking_not_available);
+        }
+        return value.trim();
     }
 
     private void refreshLiveProfileStats() {
@@ -97,8 +210,10 @@ public class DoctorProfileFragment extends Fragment {
                 ? getString(R.string.doctor_title_prefix_en) : getString(R.string.doctor_title_prefix_vi))
                 + withoutTitle;
         ((TextView) view.findViewById(R.id.doctor_profile_name)).setText(displayName);
-        ((TextView) view.findViewById(R.id.doctor_profile_title)).setText(getString(R.string.doctor_profile_degree_demo));
-        ((TextView) view.findViewById(R.id.doctor_profile_specialty_chip)).setText(getString(R.string.doctor_profile_specialty_value_demo));
+        titleView = view.findViewById(R.id.doctor_profile_title);
+        specialtyChip = view.findViewById(R.id.doctor_profile_specialty_chip);
+        titleView.setText(getString(R.string.booking_not_available));
+        specialtyChip.setText(getString(R.string.booking_not_available));
         setAvatarInitial(view, withoutTitle);
     }
 
@@ -169,21 +284,27 @@ public class DoctorProfileFragment extends Fragment {
     }
 
     private void bindExpertise(@NonNull View view) {
+        specialtyValue = view.findViewById(R.id.row_specialty).findViewById(R.id.field_value);
+        degreeValue = view.findViewById(R.id.row_degree).findViewById(R.id.field_value);
+        licenseValue = view.findViewById(R.id.row_license).findViewById(R.id.field_value);
         setupField(view.findViewById(R.id.row_specialty), R.string.doctor_profile_field_specialty,
-                getString(R.string.doctor_profile_specialty_value_demo));
+                getString(R.string.booking_not_available));
         setupField(view.findViewById(R.id.row_degree), R.string.doctor_profile_field_degree,
-                getString(R.string.doctor_profile_degree_demo));
+                getString(R.string.booking_not_available));
         setupField(view.findViewById(R.id.row_license), R.string.doctor_profile_field_license,
-                getString(R.string.doctor_profile_license_demo));
+                getString(R.string.booking_not_available));
     }
 
     private void bindWorkplace(@NonNull View view) {
+        roomValue = view.findViewById(R.id.row_room).findViewById(R.id.field_value);
+        unitValue = view.findViewById(R.id.row_unit).findViewById(R.id.field_value);
+        scheduleValue = view.findViewById(R.id.row_schedule).findViewById(R.id.field_value);
         setupField(view.findViewById(R.id.row_room), R.string.doctor_profile_field_room,
-                getString(R.string.doctor_profile_room_demo));
+                getString(R.string.booking_not_available));
         setupField(view.findViewById(R.id.row_unit), R.string.doctor_profile_field_unit,
-                getString(R.string.doctor_profile_unit_demo));
+                getString(R.string.booking_not_available));
         setupField(view.findViewById(R.id.row_schedule), R.string.doctor_profile_field_schedule,
-                getString(R.string.doctor_profile_schedule_demo));
+                getString(R.string.booking_not_available));
     }
 
     private void setupField(View row, int labelRes, String value) {
@@ -193,12 +314,11 @@ public class DoctorProfileFragment extends Fragment {
 
     private void bindContact(@NonNull View view) {
         SessionManager sm = new SessionManager(requireContext());
-        String email = "bs.nvminh@hospital.vn";
-        if (sm.getSession() != null && sm.getSession().email != null && !sm.getSession().email.isEmpty()) {
-            email = sm.getSession().email;
-        }
-        ((TextView) view.findViewById(R.id.doctor_profile_email)).setText(email);
-        ((TextView) view.findViewById(R.id.doctor_profile_phone)).setText(getString(R.string.doctor_profile_phone_demo));
+        String email = sm.getSession() != null && sm.getSession().email != null ? sm.getSession().email : "";
+        emailValue = view.findViewById(R.id.doctor_profile_email);
+        phoneValue = view.findViewById(R.id.doctor_profile_phone);
+        emailValue.setText(TextUtils.isEmpty(email) ? getString(R.string.booking_not_available) : email);
+        phoneValue.setText(getString(R.string.booking_not_available));
     }
 
     private void bindLanguage(@NonNull View view) {

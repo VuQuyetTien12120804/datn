@@ -65,9 +65,9 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@null"
+            android:contentDescription="@string/home_bell_cd"
             android:padding="4dp"
-            android:src="@android:drawable/ic_popup_reminder"
+            android:src="@drawable/ic_bell_outline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/home_avatar_wrapper"
             app:tint="@color/white" />
@@ -234,6 +234,16 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <ProgressBar
+                android:id="@+id/home_doctors_progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"
+                android:visibility="gone" />
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -249,6 +259,18 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp" />
             </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/home_doctors_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/text_secondary_dim"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <!-- Specialties -->
             <LinearLayout

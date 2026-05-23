@@ -1,6 +1,12 @@
 package com.example.frontend_bookingcare.ui.booking;
 
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.frontend_bookingcare.session.AuthSession;
+import com.example.frontend_bookingcare.session.ProfileExtras;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,8 +44,19 @@ public final class BookingPolicy {
      */
     public static boolean violatesMinLead(@Nullable String isoDate, @Nullable String startTime) {
         Long ms = slotStartMillis(isoDate, startTime);
-        if (ms == null) return false;
+        if (ms == null) return true;
         long minStart = Instant.now().toEpochMilli() + MIN_LEAD_MINUTES * 60_000L;
         return ms < minStart;
+    }
+
+    public static boolean hasEnoughProfile(@Nullable AuthSession s, @NonNull ProfileExtras ex) {
+        if (s == null) return false;
+        if (TextUtils.isEmpty(s.accessToken)) return false;
+        if (TextUtils.isEmpty(s.email)) return false;
+        if (TextUtils.isEmpty(s.fullName)) return false;
+        if (TextUtils.isEmpty(ex.phone)) return false;
+        if (TextUtils.isEmpty(ex.dob)) return false;
+        if (TextUtils.isEmpty(ex.gender)) return false;
+        return !TextUtils.isEmpty(ex.address);
     }
 }

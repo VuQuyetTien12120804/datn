@@ -1,0 +1,7 @@
+# Sao chép file này thành application-local.properties (đã gitignore)
+# rồi điền Gmail + App Password của bạn.
+#
+# spring.mail.username=tenban@gmail.com
+# spring.mail.password=abcd efgh ijkl mnop
+# app.mail.from=tenban@gmail.com
+# app.mail.expose-otp-in-response=false

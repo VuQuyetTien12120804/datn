@@ -7,6 +7,7 @@ import com.example.frontend_bookingcare.api.ApiEnvelope;
 import com.example.frontend_bookingcare.api.DoctorApiService;
 import com.example.frontend_bookingcare.api.DoctorDto;
 import com.example.frontend_bookingcare.api.RetrofitClient;
+import com.example.frontend_bookingcare.util.RepoMessages;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -58,12 +59,12 @@ public class DoctorRepository {
                     final List<DoctorDto> result = list;
                     MAIN.post(() -> cb.onDone(result, null));
                 } else {
-                    String msg = body != null ? body.message : ("HTTP " + response.code());
+                    String msg = body != null && body.message != null && !body.message.isEmpty()
+                            ? body.message : RepoMessages.httpError(response.code());
                     MAIN.post(() -> cb.onDone(null, msg));
                 }
             } catch (Exception e) {
-                String msg = e.getMessage() != null ? e.getMessage() : "Network error";
-                MAIN.post(() -> cb.onDone(null, msg));
+                MAIN.post(() -> cb.onDone(null, RepoMessages.networkError()));
             }
         });
     }

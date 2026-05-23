@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Chăm Sóc Khách Hàng"
+                android:text="@string/support_cskh_title"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_subtitle"
                 android:textStyle="bold" />
@@ -57,6 +57,18 @@
                 android:textSize="@dimen/text_caption" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/cc_locked_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFF3E0"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
+        android:text="@string/chat_locked_hint"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cc_list"
@@ -77,35 +89,21 @@
         android:paddingTop="8dp"
         android:paddingBottom="12dp">
 
-        <ImageButton
-            android:id="@+id/cc_attach"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_add"
-            app:tint="@color/text_secondary_dim"
-            android:contentDescription="@null" />
-
-        <ImageButton
-            android:id="@+id/cc_photo"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_camera"
-            app:tint="@color/text_secondary_dim"
-            android:contentDescription="@null" />
-
         <EditText
             android:id="@+id/cc_input"
             android:layout_width="0dp"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
             android:layout_weight="1"
             android:layout_marginHorizontal="8dp"
             android:background="@drawable/bg_chat_input"
             android:paddingHorizontal="12dp"
-            android:hint="Gửi tin nhắn"
+            android:paddingVertical="10dp"
+            android:hint="@string/chat_input_hint"
             android:imeOptions="actionSend"
-            android:inputType="text"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:importantForAutofill="no"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_muted" />
 
@@ -118,4 +116,9 @@
             app:tint="@color/text_secondary_dim"
             android:contentDescription="@null" />
     </LinearLayout>
+
+    <View
+        android:id="@+id/cc_bottom_inset"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
 </LinearLayout>

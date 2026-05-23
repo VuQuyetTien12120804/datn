@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BookingCare</string>
+    <string name="app_name">ClinicBooking</string>
+    <string name="clinic_name">Quyet Tien Clinic</string>
+    <string name="clinic_name_short">Quyet Tien</string>
     <string name="cd_navigate_up">Back</string>
 
     <!-- ===== BOOKING FLOW ===== -->
@@ -74,6 +76,8 @@
     <string name="booking_result_support">💬 Support</string>
     <string name="booking_result_time_fmt">%1$s (%2$s)</string>
 
+    <string name="doctor_detail_bio_benefits_title">Benefits of booking via ClinicBooking:</string>
+    <string name="doctor_detail_work_default">•  Quyet Tien Clinic</string>
     <string name="doctor_detail_missing_id">Doctor not found for booking.</string>
     <string name="nav_home">Home</string>
     <string name="nav_appointments">Appointments</string>
@@ -97,20 +101,19 @@
     <string name="home_service_specialty">Book by specialty</string>
 
     <string name="home_section_doctors">Doctors</string>
+    <string name="home_doctors_empty">No doctors to show. Please try again later.</string>
+    <string name="clinic_default_address">25 Lang Ha St., Dong Da, Hanoi</string>
     <string name="home_section_specialty_book">Book by specialty</string>
     <string name="home_see_all_specialties">See all specialties</string>
 
     <string name="home_banner_1_title">Chat with specialist doctors</string>
     <string name="home_banner_1_cta">CHAT NOW</string>
-    <string name="home_banner_2_title">Free nutrition consultation</string>
-    <string name="home_banner_2_cta">JOIN NOW</string>
-    <string name="home_banner_3_title">BookingCare voucher combo</string>
-    <string name="home_banner_3_cta">GET NOW</string>
+    <string name="home_banner_2_title">24/7 booking support</string>
+    <string name="home_banner_2_cta">CONTACT</string>
+    <string name="home_banner_3_title">Book an appointment quickly</string>
+    <string name="home_banner_3_cta">BOOK NOW</string>
 
-    <string name="home_demo_doctor_1">Dr. Hong</string>
-    <string name="home_demo_doctor_2">Dr. Trung</string>
-    <string name="home_demo_doctor_3">Dr. Ha</string>
-    <string name="home_demo_doctor_4">Dr. Hieu</string>
+    <string name="appt_queue_fmt">Queue #%1$d</string>
 
     <string name="doctor_list_search_hint">Doctor name, symptom, specialty</string>
     <string name="doctor_list_search_hint_specialty">Search within %1$s</string>
@@ -132,6 +135,8 @@
     <string name="doctor_nav_appointments">Schedule</string>
     <string name="doctor_nav_requests">Requests</string>
     <string name="doctor_nav_examining">Examining</string>
+    <string name="doctor_nav_messages">Messages</string>
+    <string name="doctor_messages_subtitle">Chat with patients</string>
     <string name="doctor_nav_account">Account</string>
 
     <string name="doctor_today">Today</string>
@@ -205,16 +210,9 @@
     <string name="doctor_profile_field_phone">Phone</string>
     <string name="doctor_profile_section_settings">Settings</string>
     <string name="doctor_profile_language_sub">App display language</string>
-    <string name="doctor_profile_degree_demo">Specialist level II</string>
-    <string name="doctor_profile_specialty_value_demo">Internal medicine</string>
-    <string name="doctor_profile_license_demo">BS-CK2-123456</string>
-    <string name="doctor_profile_room_demo">Clinic room A2 — 3rd floor</string>
-    <string name="doctor_profile_unit_demo">Internal Medicine — General Hospital</string>
-    <string name="doctor_profile_schedule_demo">Mon–Fri: 7:30–11:30; 1:30–4:30 PM · Sat: 7:30–11:30</string>
-    <string name="doctor_profile_phone_demo">0901 234 567</string>
     <string name="doctor_title_prefix_vi">BS. </string>
     <string name="doctor_title_prefix_en">Dr. </string>
-    <string name="doctor_profile_name_fallback">Dr. Nguyen Van Minh</string>
+    <string name="doctor_profile_name_fallback">Doctor</string>
     <string name="doctor_logout">Sign out</string>
     <string name="doctor_empty_schedule_title">No appointments today</string>
     <string name="doctor_empty_schedule_hint">Pull down to refresh or check back later.</string>
@@ -232,14 +230,8 @@
     <string name="view_detail">View details</string>
     <string name="cancel_booking">Cancel booking</string>
 
-    <string name="consult_demo_title">Consultation</string>
-    <string name="consult_demo_body">Doctor connection / chat will be added later.</string>
-
-    <string name="messages_demo_title">Messages</string>
-    <string name="messages_demo_body">Demo inbox — no API yet.</string>
-
-    <string name="auth_brand_part1">Booking</string>
-    <string name="auth_brand_part2">Care</string>
+    <string name="auth_brand_part1">Clinic</string>
+    <string name="auth_brand_part2">Booking</string>
     <string name="auth_id_suffix"> ID</string>
     <string name="auth_login_section_title">Sign-in details</string>
     <string name="auth_hint_email">Enter your email</string>
@@ -294,7 +286,7 @@
     <string name="account_menu_privacy">Privacy policy</string>
     <string name="account_menu_service_terms">Service terms</string>
     <string name="account_menu_support_title">Booking / support hotline</string>
-    <string name="account_menu_support_sub">Call the demo hotline</string>
+    <string name="account_menu_support_sub">Call hotline 0247 300 8899</string>
     <string name="account_menu_rate">Rate the app</string>
     <string name="account_menu_share">Share the app</string>
     <string name="account_menu_faq">FAQ</string>
@@ -303,17 +295,15 @@
     <string name="language_name_en">English</string>
     <string name="account_language_dialog_title">Choose language</string>
     <string name="language_changed">Language updated</string>
-    <string name="account_support_phone_uri">tel:19001234</string>
+    <string name="account_support_phone_display">0247 300 8899</string>
+    <string name="account_support_phone_uri">tel:02473008899</string>
+    <string name="account_support_call_fmt">Call hotline %1$s</string>
     <string name="account_support_call">Call support</string>
-    <string name="account_share_text">Book appointments easily with BookingCare.</string>
+    <string name="account_share_text">Book appointments easily with ClinicBooking.</string>
     <string name="account_version_fmt">Version %s</string>
-    <string name="account_footer_tagline">Booking app — BookingCare (demo)</string>
+    <string name="account_footer_tagline">ClinicBooking — Quyet Tien Clinic</string>
     <string name="account_logout_confirm">Are you sure you want to sign out?</string>
     <string name="account_logged_out_toast">Signed out</string>
-    <string name="account_placeholder_terms">Terms of use (demo). A full policy page will be shown in production.</string>
-    <string name="account_placeholder_privacy">Privacy policy (demo). We are committed to protecting personal data in line with applicable law.</string>
-    <string name="account_placeholder_service">Service terms (demo).</string>
-    <string name="account_placeholder_faq">Frequently asked questions will appear here.</string>
     <string name="legal_error_loading">Could not load content. Check your network and backend.</string>
     <string name="legal_default_title">Terms &amp; policies</string>
 
@@ -337,10 +327,82 @@
     <string name="gender">Gender</string>
     <string name="address">Address</string>
     <string name="health_records">Health records</string>
+    <string name="health_records_empty">No completed visits yet.</string>
+    <string name="health_records_login_required">Sign in to view visit history.</string>
+    <string name="health_records_visit">Visit</string>
+    <string name="health_record_doctor_fmt">Doctor: %1$s</string>
+    <string name="health_record_no_note">No clinical note from the doctor.</string>
     <string name="back">Back</string>
 
     <string name="error_missing_server_data">Missing data from server</string>
+    <string name="error_network_generic">Network connection error</string>
     <string name="error_network_fmt">Network error (%d)</string>
+    <string name="error_profile_parse_failed">Could not read profile from server</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Other</string>
+    <string name="chat_patient_subtitle_age_fmt">Patient: %1$s — %2$d yrs old</string>
+    <string name="chat_doctor_subtitle_fmt">Doctor: %1$s</string>
+    <string name="ticket_share_fmt">Appointment ticket: %1$s</string>
+    <string name="share_chooser_title">Share</string>
+    <string name="appt_status_pending">Awaiting doctor approval</string>
+    <string name="ticket_status_label_pending">Status: Awaiting doctor approval</string>
+    <string name="ticket_status_label_confirmed">Status: Confirmed — check in on appointment day</string>
+    <string name="ticket_status_label_checked_in">Status: Checked in — waiting for the doctor</string>
+    <string name="ticket_status_label_completed">Status: Visit completed</string>
+    <string name="ticket_status_label_cancelled">Status: Cancelled</string>
+    <string name="ticket_status_label_no_show">Status: No-show</string>
+    <string name="ticket_status_label_unknown_fmt">Status: %1$s</string>
+    <string name="appt_cancel_reason_patient">Cancelled by patient</string>
+    <string name="appt_patient_fmt">Patient: %1$s</string>
+    <string name="appt_status_booked">Booked</string>
+    <string name="appt_status_confirmed">Confirmed</string>
+    <string name="appt_status_checked_in">Checked in</string>
+    <string name="appt_status_completed">Completed</string>
+    <string name="appt_status_cancelled">Cancelled</string>
+    <string name="appt_status_no_show">No-show</string>
+    <string name="chat_doctor_title_fmt">Dr. %1$s</string>
+
+    <string name="time_ago_just_now">Just now</string>
+    <string name="time_ago_seconds_fmt">%1$d sec</string>
+    <string name="time_ago_minutes_fmt">%1$d min</string>
+    <string name="time_ago_hours_fmt">%1$d hr</string>
+    <string name="time_ago_days_fmt">%1$d d</string>
+    <string name="time_ago_weeks_fmt">%1$d wk</string>
+    <string name="time_ago_months_fmt">%1$d mo</string>
+    <string name="time_ago_years_fmt">%1$d yr</string>
+    <string name="dow_mon">Mon</string>
+    <string name="dow_tue">Tue</string>
+    <string name="dow_wed">Wed</string>
+    <string name="dow_thu">Thu</string>
+    <string name="dow_fri">Fri</string>
+    <string name="dow_sat">Sat</string>
+    <string name="dow_sun">Sun</string>
+    <string name="support_need_help_title">Need help?</string>
+    <string name="support_need_help_body">For booking help, medical service advice, or app guidance, contact Customer Care during the hours below:</string>
+    <string name="support_hours_days">Mon – Sat</string>
+    <string name="support_hours_time">08:00 – 17:30</string>
+    <string name="support_chat_btn">Message support</string>
+    <string name="support_cskh_title">Customer Care</string>
+    <string name="complete_profile_title">Complete profile</string>
+    <string name="complete_profile_intro">Please provide full details to book an appointment.</string>
+    <string name="complete_profile_required">Please fill in all fields</string>
+    <string name="complete_profile_saved">Profile saved</string>
+    <string name="complete_profile_dob_hint">Date of birth (dd/MM/yyyy)</string>
+    <string name="booking_complete_profile_btn">Update profile to book</string>
+    <string name="ticket_patient_info">Patient information</string>
+    <string name="ticket_registration_info">Visit registration</string>
+    <string name="ticket_doctor_address_fmt">Address: %1$s</string>
+    <string name="clipboard_label_ticket_code">Appointment code</string>
+    <string name="clipboard_label_hotline">Hotline</string>
+    <string name="ticket_code_copied">Appointment code copied</string>
+    <string name="ticket_hotline_copied">Hotline copied</string>
+    <string name="patient_code_loading">Loading patient ID…</string>
+    <string name="chat_login_required">Please sign in to chat.</string>
+    <string name="messages_empty_title">No messages yet</string>
+    <string name="messages_empty_hint">Chats with doctors or support will appear here.</string>
+    <string name="messages_login_required">Sign in to view messages.</string>
+
     <string name="error_login_failed">Sign-in failed</string>
     <string name="error_otp_send_failed">Could not send OTP</string>
     <string name="error_password_reset_failed">Password reset failed</string>
@@ -353,25 +415,8 @@
     <string name="profile_row_dob">📅 Date of birth: %1$s</string>
     <string name="profile_row_gender">👤 Gender: %1$s</string>
     <string name="profile_row_address">📍 Address: %1$s</string>
-    <string name="demo_health_1_title">General check-up</string>
-    <string name="demo_health_1_date">01/15/2026</string>
-    <string name="demo_health_1_doctor">Doctor: Assoc. Prof. Le Van Hung</string>
-    <string name="demo_health_1_note">Note: Monitor blood pressure regularly; adjust diet.</string>
-    <string name="demo_health_2_title">Blood test</string>
-    <string name="demo_health_2_date">12/20/2025</string>
-    <string name="demo_health_2_doctor">Doctor: Dr. Nguyen Thi Lan</string>
-    <string name="demo_health_2_note">Result: demo data.</string>
 
-    <string name="home_specialty_internal">Internal medicine</string>
-    <string name="home_specialty_pediatrics">Pediatrics</string>
-    <string name="home_specialty_ob">Obstetrics</string>
-    <string name="home_specialty_ortho">Orthopedics</string>
-    <string name="home_doctor_1_name">Dr. Nguyen Thi Lan</string>
-    <string name="home_doctor_1_rating">★ 4.9 · 342 reviews</string>
-    <string name="home_doctor_2_name">Dr. Tran Minh Tuan</string>
-    <string name="home_doctor_2_rating">★ 4.8 · 120 reviews</string>
-
-    <string name="edit_profile_saved_toast">Saved locally (profile API pending)</string>
+    <string name="edit_profile_saved_toast">Profile saved</string>
     <string name="change_pwd_fill_all">Please fill in all fields</string>
     <string name="change_pwd_min_length">New password must be at least 6 characters</string>
     <string name="change_pwd_mismatch">New passwords do not match</string>
@@ -381,13 +426,34 @@
     <string name="onboarding_start">Get started</string>
     <string name="onboarding_or_auth">Sign up or Sign in</string>
     <string name="onboarding_1_title">Book appointments</string>
-    <string name="onboarding_1_desc">Book doctors, hospitals and clinics officially partnered with BookingCare to get a queue number and time slot in advance.</string>
+    <string name="onboarding_1_desc">Book doctors at Quyet Tien Clinic through ClinicBooking to get your queue number and time slot in advance.</string>
     <string name="onboarding_2_title">Video call with a doctor</string>
     <string name="onboarding_2_desc">Start a video call with a doctor immediately or schedule one for later.</string>
     <string name="onboarding_3_title">Chat with a doctor</string>
     <string name="onboarding_3_desc">Message online doctors to get advice on symptoms, conditions and medicines.</string>
     <string name="onboarding_4_title">Buy healthcare products</string>
-    <string name="onboarding_4_desc">Order medicines, supplements and healthcare products online on BookingCare.</string>
+    <string name="onboarding_4_desc">Order medicines, supplements and healthcare products online on ClinicBooking.</string>
     <string name="onboarding_5_title">Keep your medical records</string>
-    <string name="onboarding_5_desc">Receive visit results, prescriptions and lab results right on BookingCare.</string>
+    <string name="onboarding_5_desc">Receive visit results, prescriptions and lab results right on ClinicBooking.</string>
+
+    <string name="home_bell_cd">Notifications</string>
+    <string name="home_bell_hint">View appointment notifications</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_tab_all">All</string>
+    <string name="notifications_tab_appointments">Appointments</string>
+    <string name="notifications_tab_health">Health news</string>
+    <string name="notifications_empty_title">You have no notifications yet.</string>
+    <string name="notifications_empty_all_hint">Appointment notifications will appear here.</string>
+    <string name="notifications_empty_appointments_hint">Upcoming appointments will appear here.</string>
+    <string name="notifications_empty_health_hint">Health news will appear here.</string>
+    <string name="notifications_empty_login_hint">Sign in to view your appointment notifications.</string>
+    <string name="notifications_error_title">Could not load notifications</string>
+    <string name="notification_time_label_fmt">%1$s - %2$s</string>
+    <string name="notification_view_ticket">View appointment ticket ›</string>
+    <string name="notification_reminder_title">Appointment reminder</string>
+    <string name="notification_booking_success_title">Booking confirmed</string>
+    <string name="notification_reminder_body_fmt">You have an appointment with %1$s at %2$s on %3$s. Tap to view details.</string>
+    <string name="notification_success_body_fmt">You booked an appointment with %1$s at %2$s on %3$s. Tap to view details.</string>
+    <string name="notifications_menu_more">More options</string>
+    <string name="notifications_menu_soon">Coming soon</string>
 </resources>

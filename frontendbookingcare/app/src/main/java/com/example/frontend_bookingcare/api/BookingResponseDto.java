@@ -28,4 +28,7 @@ public class BookingResponseDto {
 
     @SerializedName("createdAt")
     public String createdAt;
+
+    @SerializedName("queueNumber")
+    public Integer queueNumber;
 }

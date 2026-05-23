@@ -24,29 +24,36 @@ import com.example.frontend_bookingcare.data.DoctorPanelRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class DoctorAppointmentsFragment extends Fragment {
 
-    enum ApptStatus { DONE, PROGRESS, WAIT }
+    enum ApptStatus { DONE, PROGRESS, CONFIRMED, NO_SHOW, WAIT }
 
     static class DoctorAppt {
+        final int appointmentId;
+        final String apiStatus;
         final String time;
         final String patient;
         final String symptom;
         final ApptStatus status;
 
-        DoctorAppt(String time, String patient, String symptom, ApptStatus status) {
+        DoctorAppt(int appointmentId, String apiStatus, String time, String patient, String symptom, ApptStatus status) {
+            this.appointmentId = appointmentId;
+            this.apiStatus = apiStatus;
             this.time = time;
             this.patient = patient;
             this.symptom = symptom;
             this.status = status;
         }
     }
+
+    private static final ZoneId CLINIC_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final DoctorPanelRepository repository = new DoctorPanelRepository();
     private ApptAdapter apptAdapter;
@@ -73,20 +80,36 @@ public class DoctorAppointmentsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        DoctorUiHelper.applyTopInsetPadding(view, 12);
+        DoctorUiHelper.applyTopInsetPadding(view.findViewById(R.id.doctor_appt_root), 16);
         bindHeader(view);
 
         refresh = view.findViewById(R.id.doctor_appt_refresh);
         refresh.setColorSchemeColors(
                 ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary),
-                ContextCompat.getColor(requireContext(), R.color.home_tile_blue));
+                ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary_light));
         refresh.setOnRefreshListener(() -> loadToday(true));
 
         countView = view.findViewById(R.id.doctor_appt_count);
         emptyView = view.findViewById(R.id.doctor_appt_empty);
+        if (emptyView != null) {
+            DoctorEmptyUi.bind(emptyView,
+                    R.drawable.ic_nav_doctor_calendar,
+                    R.string.doctor_empty_schedule_title,
+                    R.string.doctor_empty_schedule_hint);
+        }
         listView = view.findViewById(R.id.doctor_appt_list);
         listView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        apptAdapter = new ApptAdapter(new ArrayList<>());
+        apptAdapter = new ApptAdapter(new ArrayList<>(), appt -> {
+            if (!(getActivity() instanceof DoctorMainActivity) || appt.appointmentId <= 0) return;
+            if ("PENDING".equalsIgnoreCase(appt.apiStatus)) {
+                Toast.makeText(requireContext(), R.string.doctor_schedule_pending_hint, Toast.LENGTH_LONG).show();
+                return;
+            }
+            if ("NO_SHOW".equalsIgnoreCase(appt.apiStatus) || appt.status == ApptStatus.DONE) {
+                return;
+            }
+            ((DoctorMainActivity) getActivity()).openExaminingForAppointment(appt.appointmentId);
+        });
         listView.setAdapter(apptAdapter);
     }
 
@@ -106,12 +129,13 @@ public class DoctorAppointmentsFragment extends Fragment {
 
     private void bindHeader(@NonNull View view) {
         TextView date = view.findViewById(R.id.doctor_appt_date);
-        SimpleDateFormat fmt = new SimpleDateFormat("EEEE, d 'tháng' M, yyyy", new Locale("vi"));
-        String s = fmt.format(Calendar.getInstance().getTime());
+        LocalDate today = LocalDate.now(CLINIC_ZONE);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEEE, d 'tháng' M, yyyy", new Locale("vi"));
+        String s = today.format(fmt);
         date.setText(Character.toUpperCase(s.charAt(0)) + s.substring(1));
 
         TextView shift = view.findViewById(R.id.doctor_appt_shift);
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int hour = java.time.LocalTime.now(CLINIC_ZONE).getHour();
         shift.setText(getString(hour < 12 ? R.string.doctor_work_shift_morning : R.string.doctor_work_shift_afternoon));
     }
 
@@ -155,31 +179,42 @@ public class DoctorAppointmentsFragment extends Fragment {
     private static List<DoctorAppt> mapToday(List<DoctorAppointmentDto> list) {
         List<DoctorAppt> out = new ArrayList<>();
         for (DoctorAppointmentDto d : list) {
-            String time = DoctorPanelFormatters.formatTimeAmPm(d.expectedTime);
+            String time = DoctorPanelFormatters.formatTimeHm(d.expectedTime);
             String patient = TextUtils.isEmpty(d.patientName) ? "—" : d.patientName;
-            String symptom = TextUtils.isEmpty(d.notes) ? "—" : d.notes;
-            out.add(new DoctorAppt(time, patient, symptom, mapApptStatus(d.status)));
+            String symptom = TextUtils.isEmpty(d.reason) ? (TextUtils.isEmpty(d.notes) ? "—" : d.notes) : d.reason;
+            int id = d.appointmentId != null ? d.appointmentId : 0;
+            String apiStatus = d.status != null ? d.status.trim().toUpperCase(Locale.ROOT) : "";
+            out.add(new DoctorAppt(id, apiStatus, time, patient, symptom, mapApptStatus(apiStatus)));
         }
         return out;
     }
 
     private static ApptStatus mapApptStatus(String status) {
-        if (status == null) return ApptStatus.WAIT;
+        if (status == null || status.isEmpty()) return ApptStatus.WAIT;
         switch (status.trim().toUpperCase(Locale.ROOT)) {
             case "COMPLETED":
                 return ApptStatus.DONE;
             case "CHECKED_IN":
-            case "IN_PROGRESS":
                 return ApptStatus.PROGRESS;
+            case "CONFIRMED":
+                return ApptStatus.CONFIRMED;
+            case "NO_SHOW":
+                return ApptStatus.NO_SHOW;
             default:
                 return ApptStatus.WAIT;
         }
     }
 
     static class ApptAdapter extends RecyclerView.Adapter<ApptAdapter.H> {
-        final List<DoctorAppt> items = new ArrayList<>();
+        interface OnApptClick {
+            void onClick(DoctorAppt appt);
+        }
 
-        ApptAdapter(List<DoctorAppt> initial) {
+        final List<DoctorAppt> items = new ArrayList<>();
+        @Nullable private final OnApptClick onApptClick;
+
+        ApptAdapter(List<DoctorAppt> initial, @Nullable OnApptClick onApptClick) {
+            this.onApptClick = onApptClick;
             items.addAll(initial);
         }
 
@@ -219,6 +254,16 @@ public class DoctorAppointmentsFragment extends Fragment {
                     statusFg = R.color.doctor_status_progress_fg;
                     statusText = R.string.doctor_status_progress;
                     break;
+                case CONFIRMED:
+                    statusBg = R.drawable.bg_doctor_status_wait;
+                    statusFg = R.color.doctor_status_wait_fg;
+                    statusText = R.string.doctor_status_confirmed;
+                    break;
+                case NO_SHOW:
+                    statusBg = R.drawable.bg_doctor_status_wait;
+                    statusFg = R.color.doctor_status_wait_fg;
+                    statusText = R.string.doctor_status_no_show;
+                    break;
                 default:
                     statusBg = R.drawable.bg_doctor_status_wait;
                     statusFg = R.color.doctor_status_wait_fg;
@@ -234,6 +279,14 @@ public class DoctorAppointmentsFragment extends Fragment {
             } else {
                 holder.card.setStrokeWidth(0);
             }
+
+            boolean canOpen = a.status == ApptStatus.PROGRESS
+                    || a.status == ApptStatus.CONFIRMED
+                    || "PENDING".equalsIgnoreCase(a.apiStatus);
+            holder.itemView.setClickable(canOpen && a.appointmentId > 0);
+            holder.itemView.setOnClickListener(canOpen && onApptClick != null
+                    ? v -> onApptClick.onClick(a) : null);
+            holder.itemView.setAlpha(a.status == ApptStatus.DONE || a.status == ApptStatus.NO_SHOW ? 0.85f : 1f);
         }
 
         @Override

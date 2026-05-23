@@ -13,7 +13,7 @@
         android:background="@color/brand_primary"
         app:navigationIcon="@drawable/ic_auth_back"
         app:navigationIconTint="@color/white"
-        app:title="Cập nhật hồ sơ"
+        app:title="@string/complete_profile_title"
         app:titleTextColor="@color/white" />
 
     <androidx.core.widget.NestedScrollView
@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Vui lòng cung cấp đầy đủ thông tin để đặt lịch khám."
+                android:text="@string/complete_profile_intro"
                 android:textColor="@color/text_secondary_dim"
                 android:textSize="13sp" />
 
@@ -43,7 +43,7 @@
                     android:id="@+id/cp_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Số điện thoại" />
+                    android:hint="@string/phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -54,7 +54,7 @@
                     android:id="@+id/cp_dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Ngày sinh (dd/MM/yyyy)"
+                    android:hint="@string/complete_profile_dob_hint"
                     android:focusable="false"
                     android:clickable="true"
                     android:inputType="none" />
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Giới tính"
+                android:hint="@string/gender"
                 app:endIconMode="dropdown_menu">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/cp_gender"
@@ -81,7 +81,8 @@
                     android:id="@+id/cp_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Địa chỉ" />
+                    android:hint="@string/address"
+                    android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -89,8 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Lưu" />
+                android:text="@string/save" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>
-

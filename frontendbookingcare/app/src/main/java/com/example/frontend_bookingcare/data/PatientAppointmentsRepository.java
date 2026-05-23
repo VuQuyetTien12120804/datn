@@ -8,6 +8,8 @@ import com.example.frontend_bookingcare.api.CancelAppointmentRequest;
 import com.example.frontend_bookingcare.api.PatientAppointmentDto;
 import com.example.frontend_bookingcare.api.PatientAppointmentsApiService;
 import com.example.frontend_bookingcare.api.RetrofitClient;
+import com.example.frontend_bookingcare.util.ApiErrorParser;
+import com.example.frontend_bookingcare.util.RepoMessages;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -46,7 +48,24 @@ public class PatientAppointmentsRepository {
                     List<PatientAppointmentDto> out = list;
                     MAIN.post(() -> cb.onDone(out, null));
                 } else {
-                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
+                }
+            } catch (Exception e) {
+                MAIN.post(() -> cb.onDone(null, safeMessage(e)));
+            }
+        });
+    }
+
+    public void fetchDetail(String authorizationBearer, int appointmentId, ResultCallback<PatientAppointmentDto> cb) {
+        EXECUTOR.execute(() -> {
+            try {
+                Response<ApiEnvelope> response = api.appointmentDetail(authorizationBearer, appointmentId).execute();
+                ApiEnvelope body = response.body();
+                if (response.isSuccessful() && body != null && body.success && body.data != null && !body.data.isJsonNull()) {
+                    PatientAppointmentDto dto = gson.fromJson(body.data, PatientAppointmentDto.class);
+                    MAIN.post(() -> cb.onDone(dto, null));
+                } else {
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
                 }
             } catch (Exception e) {
                 MAIN.post(() -> cb.onDone(null, safeMessage(e)));
@@ -66,7 +85,7 @@ public class PatientAppointmentsRepository {
                 if (response.isSuccessful() && body != null && body.success) {
                     MAIN.post(() -> cb.onDone(body, null));
                 } else {
-                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
                 }
             } catch (Exception e) {
                 MAIN.post(() -> cb.onDone(null, safeMessage(e)));
@@ -74,13 +93,19 @@ public class PatientAppointmentsRepository {
         });
     }
 
-    private static String errorMessage(ApiEnvelope body, int httpCode) {
-        if (body != null && body.message != null && !body.message.isEmpty()) return body.message;
-        return "HTTP " + httpCode;
+    public void checkIn(String authorizationBearer, int appointmentId, ResultCallback<Boolean> cb) {
+        EXECUTOR.execute(() -> {
+            try {
+                Response<ApiEnvelope> response = api.checkInAppointment(authorizationBearer, appointmentId).execute();
+                boolean ok = response.isSuccessful() && response.body() != null && response.body().success;
+                MAIN.post(() -> cb.onDone(ok, ok ? null : ApiErrorParser.message(response)));
+            } catch (Exception e) {
+                MAIN.post(() -> cb.onDone(false, safeMessage(e)));
+            }
+        });
     }
-
     private static String safeMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : "Network error";
+        return RepoMessages.networkError();
     }
 }
 

@@ -14,7 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Frontendbookingcare"
-        android:usesCleartextTraffic="true"
+        android:localeConfig="@xml/locales_config"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="false"
         tools:targetApi="31">
         <activity
             android:name=".onboarding.OnboardingActivity"
@@ -65,6 +67,9 @@
             android:name=".ui.appointments.AppointmentTicketActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.notifications.NotificationsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.support.chat.CustomerCareChatActivity"
             android:exported="false"

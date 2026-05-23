@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -108,7 +110,6 @@ public class DoctorRequestsFragment extends Fragment {
             if (rawStatus == null) return true;
             String u = rawStatus.trim().toUpperCase(Locale.ROOT);
             if ("COMPLETED".equals(u)) return false;
-            if ("IN_PROGRESS".equals(u)) return false;
             if ("CHECKED_IN".equals(u)) return false;
             return true;
         }
@@ -119,8 +120,9 @@ public class DoctorRequestsFragment extends Fragment {
             int age = DoctorPanelFormatters.resolvePatientAge(d.dob, d.patientAge);
             String gender = DoctorPanelFormatters.displayGender(d.gender);
             String date = DoctorPanelFormatters.formatAppointmentDate(d.appointmentDate);
-            String time = DoctorPanelFormatters.formatTimeAmPm(d.expectedTime);
-            String reason = TextUtils.isEmpty(d.notes) ? "—" : d.notes;
+            String time = DoctorPanelFormatters.formatTimeHm(d.expectedTime);
+            String reason = !TextUtils.isEmpty(d.reason) ? d.reason
+                    : (TextUtils.isEmpty(d.notes) ? "—" : d.notes);
             String iso = d.appointmentDate != null ? d.appointmentDate.trim() : null;
             if (TextUtils.isEmpty(iso)) {
                 iso = null;
@@ -128,7 +130,9 @@ public class DoctorRequestsFragment extends Fragment {
             Long slotMs = DoctorPanelFormatters.appointmentSlotStartMillis(d.appointmentDate, d.expectedTime);
             String st = d.status != null ? d.status.trim() : null;
             if (TextUtils.isEmpty(st)) st = null;
-            return new DoctorReq(id, name, age, gender, date, time, reason, false, tab, iso, slotMs, st);
+            return new DoctorReq(id, name, age, gender, date, time, reason,
+                    DoctorPanelFormatters.isPriorityPending(tab == ReqStatus.PENDING, slotMs),
+                    tab, iso, slotMs, st);
         }
     }
 
@@ -146,6 +150,13 @@ public class DoctorRequestsFragment extends Fragment {
     private View tabLegendCard;
     private TextView tabLegendText;
 
+    private SwipeRefreshLayout swipeRefresh;
+    private ProgressBar loading;
+    private View errorPanel;
+    private TextView errorText;
+    private MaterialButton retryBtn;
+    private boolean loadedOnce;
+
     private final DoctorPanelRepository repository = new DoctorPanelRepository();
 
     @Nullable
@@ -157,8 +168,12 @@ public class DoctorRequestsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        DoctorUiHelper.applyTopInsetPadding(view, 12);
-        subtitle = view.findViewById(R.id.doctor_req_subtitle);
+        DoctorUiHelper.applyHeroTopInset(view.findViewById(R.id.doctor_req_hero), 16);
+        DoctorEmptyUi.bindHero(view,
+                R.drawable.ic_nav_doctor_inbox,
+                R.string.doctor_requests_title,
+                R.string.doctor_requests_subtitle_default);
+        subtitle = view.findViewById(R.id.doctor_hero_subtitle);
         MaterialButtonToggleGroup tabs = view.findViewById(R.id.doctor_req_tabs);
         MaterialButton btnPending = view.findViewById(R.id.doctor_tab_pending);
         MaterialButton btnAccepted = view.findViewById(R.id.doctor_tab_accepted);
@@ -169,8 +184,27 @@ public class DoctorRequestsFragment extends Fragment {
 
         reqList = view.findViewById(R.id.doctor_req_list);
         reqEmpty = view.findViewById(R.id.doctor_req_empty);
+        if (reqEmpty != null) {
+            DoctorEmptyUi.bind(reqEmpty,
+                    R.drawable.ic_nav_doctor_inbox,
+                    R.string.doctor_empty_requests_title,
+                    R.string.doctor_empty_requests_hint);
+        }
         tabLegendCard = view.findViewById(R.id.doctor_req_tab_legend);
         tabLegendText = view.findViewById(R.id.doctor_req_legend_text);
+
+        swipeRefresh = view.findViewById(R.id.doctor_req_refresh);
+        swipeRefresh.setColorSchemeColors(
+                ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary),
+                ContextCompat.getColor(requireContext(), R.color.doctor_brand_primary_light));
+        swipeRefresh.setOnRefreshListener(() -> loadAppointmentTabs(true, true));
+
+        loading = view.findViewById(R.id.doctor_fetch_loading);
+        errorPanel = view.findViewById(R.id.doctor_fetch_error);
+        errorText = view.findViewById(R.id.doctor_fetch_error_text);
+        retryBtn = view.findViewById(R.id.doctor_fetch_retry);
+        retryBtn.setOnClickListener(v -> loadAppointmentTabs(false, false));
+
         reqList.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ReqAdapter();
         reqList.setAdapter(adapter);
@@ -194,7 +228,7 @@ public class DoctorRequestsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadAppointmentTabs();
+        loadAppointmentTabs(false, loadedOnce);
     }
 
     private void selectTab(ReqStatus s) {
@@ -390,10 +424,17 @@ public class DoctorRequestsFragment extends Fragment {
         return rows;
     }
 
-    private void loadAppointmentTabs() {
+    private void loadAppointmentTabs(boolean fromSwipe, boolean silent) {
+        if (fromSwipe) {
+            DoctorPanelStateUi.hide(loading, errorPanel, null);
+        } else if (!silent) {
+            DoctorPanelStateUi.showLoading(loading, errorPanel, swipeRefresh);
+        }
+
         SessionManager sm = new SessionManager(requireContext());
         AuthSession s = sm.getSession();
         if (s == null || TextUtils.isEmpty(s.accessToken)) {
+            DoctorPanelStateUi.hide(loading, errorPanel, swipeRefresh);
             Toast.makeText(requireContext(), R.string.doctor_panel_session_required, Toast.LENGTH_SHORT).show();
             pendingItems.clear();
             acceptedItems.clear();
@@ -405,13 +446,17 @@ public class DoctorRequestsFragment extends Fragment {
         repository.fetchAllTabs(auth, (tabs, err) -> {
             if (!isAdded()) return;
             if (err != null) {
-                Toast.makeText(requireContext(), getString(R.string.doctor_panel_load_failed_fmt, err), Toast.LENGTH_LONG).show();
+                DoctorPanelStateUi.showError(loading, errorPanel, errorText, retryBtn, swipeRefresh,
+                        getString(R.string.doctor_panel_load_failed_fmt, err),
+                        () -> loadAppointmentTabs(false, false));
                 pendingItems.clear();
                 acceptedItems.clear();
                 rejectedItems.clear();
                 refresh();
                 return;
             }
+            loadedOnce = true;
+            DoctorPanelStateUi.hide(loading, errorPanel, swipeRefresh);
             pendingItems.clear();
             acceptedItems.clear();
             rejectedItems.clear();
@@ -489,7 +534,7 @@ public class DoctorRequestsFragment extends Fragment {
                 Toast.makeText(requireContext(), getString(R.string.doctor_panel_action_failed_fmt, err != null ? err : ""), Toast.LENGTH_LONG).show();
                 return;
             }
-            loadAppointmentTabs();
+            loadAppointmentTabs(false, true);
         });
     }
 
@@ -507,7 +552,7 @@ public class DoctorRequestsFragment extends Fragment {
                 Toast.makeText(requireContext(), getString(R.string.doctor_panel_action_failed_fmt, err != null ? err : ""), Toast.LENGTH_LONG).show();
                 return;
             }
-            loadAppointmentTabs();
+            loadAppointmentTabs(false, true);
         });
     }
 
@@ -599,6 +644,11 @@ public class DoctorRequestsFragment extends Fragment {
                 h.btnReject.setOnClickListener(v -> cancelRequest(r));
             } else {
                 h.actionRow.setVisibility(View.GONE);
+                h.itemView.setOnClickListener(v -> {
+                    if (r.appointmentId > 0 && getActivity() instanceof DoctorMainActivity) {
+                        ((DoctorMainActivity) getActivity()).openExaminingForAppointment(r.appointmentId);
+                    }
+                });
             }
 
             float density = h.itemView.getResources().getDisplayMetrics().density;

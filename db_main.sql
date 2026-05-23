@@ -1,12 +1,16 @@
 /*
-  BookingCare Clinic DB - MAIN SCHEMA (SQL Server)
-  Run this file first.
+  ClinicBooking — SCHEMA (SQL Server)
+  File duy nhất cho cấu trúc DB. Chạy TRƯỚC `db_seed.sql`.
 
-  What it does:
-  - Drops and recreates database `clinic_db`
-  - Creates all tables, constraints, procedures, and indexes
+  Bao gồm:
+  - Drop/create database `clinic_db`
+  - Toàn bộ bảng (lịch hẹn, chat CSKH, auth, …)
+  - Stored procedure `sp_create_appointment` (capacity-aware)
+  - Toàn bộ index
 
-  Tested with SQL Server 2019+.
+  Thiết lập DB mới (chỉ 2 bước):
+    sqlcmd -S localhost -U sa -P <pass> -i db_main.sql
+    sqlcmd -S localhost -U sa -P <pass> -i db_seed.sql
 */
 
 SET NOCOUNT ON;
@@ -419,6 +423,39 @@ CREATE TABLE dbo.access_token_blacklist (
 );
 GO
 
+/* ===== 8) patient-doctor messaging ===== */
+CREATE TABLE dbo.message_threads (
+  id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_message_threads PRIMARY KEY,
+  thread_type nvarchar(20) NOT NULL,
+  patient_id int NOT NULL,
+  doctor_id int NULL,
+  last_message_at datetimeoffset(0) NULL,
+  created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_message_threads_created DEFAULT SYSDATETIMEOFFSET(),
+  updated_at datetimeoffset(0) NOT NULL CONSTRAINT DF_message_threads_updated DEFAULT SYSDATETIMEOFFSET(),
+  CONSTRAINT FK_message_threads_patient FOREIGN KEY (patient_id) REFERENCES dbo.patients(id) ON DELETE NO ACTION,
+  CONSTRAINT FK_message_threads_doctor FOREIGN KEY (doctor_id) REFERENCES dbo.doctors(id) ON DELETE NO ACTION,
+  CONSTRAINT CK_message_threads_type CHECK (thread_type IN (N'doctor', N'support')),
+  CONSTRAINT CK_message_threads_doctor_ref CHECK (
+    (thread_type = N'doctor' AND doctor_id IS NOT NULL)
+    OR (thread_type = N'support' AND doctor_id IS NULL)
+  )
+);
+GO
+
+CREATE TABLE dbo.messages (
+  id int IDENTITY(1,1) NOT NULL CONSTRAINT PK_messages PRIMARY KEY,
+  thread_id int NOT NULL,
+  sender_account_id int NOT NULL,
+  sender_role nvarchar(20) NOT NULL,
+  content nvarchar(4000) NOT NULL,
+  read_at datetimeoffset(0) NULL,
+  created_at datetimeoffset(0) NOT NULL CONSTRAINT DF_messages_created DEFAULT SYSDATETIMEOFFSET(),
+  CONSTRAINT FK_messages_thread FOREIGN KEY (thread_id) REFERENCES dbo.message_threads(id) ON DELETE CASCADE,
+  CONSTRAINT FK_messages_account FOREIGN KEY (sender_account_id) REFERENCES dbo.accounts(id) ON DELETE NO ACTION,
+  CONSTRAINT CK_messages_sender_role CHECK (sender_role IN (N'patient', N'doctor', N'admin'))
+);
+GO
+
 /* ===== Optional: stored procedure đặt lịch an toàn (chống trùng giờ bác sĩ) ===== */
 CREATE OR ALTER PROCEDURE dbo.sp_create_appointment
   @patient_id int,
@@ -445,9 +482,12 @@ BEGIN
 
   IF (@slot_id IS NOT NULL)
   BEGIN
-    SELECT 1
-    FROM dbo.appointment_slots WITH (UPDLOCK, HOLDLOCK)
-    WHERE id = @slot_id AND doctor_id = @doctor_id AND starts_at = @starts_at AND ends_at = @ends_at;
+    DECLARE @slot_capacity int = 1;
+    DECLARE @slot_booked int = 0;
+
+    SELECT @starts_at = s.starts_at, @ends_at = s.ends_at, @slot_capacity = s.capacity
+    FROM dbo.appointment_slots s WITH (UPDLOCK, HOLDLOCK)
+    WHERE s.id = @slot_id AND s.doctor_id = @doctor_id AND s.is_active = 1;
 
     IF (@@ROWCOUNT = 0)
     BEGIN
@@ -455,7 +495,12 @@ BEGIN
       THROW 50002, 'Slot not found or mismatch', 1;
     END
 
-    IF EXISTS (SELECT 1 FROM dbo.appointments WITH (UPDLOCK, HOLDLOCK) WHERE slot_id = @slot_id AND status IN (N'pending',N'confirmed',N'checked_in'))
+    SELECT @slot_booked = COUNT(*)
+    FROM dbo.appointments WITH (UPDLOCK, HOLDLOCK)
+    WHERE slot_id = @slot_id
+      AND status IN (N'pending', N'confirmed', N'checked_in');
+
+    IF (@slot_booked >= @slot_capacity)
     BEGIN
       ROLLBACK TRANSACTION;
       THROW 50003, 'Slot already booked', 1;
@@ -631,3 +676,18 @@ GO
 CREATE INDEX IX_atb_expires_at ON dbo.access_token_blacklist(expires_at);
 GO
 
+/* message_threads */
+CREATE UNIQUE INDEX UX_message_threads_patient_doctor
+  ON dbo.message_threads(patient_id, doctor_id)
+  WHERE thread_type = N'doctor' AND doctor_id IS NOT NULL;
+GO
+CREATE UNIQUE INDEX UX_message_threads_patient_support
+  ON dbo.message_threads(patient_id)
+  WHERE thread_type = N'support';
+GO
+CREATE INDEX IX_message_threads_patient ON dbo.message_threads(patient_id, last_message_at DESC);
+GO
+
+/* messages */
+CREATE INDEX IX_messages_thread_created ON dbo.messages(thread_id, created_at);
+GO

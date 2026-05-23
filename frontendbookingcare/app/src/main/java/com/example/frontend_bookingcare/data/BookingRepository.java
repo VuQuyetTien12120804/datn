@@ -8,6 +8,8 @@ import com.example.frontend_bookingcare.api.BookingApiService;
 import com.example.frontend_bookingcare.api.BookingRequest;
 import com.example.frontend_bookingcare.api.BookingResponseDto;
 import com.example.frontend_bookingcare.api.RetrofitClient;
+import com.example.frontend_bookingcare.util.ApiErrorParser;
+import com.example.frontend_bookingcare.util.RepoMessages;
 import com.example.frontend_bookingcare.api.SlotDto;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -54,7 +56,7 @@ public class BookingRepository {
                     final List<String> result = list;
                     MAIN.post(() -> cb.onDone(result, null));
                 } else {
-                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
                 }
             } catch (Exception e) {
                 MAIN.post(() -> cb.onDone(null, safeMessage(e)));
@@ -79,7 +81,7 @@ public class BookingRepository {
                     final List<SlotDto> result = list;
                     MAIN.post(() -> cb.onDone(result, null));
                 } else {
-                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
                 }
             } catch (Exception e) {
                 MAIN.post(() -> cb.onDone(null, safeMessage(e)));
@@ -101,20 +103,14 @@ public class BookingRepository {
                     final BookingResponseDto out = result;
                     MAIN.post(() -> cb.onDone(out, null));
                 } else {
-                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    MAIN.post(() -> cb.onDone(null, ApiErrorParser.message(response)));
                 }
             } catch (Exception e) {
                 MAIN.post(() -> cb.onDone(null, safeMessage(e)));
             }
         });
     }
-
-    private static String errorMessage(ApiEnvelope body, int httpCode) {
-        if (body != null && body.message != null && !body.message.isEmpty()) return body.message;
-        return "HTTP " + httpCode;
-    }
-
     private static String safeMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : "Network error";
+        return RepoMessages.networkError();
     }
 }

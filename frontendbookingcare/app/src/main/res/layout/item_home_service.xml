@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -18,9 +19,17 @@
 
         <TextView
             android:id="@+id/service_icon"
-            style="@style/Text.Tile.Icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:id="@+id/service_icon_image"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            app:tint="@color/white" />
     </FrameLayout>
 
     <TextView

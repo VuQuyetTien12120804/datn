@@ -28,10 +28,17 @@ type FormValues = {
 }
 
 const statusOptions = [
-  { value: 'active', label: 'active' },
-  { value: 'inactive', label: 'inactive' },
-  { value: 'blocked', label: 'blocked' },
+  { value: 'active', label: 'Hoạt động' },
+  { value: 'inactive', label: 'Ngưng' },
+  { value: 'blocked', label: 'Đã khóa' },
 ]
+
+function accountStatusTag(v?: string | null) {
+  const s = v ?? 'active'
+  const color = s === 'blocked' ? 'red' : s === 'inactive' ? 'orange' : 'green'
+  const label = statusOptions.find((x) => x.value === s)?.label ?? s
+  return <Tag color={color}>{label}</Tag>
+}
 
 export default function AccountsPage() {
   const qc = useQueryClient()
@@ -90,7 +97,7 @@ export default function AccountsPage() {
     () => [
       { title: 'ID', dataIndex: 'userId', width: 90 },
       {
-        title: 'Role',
+        title: 'Vai trò',
         dataIndex: 'role',
         width: 200,
         render: (r: Role | null | undefined) =>
@@ -105,16 +112,12 @@ export default function AccountsPage() {
       },
       { title: 'Họ tên', dataIndex: 'fullName', width: 220 },
       { title: 'Email', dataIndex: 'email', width: 240, render: (v) => v ?? '—' },
-      { title: 'Phone', dataIndex: 'phone', width: 140, render: (v) => v ?? '—' },
+      { title: 'SĐT', dataIndex: 'phone', width: 140, render: (v) => v ?? '—' },
       {
-        title: 'Status',
+        title: 'Trạng thái',
         dataIndex: 'status',
         width: 130,
-        render: (v: string | null | undefined) => {
-          const s = v ?? 'active'
-          const color = s === 'blocked' ? 'red' : s === 'inactive' ? 'orange' : 'green'
-          return <Tag color={color}>{s}</Tag>
-        },
+        render: (v: string | null | undefined) => accountStatusTag(v),
       },
       {
         title: 'Thao tác',
@@ -200,7 +203,7 @@ export default function AccountsPage() {
             <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
               Tài khoản
             </Typography.Title>
-            <Typography.Text type="secondary">Quản lý tài khoản người dùng (CRUD + block/unblock)</Typography.Text>
+            <Typography.Text type="secondary">Quản lý tài khoản đăng nhập (tạo, sửa, khóa/mở khóa)</Typography.Text>
           </div>
 
           <Button
@@ -258,7 +261,7 @@ export default function AccountsPage() {
             <Form.Item name="email" label="Email" style={{ flex: 1 }}>
               <Input placeholder="user@email.com" />
             </Form.Item>
-            <Form.Item name="phone" label="Phone" style={{ flex: 1 }}>
+            <Form.Item name="phone" label="SĐT" style={{ flex: 1 }}>
               <Input placeholder="090..." />
             </Form.Item>
           </Space>
@@ -268,7 +271,7 @@ export default function AccountsPage() {
           </Form.Item>
 
           <Space size={12} style={{ width: '100%' }} align="start">
-            <Form.Item name="status" label="Status" style={{ flex: 1 }}>
+            <Form.Item name="status" label="Trạng thái" style={{ flex: 1 }}>
               <Select options={statusOptions} />
             </Form.Item>
             <Form.Item

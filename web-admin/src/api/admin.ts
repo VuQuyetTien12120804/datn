@@ -199,6 +199,21 @@ export async function searchAppointments(params: {
   return res.data.data
 }
 
+export async function searchAllAppointments(
+  params: Omit<Parameters<typeof searchAppointments>[0], 'page' | 'size'>,
+): Promise<AppointmentAdminRow[]> {
+  const rows: AppointmentAdminRow[] = []
+  let page = 0
+  const size = 100
+  while (true) {
+    const res = await searchAppointments({ ...params, page, size })
+    rows.push(...(res.content ?? []))
+    if (res.last || (res.content ?? []).length === 0) break
+    page += 1
+  }
+  return rows
+}
+
 export async function getAppointmentDetail(id: number): Promise<AppointmentAdminDetail> {
   const res = await http.get<ApiEnvelope<AppointmentAdminDetail>>(`/api/v1/admin/appointments/${id}/detail`)
   return res.data.data
@@ -389,7 +404,6 @@ export type ReportTimeseriesPoint = {
   completed: number
   cancelled: number
   noShow: number
-  revenueCents: number
 }
 
 export type TopItemPoint = {
@@ -422,14 +436,58 @@ export async function reportTopSpecialties(params: { from?: string; to?: string;
   return res.data.data ?? []
 }
 
-export async function reportRevenueSummary(params: { from?: string; to?: string }): Promise<{
-  revenueCents: number
+export async function reportAppointmentSummary(params: { from?: string; to?: string }): Promise<{
+  total: number
+  completed: number
   cancelled: number
   noShow: number
-  total: number
+  pending: number
+  confirmed: number
 }> {
-  const res = await http.get<ApiEnvelope<any>>('/api/v1/admin/reports/revenue/summary', { params })
+  const res = await http.get<ApiEnvelope<any>>('/api/v1/admin/reports/appointments/summary', { params })
   return res.data.data
 }
 
+export type ChatThread = {
+  threadId: number
+  threadKey: string
+  threadType: string
+  title: string
+  subtitle: string
+  lastMessage: string
+  updatedAtMs: number
+  unreadCount: number
+  locked: boolean
+  canSend: boolean
+}
+
+export type ChatMessage = {
+  messageId: number
+  senderRole: string
+  content: string
+  fromMe: boolean
+  createdAtMs: number
+}
+
+export async function listSupportThreads(): Promise<ChatThread[]> {
+  const res = await http.get<ApiEnvelope<ChatThread[]>>('/api/v1/admin/messages/threads')
+  return res.data.data ?? []
+}
+
+export async function listSupportMessages(threadKey: string): Promise<ChatMessage[]> {
+  const encoded = encodeURIComponent(threadKey)
+  const res = await http.get<ApiEnvelope<ChatMessage[]>>(`/api/v1/admin/messages/threads/${encoded}/messages`)
+  return res.data.data ?? []
+}
+
+export async function sendSupportMessage(threadKey: string, content: string): Promise<ChatMessage> {
+  const encoded = encodeURIComponent(threadKey)
+  const res = await http.post<ApiEnvelope<ChatMessage>>(`/api/v1/admin/messages/threads/${encoded}/messages`, { content })
+  return res.data.data
+}
+
+export async function markSupportThreadRead(threadKey: string): Promise<void> {
+  const encoded = encodeURIComponent(threadKey)
+  await http.post(`/api/v1/admin/messages/threads/${encoded}/read`)
+}
 

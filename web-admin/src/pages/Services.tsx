@@ -15,7 +15,6 @@ type FormValues = {
   name: string
   description?: string
   durationMinutes: number
-  priceCents: number
   isActive: boolean
 }
 
@@ -77,10 +76,9 @@ export default function ServicesPage() {
         render: (sid) => (sid ? specMap.get(sid)?.name ?? `#${sid}` : <Typography.Text type="secondary">—</Typography.Text>),
       },
       { title: 'Mã', dataIndex: 'code', width: 140, render: (v) => (v ? <code>{v}</code> : '—') },
-      { title: 'Tên dịch vụ', dataIndex: 'name', width: 260 },
+      { title: 'Tên dịch vụ', dataIndex: 'name', width: 280 },
       { title: 'Thời lượng', dataIndex: 'durationMinutes', width: 120, render: (v) => `${v} phút` },
-      { title: 'Giá', dataIndex: 'priceCents', width: 140, render: (v) => `${v}` },
-      { title: 'Active', dataIndex: 'isActive', width: 110, render: (v) => (v ? <Tag color="green">ON</Tag> : <Tag>OFF</Tag>) },
+      { title: 'Trạng thái', dataIndex: 'isActive', width: 110, render: (v) => (v ? <Tag color="green">Đang dùng</Tag> : <Tag>Tắt</Tag>) },
       {
         title: 'Thao tác',
         key: 'actions',
@@ -97,7 +95,6 @@ export default function ServicesPage() {
                   name: row.name,
                   description: row.description ?? undefined,
                   durationMinutes: row.durationMinutes,
-                  priceCents: row.priceCents,
                   isActive: row.isActive,
                 })
               }}
@@ -135,7 +132,7 @@ export default function ServicesPage() {
       name: v.name.trim(),
       description: v.description?.trim() ? v.description.trim() : null,
       durationMinutes: v.durationMinutes,
-      priceCents: v.priceCents,
+      priceCents: 0,
       isActive: v.isActive,
     }
     if (editing) await updateMut.mutateAsync({ id: editing.id, payload })
@@ -148,16 +145,16 @@ export default function ServicesPage() {
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
           <div>
             <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-              Services (Dịch vụ khám)
+              Dịch vụ khám
             </Typography.Title>
-            <Typography.Text type="secondary">CRUD dịch vụ + gán chuyên khoa</Typography.Text>
+            <Typography.Text type="secondary">Danh mục dịch vụ dùng khi đặt lịch (thời lượng khám, chuyên khoa)</Typography.Text>
           </div>
           <Button
             type="primary"
             onClick={() => {
               setEditing(null)
               form.resetFields()
-              form.setFieldsValue({ durationMinutes: 15, priceCents: 0, isActive: true } as any)
+              form.setFieldsValue({ durationMinutes: 15, isActive: true } as any)
               setOpen(true)
             }}
           >
@@ -174,10 +171,10 @@ export default function ServicesPage() {
             dataSource={q.data ?? []}
             columns={columns}
             pagination={{ pageSize: 10 }}
-            scroll={{ x: 1200, y: 'calc(100vh - 480px)' as any }}
+            scroll={{ x: 1100, y: 'calc(100vh - 480px)' as any }}
             sticky
             locale={{
-              emptyText: <EmptyState title="Chưa có dịch vụ" description="Tạo dịch vụ để tính doanh thu và gán vào lịch hẹn." />,
+              emptyText: <EmptyState title="Chưa có dịch vụ" description="Thêm dịch vụ để gán vào quy trình đặt lịch." />,
             }}
           />
         </TableShell>
@@ -217,10 +214,7 @@ export default function ServicesPage() {
             <Form.Item name="durationMinutes" label="Thời lượng (phút)" style={{ flex: 1 }} rules={[{ required: true }]}>
               <InputNumber style={{ width: '100%' }} min={5} max={1440} />
             </Form.Item>
-            <Form.Item name="priceCents" label="Giá (cents/đồng tuỳ bạn)" style={{ flex: 1 }} rules={[{ required: true }]}>
-              <InputNumber style={{ width: '100%' }} min={0} />
-            </Form.Item>
-            <Form.Item name="isActive" label="Active" valuePropName="checked" style={{ flex: 1 }}>
+            <Form.Item name="isActive" label="Đang sử dụng" valuePropName="checked" style={{ flex: 1 }}>
               <Switch />
             </Form.Item>
           </Space>
@@ -229,4 +223,3 @@ export default function ServicesPage() {
     </Space>
   )
 }
-

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Placeholder cho QR code khi chưa tích hợp thư viện ZXing.
-    Dùng pattern ô vuông đen-trắng giả lập. Sau này có thể thay bằng QR thật.
--->
+<!-- Nền trắng viền mỏng cho vùng hiển thị QR mã lịch khám. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">

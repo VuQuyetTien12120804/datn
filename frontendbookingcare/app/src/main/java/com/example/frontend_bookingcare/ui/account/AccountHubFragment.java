@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.frontend_bookingcare.MainActivity;
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.account.AccountFlowListener;
 import com.example.frontend_bookingcare.locale.LocaleStore;
@@ -36,7 +37,6 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
     public static final String ROW_PROFILE = "profile_detail";
     public static final String ROW_CHANGE_PWD = "change_password";
     public static final String ROW_LOGOUT = "logout";
-    public static final String ROW_HEALTH = "health_summary";
     public static final String ROW_TERMS = "terms";
     public static final String ROW_PRIVACY = "privacy";
     public static final String ROW_SERVICE = "service_terms";
@@ -140,13 +140,8 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
             list.add(AccountListItem.section(getString(R.string.account_section_account)));
             list.add(AccountListItem.row(ROW_PROFILE, getString(R.string.account_menu_profile_detail),
                     getString(R.string.account_menu_profile_detail_sub), null, "👤", R.color.icon_bg_blue));
-            list.add(AccountListItem.row(ROW_HEALTH, getString(R.string.account_menu_health),
-                    getString(R.string.account_menu_health_sub), null, "📋", R.color.icon_bg_teal));
             list.add(AccountListItem.row(ROW_CHANGE_PWD, getString(R.string.change_password), null, null, "🔑", R.color.icon_bg_purple));
             list.add(AccountListItem.row(ROW_LOGOUT, getString(R.string.logout), getString(R.string.account_menu_logout_sub), null, "🚪", R.color.icon_bg_red));
-        } else {
-            list.add(AccountListItem.row(ROW_HEALTH, getString(R.string.account_menu_health),
-                    getString(R.string.account_menu_health_guest_sub), null, "📋", R.color.icon_bg_teal));
         }
 
         list.add(AccountListItem.section(getString(R.string.account_section_terms)));
@@ -196,19 +191,15 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
                         .setPositiveButton(R.string.logout, (d, w) ->
                                 repo.logout((a, err) -> {
                                     Toast.makeText(requireContext(), R.string.account_logged_out_toast, Toast.LENGTH_SHORT).show();
+                                    if (requireActivity() instanceof MainActivity) {
+                                        ((MainActivity) requireActivity()).refreshAfterAuthChange();
+                                    }
                                     View root = getView();
                                     if (root != null) {
                                         refreshAll(root);
                                     }
                                 }))
                         .show();
-                break;
-            case ROW_HEALTH:
-                if (sm.isLoggedIn()) {
-                    flow.openProfileDetail();
-                } else {
-                    flow.openLogin();
-                }
                 break;
             case ROW_TERMS:
                 LegalDocumentActivity.start(this, LegalDocumentActivity.CODE_TERMS);
@@ -229,7 +220,7 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
                 shareApp();
                 break;
             case ROW_FAQ:
-                showInfoDialog(R.string.account_menu_faq, R.string.account_placeholder_faq);
+                LegalDocumentActivity.start(this, LegalDocumentActivity.CODE_FAQ);
                 break;
             case ROW_LANG:
                 showLanguagePicker();
@@ -237,14 +228,6 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
             default:
                 break;
         }
-    }
-
-    private void showInfoDialog(int titleRes, int messageRes) {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(titleRes)
-                .setMessage(messageRes)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
     }
 
     private void showLanguagePicker() {

@@ -12,6 +12,9 @@ public class PatientAppointmentDto {
     @SerializedName("doctorName")
     public String doctorName;
 
+    @SerializedName("specialty")
+    public String specialty;
+
     @SerializedName("appointmentDate")
     public String appointmentDate; // yyyy-MM-dd
 
@@ -23,5 +26,14 @@ public class PatientAppointmentDto {
 
     @SerializedName("status")
     public String status;
+
+    @SerializedName("clinicalNote")
+    public String clinicalNote;
+
+    @SerializedName("reason")
+    public String reason;
+
+    @SerializedName("queueNumber")
+    public Integer queueNumber;
 }
 

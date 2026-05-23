@@ -7,7 +7,6 @@ import {
   Divider,
   Form,
   Input,
-  InputNumber,
   Modal,
   Pagination,
   Row,
@@ -31,7 +30,6 @@ import {
   MailOutlined,
   PhoneOutlined,
   PlusOutlined,
-  StarFilled,
   UserOutlined,
 } from '@ant-design/icons'
 
@@ -45,8 +43,6 @@ type FormValues = {
   licenseNo?: string
   bio?: string
   avatarUrl?: string
-  rating?: number
-  visitsCount?: number
   roomLocation?: string
   scheduleText?: string
   education?: string[]
@@ -60,18 +56,6 @@ const genderOptions = [
   { value: 'female', label: 'Nữ' },
   { value: 'other', label: 'Khác' },
 ]
-
-const avatarPresets = [
-  {
-    label: 'Nam (icon chung)',
-    value: 'https://api.dicebear.com/7.x/avataaars/png?seed=doctor-male',
-  },
-  {
-    label: 'Nữ (icon chung)',
-    value: 'https://api.dicebear.com/7.x/avataaars/png?seed=doctor-female',
-  },
-]
-
 
 export default function DoctorsPage() {
   const qc = useQueryClient()
@@ -159,8 +143,6 @@ export default function DoctorsPage() {
       licenseNo: v.licenseNo?.trim() ? v.licenseNo.trim() : undefined,
       bio: v.bio?.trim() ? v.bio.trim() : undefined,
       avatarUrl: v.avatarUrl?.trim() ? v.avatarUrl.trim() : undefined,
-      rating: typeof v.rating === 'number' ? v.rating : undefined,
-      visitsCount: typeof v.visitsCount === 'number' ? v.visitsCount : undefined,
       roomLocation: v.roomLocation?.trim() ? v.roomLocation.trim() : undefined,
       scheduleText: v.scheduleText?.trim() ? v.scheduleText.trim() : undefined,
       education: v.education?.length ? v.education : undefined,
@@ -229,8 +211,6 @@ export default function DoctorsPage() {
       licenseNo: d.licenseNo ?? undefined,
       bio: d.bio ?? undefined,
       avatarUrl: d.avatarUrl ?? undefined,
-      rating: (d.rating ?? 4.8) as any,
-      visitsCount: (d.visitsCount ?? 0) as any,
       roomLocation: d.roomLocation ?? undefined,
       scheduleText: d.scheduleText ?? undefined,
       education: (d.education ?? []) as any,
@@ -271,8 +251,6 @@ export default function DoctorsPage() {
             form.resetFields()
             form.setFieldsValue({
               gender: 'unknown',
-              rating: 4.8,
-              visitsCount: 0,
               education: [],
               certificates: [],
               specialtyIds: [],
@@ -306,8 +284,6 @@ export default function DoctorsPage() {
       <div className="page-scroll doctor-list-scroll">
         <Row gutter={[16, 16]}>
           {pagedDoctors.map((d) => {
-            const rating = d.rating ?? 4.8
-            const visits = d.visitsCount ?? 0
             const primary = primarySpecialtyLabel(d)
             const tagId = (d.specialtyIds ?? [])[0]
             const tagLabel = tagId ? specialtyMap.get(tagId)?.name ?? 'Chuyên khoa' : 'Chuyên khoa'
@@ -330,18 +306,14 @@ export default function DoctorsPage() {
 
                   <Tag className="doctor-pill">{tagLabel}</Tag>
 
-                  <div style={{ height: 10 }} />
-
-                  <div className="doctor-card-metrics">
-                    <div className="doctor-metric">
-                      <UserOutlined style={{ opacity: 0.7 }} />
-                      <span>{visits} lượt khám</span>
-                    </div>
-                    <div className="doctor-metric">
-                      <StarFilled style={{ color: '#f59e0b' }} />
-                      <span>Đánh giá: {Number(rating).toFixed(1)}/5.0</span>
-                    </div>
-                  </div>
+                  {(d.phone || d.email) && (
+                    <>
+                      <div style={{ height: 10 }} />
+                      <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
+                        {d.phone ?? d.email}
+                      </Typography.Text>
+                    </>
+                  )}
                 </Card>
               </Col>
             )
@@ -441,12 +413,8 @@ export default function DoctorsPage() {
                     {((form.getFieldValue('fullName') ?? 'BS') as string).trim()?.[0]?.toUpperCase?.() ?? 'B'}
                   </Avatar>
                   <div style={{ flex: 1 }}>
-                    <Form.Item name="avatarUrl" label="Chọn nhanh" style={{ marginBottom: 0 }}>
-                      <Select
-                        allowClear
-                        placeholder="Chọn avatar..."
-                        options={avatarPresets}
-                      />
+                    <Form.Item name="avatarUrl" label="URL ảnh đại diện (tuỳ chọn)" style={{ marginBottom: 0 }}>
+                      <Input placeholder="https://..." allowClear />
                     </Form.Item>
                   </div>
                 </div>
@@ -501,20 +469,6 @@ export default function DoctorsPage() {
                 <Form.Item name="bio" label="Giới thiệu (tuỳ chọn)">
                   <Input.TextArea rows={3} placeholder="Mô tả ngắn về bác sĩ..." />
                 </Form.Item>
-
-                <Divider style={{ margin: '10px 0' }} />
-                <Row gutter={12}>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="rating" label="Đánh giá (1-5)">
-                      <InputNumber min={1} max={5} step={0.1} style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="visitsCount" label="Lượt khám">
-                      <InputNumber min={0} step={1} style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                </Row>
 
                 <Row gutter={12}>
                   <Col xs={24} md={12}>
@@ -666,14 +620,14 @@ export default function DoctorsPage() {
 
             <div style={{ height: 12 }} />
 
-            <div className="doctor-detail-kpis">
-              <div className="doctor-kpi">
-                <UserOutlined />
-                <span>{selected.visitsCount ?? 0} lượt khám</span>
+            <div className="doctor-detail-lines">
+              <div className="doctor-line">
+                <IdcardOutlined />
+                <span>Số chứng chỉ: {selected.licenseNo ?? '—'}</span>
               </div>
-              <div className="doctor-kpi">
-                <StarFilled style={{ color: '#f59e0b' }} />
-                <span>Đánh giá: {Number(selected.rating ?? 4.8).toFixed(1)}/5.0</span>
+              <div className="doctor-line">
+                <EnvironmentOutlined />
+                <span>{selected.roomLocation ?? '—'}</span>
               </div>
             </div>
 

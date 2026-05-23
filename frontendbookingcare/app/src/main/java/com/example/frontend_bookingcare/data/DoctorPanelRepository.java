@@ -4,8 +4,10 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.example.frontend_bookingcare.api.ApiEnvelope;
+import com.example.frontend_bookingcare.api.ClinicalNoteRequest;
 import com.example.frontend_bookingcare.api.DoctorAppointmentDetailDto;
 import com.example.frontend_bookingcare.api.DoctorAppointmentDto;
+import com.example.frontend_bookingcare.api.DoctorProfileDto;
 import com.example.frontend_bookingcare.api.DoctorPanelApiService;
 import com.example.frontend_bookingcare.api.RetrofitClient;
 import com.google.gson.Gson;
@@ -96,6 +98,47 @@ public class DoctorPanelRepository {
         });
     }
 
+    public void markNoShow(String authorizationBearer, int appointmentId, ResultCallback<DoctorAppointmentDetailDto> cb) {
+        patchDetail(authorizationBearer, appointmentId, auth -> api.markNoShow(auth, appointmentId), cb);
+    }
+
+    public void startExam(String authorizationBearer, int appointmentId, ResultCallback<DoctorAppointmentDetailDto> cb) {
+        patchDetail(authorizationBearer, appointmentId, auth -> api.startExam(auth, appointmentId), cb);
+    }
+
+    public void saveClinicalNote(String authorizationBearer, int appointmentId, String note,
+                                 ResultCallback<DoctorAppointmentDetailDto> cb) {
+        patchDetail(authorizationBearer, appointmentId,
+                auth -> api.saveClinicalNote(auth, appointmentId, new ClinicalNoteRequest(note)), cb);
+    }
+
+    public void completeExam(String authorizationBearer, int appointmentId, String note,
+                             ResultCallback<DoctorAppointmentDetailDto> cb) {
+        patchDetail(authorizationBearer, appointmentId,
+                auth -> api.completeExam(auth, appointmentId, new ClinicalNoteRequest(note)), cb);
+    }
+
+    private void patchDetail(String authorizationBearer, int appointmentId,
+                             PatchCall call, ResultCallback<DoctorAppointmentDetailDto> cb) {
+        EXECUTOR.execute(() -> {
+            try {
+                Response<ApiEnvelope> response = call.execute(authorizationBearer).execute();
+                DoctorAppointmentDetailDto dto = unwrapDetail(response);
+                if (dto != null) {
+                    MAIN.post(() -> cb.onDone(dto, null));
+                } else {
+                    MAIN.post(() -> cb.onDone(null, errorMessage(response.body(), response.code())));
+                }
+            } catch (Exception e) {
+                MAIN.post(() -> cb.onDone(null, safeMessage(e)));
+            }
+        });
+    }
+
+    private interface PatchCall {
+        retrofit2.Call<ApiEnvelope> execute(String authorizationBearer);
+    }
+
     /**
      * Chi tiết cuộc hẹn (ngày sinh / giới tính bệnh nhân). Trả null nếu HTTP lỗi hoặc không có dữ liệu — không ném exception.
      */
@@ -126,6 +169,27 @@ public class DoctorPanelRepository {
     private List<DoctorAppointmentDto> fetchStatusBlocking(String auth, String status) throws IOException {
         Response<ApiEnvelope> response = api.getAppointmentsByStatus(auth, status).execute();
         return unwrapList(response);
+    }
+
+    public void fetchProfile(String authorizationBearer, ResultCallback<DoctorProfileDto> cb) {
+        EXECUTOR.execute(() -> {
+            try {
+                Response<ApiEnvelope> response = api.getProfile(authorizationBearer).execute();
+                ApiEnvelope body = response.body();
+                if (!response.isSuccessful() || body == null || !body.success) {
+                    MAIN.post(() -> cb.onDone(null, errorMessage(body, response.code())));
+                    return;
+                }
+                if (body.data == null || body.data.isJsonNull()) {
+                    MAIN.post(() -> cb.onDone(null, "Không có dữ liệu hồ sơ"));
+                    return;
+                }
+                DoctorProfileDto dto = gson.fromJson(body.data, DoctorProfileDto.class);
+                MAIN.post(() -> cb.onDone(dto, null));
+            } catch (Exception e) {
+                MAIN.post(() -> cb.onDone(null, safeMessage(e)));
+            }
+        });
     }
 
     private List<DoctorAppointmentDto> unwrapList(Response<ApiEnvelope> response) {

@@ -117,7 +117,7 @@ export default function RoomsPage() {
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
           <div>
             <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-              Rooms (Phòng khám)
+              Phòng khám
             </Typography.Title>
             <Typography.Text type="secondary">Quản lý phòng khám bệnh để gán vào slot</Typography.Text>
           </div>

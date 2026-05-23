@@ -32,11 +32,21 @@ public final class LocaleStore {
                 .edit()
                 .putString(KEY_LOCALE, languageTag)
                 .apply();
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag));
+        AppCompatDelegate.setApplicationLocales(localeListForTag(languageTag));
     }
 
     public static void applySaved(Context context) {
-        String tag = getSavedTag(context);
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag));
+        AppCompatDelegate.setApplicationLocales(localeListForTag(getSavedTag(context)));
+    }
+
+    /**
+     * Keep Vietnamese in the locale list even when UI is English so IME can compose
+     * Vietnamese text (Telex/VNI) in chat, profile, search, etc.
+     */
+    private static LocaleListCompat localeListForTag(String languageTag) {
+        if ("en".equals(languageTag)) {
+            return LocaleListCompat.forLanguageTags("en,vi");
+        }
+        return LocaleListCompat.forLanguageTags("vi,en");
     }
 }

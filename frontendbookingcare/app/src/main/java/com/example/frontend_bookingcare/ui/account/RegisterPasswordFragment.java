@@ -16,6 +16,7 @@ import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.account.AccountFlowListener;
 import com.example.frontend_bookingcare.account.AuthUiUtils;
 import com.example.frontend_bookingcare.data.AuthRepository;
+import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -53,6 +54,7 @@ public class RegisterPasswordFragment extends Fragment {
         TextInputEditText fullName = view.findViewById(R.id.input_full_name);
         TextInputEditText password = view.findViewById(R.id.input_password);
         TextInputEditText confirm = view.findViewById(R.id.input_password_confirm);
+        UnicodeInputHelper.enableSingleLineText(fullName);
         MaterialButton btn = view.findViewById(R.id.btn_register_password_continue);
 
         btn.setOnClickListener(v -> {
@@ -60,11 +62,11 @@ public class RegisterPasswordFragment extends Fragment {
             String pw = text(password);
             String c = text(confirm);
             if (TextUtils.isEmpty(fn)) {
-                Toast.makeText(requireContext(), R.string.full_name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.auth_full_name_required, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (TextUtils.isEmpty(pw) || pw.length() < 6) {
-                Toast.makeText(requireContext(), R.string.auth_create_password_desc, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.auth_password_required, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (!pw.equals(c)) {

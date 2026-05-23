@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/brand_primary"
-        app:title="Tin nhắn"
+        app:title="@string/messages_title"
         app:titleTextColor="@color/white"
         app:titleCentered="true" />
 
@@ -49,21 +49,34 @@
                 android:layout_weight="1"
                 android:layout_marginStart="10dp"
                 android:background="@null"
-                android:hint="Tìm theo tên bác sĩ, nội dung..."
+                android:hint="@string/messages_search_hint"
                 android:imeOptions="actionSearch"
-                android:inputType="text"
+                    android:inputType="text"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/text_muted" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/messages_list"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp"
-        android:clipToPadding="false" />
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messages_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:clipToPadding="false" />
+
+        <include
+            android:id="@+id/messages_empty"
+            layout="@layout/include_patient_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/messages_fab"

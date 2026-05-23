@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.frontend_bookingcare.BuildConfig;
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.account.AccountFlowListener;
 import com.example.frontend_bookingcare.data.AuthRepository;
@@ -84,7 +85,7 @@ public class VerifyOtpFragment extends Fragment {
                     resendView.setEnabled(true);
                     Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show();
                 } else {
-                    if (otpDto != null && otpDto.otp != null && !otpDto.otp.isEmpty()) {
+                    if (BuildConfig.DEBUG && otpDto != null && otpDto.otp != null && !otpDto.otp.isEmpty()) {
                         Toast.makeText(requireContext(), getString(R.string.auth_otp_dev_hint, otpDto.otp), Toast.LENGTH_LONG).show();
                     }
                     Toast.makeText(requireContext(), R.string.auth_otp_sent, Toast.LENGTH_SHORT).show();
@@ -98,7 +99,7 @@ public class VerifyOtpFragment extends Fragment {
         confirmBtn.setOnClickListener(v -> {
             String code = otp.getText() != null ? otp.getText().toString().trim() : "";
             if (TextUtils.isEmpty(code)) {
-                Toast.makeText(requireContext(), R.string.otp, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.auth_otp_required, Toast.LENGTH_SHORT).show();
                 return;
             }
             confirmBtn.setEnabled(false);

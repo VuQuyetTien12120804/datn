@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Bạn cần hỗ trợ"
+            android:text="@string/support_need_help_title"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:textSize="16sp" />
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:lineSpacingExtra="2dp"
-        android:text="Nếu bạn cần hỗ trợ đặt lịch khám, tư vấn dịch vụ y tế hoặc hướng dẫn sử dụng hệ thống, vui lòng liên hệ bộ phận Chăm sóc khách hàng trong khung giờ sau:"
+        android:text="@string/support_need_help_body"
         android:textColor="@color/text_secondary_dim"
         android:textSize="13sp" />
 
@@ -52,7 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Thứ 2 - Thứ 7"
+            android:text="@string/support_hours_days"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:textSize="14sp" />
@@ -60,7 +60,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="08:00 - 17:30"
+            android:text="@string/support_hours_time"
             android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:textSize="14sp" />
@@ -72,7 +72,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/brand_primary"
-        android:text="Nhắn tin với CSKH"
+        android:text="@string/support_chat_btn"
         android:textColor="@color/white"
         app:cornerRadius="12dp" />
 
@@ -82,9 +82,8 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
-        android:text="Gọi tổng đài 1900-2805"
+        android:text="@string/account_support_call"
         android:textColor="@color/text_primary"
         app:cornerRadius="12dp"
         app:strokeColor="@color/divider_line" />
 </LinearLayout>
-

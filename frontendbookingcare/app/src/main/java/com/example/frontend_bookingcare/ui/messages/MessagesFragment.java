@@ -1,47 +1,48 @@
 package com.example.frontend_bookingcare.ui.messages;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.TypedValue;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.frontend_bookingcare.MainActivity;
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.api.ChatThreadDto;
+import com.example.frontend_bookingcare.data.ChatRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
-import com.example.frontend_bookingcare.ui.chat.ChatStore;
-import com.example.frontend_bookingcare.ui.chat.ChatThreadMeta;
 import com.example.frontend_bookingcare.ui.common.HeaderInsets;
-import com.example.frontend_bookingcare.ui.support.chat.ChatMessage;
+import com.example.frontend_bookingcare.ui.common.PatientEmptyUi;
+import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 import com.example.frontend_bookingcare.ui.support.chat.CustomerCareChatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashSet;
 
 public class MessagesFragment extends Fragment {
 
-    private final com.example.frontend_bookingcare.data.PatientAppointmentsRepository apptRepo =
-            new com.example.frontend_bookingcare.data.PatientAppointmentsRepository();
+    private final ChatRepository chatRepo = new ChatRepository();
     private ThreadsAdapter adapter;
-    private ChatStore store;
     private List<MessageThread> all = new ArrayList<>();
     private String query = "";
+    private RecyclerView rv;
+    private View emptyState;
 
     @Nullable
     @Override
@@ -56,123 +57,167 @@ public class MessagesFragment extends Fragment {
         MaterialToolbar tb = view.findViewById(R.id.messages_toolbar);
         HeaderInsets.applyToToolbar(tb);
 
-        RecyclerView rv = view.findViewById(R.id.messages_list);
+        rv = view.findViewById(R.id.messages_list);
+        emptyState = view.findViewById(R.id.messages_empty);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        SessionManager sm = new SessionManager(requireContext());
-        AuthSession s = sm.getSession();
-        String patientName = (s != null && s.fullName != null && !s.fullName.isEmpty()) ? s.fullName : "Tien";
-
-        store = new ChatStore(requireContext());
-
-        // Seed demo doctor threads only once (if empty)
-        long now = System.currentTimeMillis();
-        store.seedIfEmpty(
-                "doctor:1",
-                new ChatThreadMeta("doctor:1", "Bác sĩ Nguyễn Thị Bích Đào", patientName, true, 0, ""),
-                java.util.List.of(new ChatMessage(false, "Bạn có lịch hẹn khám với Nguyễn...", now - 5L * 24 * 3600_000))
-        );
-        store.seedIfEmpty(
-                "doctor:2",
-                new ChatThreadMeta("doctor:2", "Bác sĩ Tô Lang Châu", patientName, false, 0, ""),
-                java.util.List.of(new ChatMessage(false, "Chào A T nha, a cần đk khám ch...", now - 6L * 24 * 3600_000))
-        );
-        store.seedIfEmpty(
-                "doctor:3",
-                new ChatThreadMeta("doctor:3", "Bác sĩ Hà Thị Ngọc Bích", patientName, false, 0, ""),
-                java.util.List.of(new ChatMessage(false, "Yêu cầu tư vấn của bạn đã được...", now - 8L * 24 * 3600_000))
-        );
-        store.seedIfEmpty(
-                "support:cskh",
-                new ChatThreadMeta("support:cskh", "Chăm Sóc Khách Hàng", patientName, false, 0, ""),
-                java.util.List.of(new ChatMessage(false, "Xin chào bạn, mình có thể hỗ trợ gì ạ?", now - 60_000))
-        );
 
         adapter = new ThreadsAdapter(t ->
                 startActivity(CustomerCareChatActivity.newIntent(
                         requireContext(),
                         t.threadId,
                         t.title,
-                        t.patientName,
+                        t.chatSubtitle,
                         t.locked
                 )));
         rv.setAdapter(adapter);
 
-        all = toUiThreads(store.listThreadsSorted());
-        adapter.setItems(filter(all, query));
-
         EditText search = view.findViewById(R.id.messages_search);
+        UnicodeInputHelper.enableSingleLineText(search);
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                if (UnicodeInputHelper.isImeComposing(s)) return;
                 query = s != null ? s.toString().trim() : "";
-                if (adapter != null) adapter.setItems(filter(all, query));
+                refreshVisibleThreads();
             }
-            @Override public void afterTextChanged(Editable s) {}
         });
-
-        // Build real threads from appointments (unique doctorId -> doctorName)
-        if (sm.isLoggedIn() && s != null && s.accessToken != null && !s.accessToken.isEmpty()) {
-            String bearer = "Bearer " + s.accessToken;
-            loadFromAppointments(bearer, patientName);
-        }
 
         FloatingActionButton fab = view.findViewById(R.id.messages_fab);
         fab.setOnClickListener(v -> {
-            Intent dial = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:19002805"));
+            Intent dial = new Intent(Intent.ACTION_DIAL, Uri.parse(getString(R.string.account_support_phone_uri)));
             startActivity(dial);
         });
     }
 
-    // toolbar insets handled by HeaderInsets
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadThreads();
+    }
 
-    private static List<MessageThread> toUiThreads(List<ChatThreadMeta> metas) {
+    /**
+     * MainActivity đổi tab bằng hide/show — onResume không chạy lại khi quay lại tab này.
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden && isAdded()) {
+            loadThreads();
+        }
+    }
+
+    public void reloadForSessionChange() {
+        all.clear();
+        query = "";
+        if (isAdded()) loadThreads();
+    }
+
+    private void loadThreads() {
+        SessionManager sm = new SessionManager(requireContext());
+        AuthSession s = sm.getSession();
+        if (!sm.isLoggedIn() || s == null || s.accessToken == null || s.accessToken.isEmpty()) {
+            all = new ArrayList<>();
+            refreshVisibleThreads();
+            return;
+        }
+        String bearer = "Bearer " + s.accessToken;
+        chatRepo.fetchThreads(ChatRepository.Audience.PATIENT, bearer, (data, err) -> {
+            if (!isAdded()) return;
+            if (err != null) {
+                all = new ArrayList<>();
+                refreshVisibleThreads();
+                if (emptyState != null && rv != null) {
+                    emptyState.setVisibility(View.VISIBLE);
+                    rv.setVisibility(View.GONE);
+                    PatientEmptyUi.bindMessage(emptyState, R.string.messages_empty_title, err);
+                }
+                return;
+            }
+            all = toUiThreads(requireContext(), data, getString(R.string.messages_title));
+            refreshVisibleThreads();
+        });
+    }
+
+    private void refreshVisibleThreads() {
+        List<MessageThread> visible = filter(all, query);
+        applyList(visible);
+        updateEmptyState(visible);
+    }
+
+    private void applyList(List<MessageThread> list) {
+        if (adapter != null) adapter.setItems(list);
+    }
+
+    private void updateEmptyState(@NonNull List<MessageThread> visible) {
+        if (emptyState == null || rv == null) return;
+        SessionManager sm = new SessionManager(requireContext());
+        if (!sm.isLoggedIn()) {
+            emptyState.setVisibility(View.VISIBLE);
+            rv.setVisibility(View.GONE);
+            PatientEmptyUi.bind(emptyState, android.R.drawable.ic_lock_lock,
+                    R.string.messages_login_title, R.string.messages_login_hint);
+            emptyState.setOnClickListener(v -> openAccountTab());
+            return;
+        }
+        if (!visible.isEmpty()) {
+            emptyState.setVisibility(View.GONE);
+            rv.setVisibility(View.VISIBLE);
+            emptyState.setOnClickListener(null);
+            return;
+        }
+        emptyState.setVisibility(View.VISIBLE);
+        rv.setVisibility(View.GONE);
+        if (!TextUtils.isEmpty(query) && !all.isEmpty()) {
+            PatientEmptyUi.bind(emptyState, android.R.drawable.ic_menu_search,
+                    R.string.search_no_results_title, R.string.search_no_results_hint);
+        } else {
+            PatientEmptyUi.bind(emptyState, android.R.drawable.ic_dialog_email,
+                    R.string.messages_empty_title, R.string.messages_empty_hint);
+        }
+        emptyState.setOnClickListener(null);
+    }
+
+    private void openAccountTab() {
+        if (requireActivity() instanceof MainActivity) {
+            ((MainActivity) requireActivity()).switchToTab(R.id.nav_account);
+        }
+    }
+
+    private static List<MessageThread> toUiThreads(Context ctx, List<ChatThreadDto> dtos, String defaultTitle) {
         List<MessageThread> out = new ArrayList<>();
-        if (metas == null) return out;
+        if (dtos == null) return out;
         long now = System.currentTimeMillis();
-        for (ChatThreadMeta m : metas) {
-            if (m == null) continue;
-            String time = TimeAgo.format(now, m.updatedAtMs);
+        for (ChatThreadDto dto : dtos) {
+            if (dto == null) continue;
+            String time = TimeAgo.format(ctx, now, dto.updatedAtMs);
+            String rawSub = dto.subtitle != null ? dto.subtitle.trim() : "";
+            String listSub = subtitleForList(rawSub);
+            String chatSub = !rawSub.isEmpty() ? rawSub : listSub;
+            boolean locked = dto.locked || !dto.canSend;
             out.add(new MessageThread(
-                    m.threadId != null ? m.threadId : "",
-                    m.title != null ? m.title : "Tin nhắn",
-                    m.subtitle != null ? m.subtitle : "",
-                    m.lastMessage != null ? m.lastMessage : "",
+                    dto.threadKey != null ? dto.threadKey : "",
+                    dto.title != null ? dto.title : defaultTitle,
+                    listSub,
+                    dto.lastMessage != null ? dto.lastMessage : "",
                     time,
-                    m.locked
-                    , m.unreadCount
+                    locked,
+                    dto.unreadCount,
+                    chatSub
             ));
         }
         return out;
     }
 
-    private void loadFromAppointments(String bearer, String patientName) {
-        // fetch 3 groups, merge unique doctor threads
-        HashSet<Integer> doctorIds = new HashSet<>();
-        java.util.function.BiConsumer<java.util.List<com.example.frontend_bookingcare.api.PatientAppointmentDto>, String> ingest = (list, group) -> {
-            if (list == null) return;
-            for (com.example.frontend_bookingcare.api.PatientAppointmentDto a : list) {
-                if (a == null || a.doctorId == null) continue;
-                if (doctorIds.contains(a.doctorId)) continue;
-                doctorIds.add(a.doctorId);
-                String docName = a.doctorName != null ? a.doctorName : ("Bác sĩ #" + a.doctorId);
-                boolean locked = a.status != null && ("pending".equalsIgnoreCase(a.status) || "confirmed".equalsIgnoreCase(a.status) || "checked_in".equalsIgnoreCase(a.status));
-                store.upsertThread(new ChatThreadMeta("doctor:" + a.doctorId, docName, patientName, locked, 0, ""));
-            }
-        };
-
-        apptRepo.fetch(bearer, "UPCOMING", (data, err) -> {
-            ingest.accept(data, "UPCOMING");
-            apptRepo.fetch(bearer, "COMPLETED", (d2, e2) -> {
-                ingest.accept(d2, "COMPLETED");
-                apptRepo.fetch(bearer, "CANCELLED", (d3, e3) -> {
-                    ingest.accept(d3, "CANCELLED");
-                    // refresh UI from store after all
-                    all = toUiThreads(store.listThreadsSorted());
-                    if (adapter != null) adapter.setItems(filter(all, query));
-                });
-            });
-        });
+    /** Bỏ dòng phụ là tên bệnh nhân — chỉ giữ thông tin bác sĩ / CSKH. */
+    private static String subtitleForList(@NonNull String raw) {
+        if (raw.isEmpty()) return "";
+        String lower = raw.toLowerCase();
+        if (lower.startsWith("bệnh nhân:") || lower.startsWith("benh nhan:")
+                || lower.startsWith("patient:")) {
+            return "";
+        }
+        return raw;
     }
 
     private static List<MessageThread> filter(List<MessageThread> list, String q) {

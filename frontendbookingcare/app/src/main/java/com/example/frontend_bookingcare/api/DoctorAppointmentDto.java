@@ -40,6 +40,15 @@ public class DoctorAppointmentDto {
     @SerializedName("notes")
     public String notes;
 
+    @SerializedName("reason")
+    public String reason;
+
+    @SerializedName(value = "clinicalNote", alternate = {"note"})
+    public String clinicalNote;
+
+    @SerializedName("address")
+    public String address;
+
     @SerializedName("appointmentDate")
     public String appointmentDate;
 

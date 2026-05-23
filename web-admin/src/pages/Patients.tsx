@@ -7,6 +7,18 @@ import TableCard from '../ui/TableCard'
 import EmptyState from '../ui/EmptyState'
 import TableShell from '../ui/TableShell'
 
+const genderLabels: Record<string, string> = {
+  male: 'Nam',
+  female: 'Nữ',
+  other: 'Khác',
+  unknown: 'Không rõ',
+}
+
+function genderLabel(v?: string | null) {
+  if (!v) return 'Không rõ'
+  return genderLabels[v.toLowerCase()] ?? v
+}
+
 export default function PatientsPage() {
   const q = useQuery({ queryKey: ['admin', 'patients'], queryFn: listPatients })
   const [selected, setSelected] = useState<Patient | null>(null)
@@ -16,7 +28,7 @@ export default function PatientsPage() {
     () => [
       { title: 'ID', dataIndex: 'id', width: 90 },
       { title: 'Họ tên', dataIndex: 'fullName', width: 240 },
-      { title: 'Giới tính', dataIndex: 'gender', width: 120, render: (v) => <Tag>{v ?? 'unknown'}</Tag> },
+      { title: 'Giới tính', dataIndex: 'gender', width: 120, render: (v) => <Tag>{genderLabel(v)}</Tag> },
       { title: 'Ngày sinh', dataIndex: 'dob', width: 140, render: (v) => v ?? '—' },
       { title: 'Phone', dataIndex: 'phone', width: 140, render: (v) => v ?? '—' },
       { title: 'Email', dataIndex: 'email', width: 240, render: (v) => v ?? '—' },
@@ -43,10 +55,10 @@ export default function PatientsPage() {
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
       <Card className="card-soft">
         <div>
-          <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-            Patients (Bệnh nhân)
-          </Typography.Title>
-          <Typography.Text type="secondary">Danh sách bệnh nhân + xem thông tin cơ bản</Typography.Text>
+            <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
+              Bệnh nhân
+            </Typography.Title>
+            <Typography.Text type="secondary">Danh sách bệnh nhân đã đăng ký trên hệ thống</Typography.Text>
         </div>
       </Card>
 
@@ -73,9 +85,9 @@ export default function PatientsPage() {
             <Descriptions.Item label="ID">{selected.id}</Descriptions.Item>
             <Descriptions.Item label="Account ID">{selected.accountId ?? '—'}</Descriptions.Item>
             <Descriptions.Item label="Họ tên">{selected.fullName}</Descriptions.Item>
-            <Descriptions.Item label="Giới tính">{selected.gender ?? 'unknown'}</Descriptions.Item>
+            <Descriptions.Item label="Giới tính">{genderLabel(selected.gender)}</Descriptions.Item>
             <Descriptions.Item label="Ngày sinh">{selected.dob ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="Phone">{selected.phone ?? '—'}</Descriptions.Item>
+            <Descriptions.Item label="SĐT">{selected.phone ?? '—'}</Descriptions.Item>
             <Descriptions.Item label="Email">{selected.email ?? '—'}</Descriptions.Item>
             <Descriptions.Item label="Địa chỉ" span={2}>
               {selected.address ?? '—'}

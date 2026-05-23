@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.frontend_bookingcare.R;
@@ -15,19 +16,35 @@ import java.util.List;
 
 public class HomeBannerAdapter extends RecyclerView.Adapter<HomeBannerAdapter.BannerHolder> {
 
+    public static final int ACTION_BOOK = 0;
+    public static final int ACTION_MESSAGES = 1;
+    public static final int ACTION_SPECIALTY = 2;
+
     public static final class Banner {
         @DrawableRes
         public final int imageRes;
+        public final int action;
 
-        public Banner(@DrawableRes int imageRes) {
+        public Banner(@DrawableRes int imageRes, int action) {
             this.imageRes = imageRes;
+            this.action = action;
         }
     }
 
+    public interface OnBannerClickListener {
+        void onBannerClick(int action);
+    }
+
     private final List<Banner> banners;
+    @Nullable
+    private OnBannerClickListener listener;
 
     public HomeBannerAdapter(List<Banner> banners) {
         this.banners = banners;
+    }
+
+    public void setOnBannerClickListener(@Nullable OnBannerClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,7 +56,13 @@ public class HomeBannerAdapter extends RecyclerView.Adapter<HomeBannerAdapter.Ba
 
     @Override
     public void onBindViewHolder(@NonNull BannerHolder holder, int position) {
-        holder.image.setImageResource(banners.get(position).imageRes);
+        Banner banner = banners.get(position);
+        holder.image.setImageResource(banner.imageRes);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onBannerClick(banner.action);
+            }
+        });
     }
 
     @Override

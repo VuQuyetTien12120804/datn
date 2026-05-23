@@ -4,12 +4,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,16 +20,20 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.api.DoctorDto;
+import com.example.frontend_bookingcare.data.DoctorRepository;
 import com.example.frontend_bookingcare.data.PatientProfileRepository;
 import com.example.frontend_bookingcare.data.PatientAppointmentsRepository;
+import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.support.chat.CustomerCareChatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.frontend_bookingcare.ui.common.QrCodeUtil;
+
+import com.example.frontend_bookingcare.ui.booking.BookingFormatters;
+import com.example.frontend_bookingcare.ui.booking.BookingPolicy;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -86,9 +89,7 @@ public class AppointmentTicketActivity extends AppCompatActivity {
         tb.inflateMenu(R.menu.menu_ticket);
         tb.setOnMenuItemClickListener(item -> onToolbarItem(item, apptId, date));
 
-        String ddMMyyyy = formatDateDdMMyyyy(date);
-        String timeRange = (start != null ? start : "") + (end != null && !TextUtils.isEmpty(end) ? ("-" + end) : "");
-        String code = buildAppointmentCode(apptId, date);
+        String code = AppointmentCodes.appointmentCode(apptId, date);
 
         TextView tDoctor = findViewById(R.id.ticket_doctor_name);
         TextView tDoctor2 = findViewById(R.id.ticket_doctor_name2);
@@ -96,14 +97,18 @@ public class AppointmentTicketActivity extends AppCompatActivity {
         TextView tCode = findViewById(R.id.ticket_code);
         TextView tDate = findViewById(R.id.ticket_date);
         TextView tTime = findViewById(R.id.ticket_time);
+        TextView statusBanner = findViewById(R.id.ticket_status_banner);
         ImageView qr = findViewById(R.id.ticket_qr);
 
         tDoctor.setText(doctorName != null ? doctorName : "—");
         tDoctor2.setText(doctorName != null ? doctorName : "—");
-        tStt.setText(String.valueOf(apptId));
+        tStt.setText(getString(R.string.dash_placeholder));
         tCode.setText(code);
-        tDate.setText(ddMMyyyy);
-        tTime.setText(timeRange);
+        tDate.setText(formatDateDdMMyyyy(date));
+        tTime.setText(BookingFormatters.timeRange(start, end));
+        if (statusBanner != null) {
+            statusBanner.setText(statusBannerFor(this, status));
+        }
 
         // Patient info from cached profile extras
         SessionManager sm = new SessionManager(this);
@@ -112,6 +117,11 @@ public class AppointmentTicketActivity extends AppCompatActivity {
         TextView pName = findViewById(R.id.ticket_patient_name);
         TextView pPhone = findViewById(R.id.ticket_patient_phone);
         TextView support = findViewById(R.id.ticket_support_phone);
+        TextView doctorAddress = findViewById(R.id.ticket_doctor_address);
+        if (doctorAddress != null) {
+            doctorAddress.setText(getString(R.string.ticket_doctor_address_fmt, getString(R.string.dash_placeholder)));
+            loadDoctorAddress(doctorId, doctorAddress);
+        }
 
         int patientIdGuess = 0;
         try {
@@ -120,7 +130,7 @@ public class AppointmentTicketActivity extends AppCompatActivity {
             }
         } catch (Exception ignored) {
         }
-        pCode.setText(buildPatientCode(patientIdGuess, date));
+        pCode.setText(getString(R.string.patient_code_loading));
         pName.setText(sm.getSession() != null && !TextUtils.isEmpty(sm.getSession().fullName) ? sm.getSession().fullName : "—");
         pPhone.setText(!TextUtils.isEmpty(ex.phone) ? ex.phone : "—");
 
@@ -129,41 +139,165 @@ public class AppointmentTicketActivity extends AppCompatActivity {
             String bearer = "Bearer " + sm.getSession().accessToken;
             new PatientProfileRepository().fetchPatientId(bearer, (patientId, err) -> {
                 if (patientId == null) return;
-                runOnUiThread(() -> pCode.setText(buildPatientCode(patientId, date)));
+                runOnUiThread(() -> pCode.setText(AppointmentCodes.patientCode(patientId, date)));
             });
         }
 
         // QR code
-        qr.setImageBitmap(makeQrBitmap(code, dp(110), dp(110)));
+        qr.setImageBitmap(QrCodeUtil.encode(code, dp(110), dp(110)));
+
+        loadQueueNumber(apptId, tStt);
 
         // copy-on-tap
         tCode.setOnClickListener(v -> {
-            copyToClipboard("Mã phiếu khám", code);
-            Toast.makeText(this, "Đã copy mã phiếu khám", Toast.LENGTH_SHORT).show();
+            copyToClipboard(getString(R.string.clipboard_label_ticket_code), code);
+            Toast.makeText(this, R.string.ticket_code_copied, Toast.LENGTH_SHORT).show();
         });
         support.setOnClickListener(v -> {
-            copyToClipboard("Hotline", support.getText().toString());
-            Toast.makeText(this, "Đã copy hotline", Toast.LENGTH_SHORT).show();
+            copyToClipboard(getString(R.string.clipboard_label_hotline), support.getText().toString());
+            Toast.makeText(this, R.string.ticket_hotline_copied, Toast.LENGTH_SHORT).show();
         });
 
         int finalDoctorId = doctorId;
         findViewById(R.id.ticket_message).setOnClickListener(v -> {
-            String dName = doctorName != null ? doctorName : "Bác sĩ";
+            SessionManager chatSm = new SessionManager(this);
+            if (!chatSm.isLoggedIn() || chatSm.getSession() == null
+                    || TextUtils.isEmpty(chatSm.getSession().accessToken)) {
+                Toast.makeText(this, R.string.chat_login_required, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String displayName = doctorName != null && !doctorName.isEmpty()
+                    ? doctorName : getString(R.string.dash_placeholder);
             String threadId = "doctor:" + Math.max(0, finalDoctorId);
             boolean locked = isChatLocked(status);
             startActivity(CustomerCareChatActivity.newIntent(
                     this,
                     threadId,
-                    "Chăm Sóc Khách Hàng",
-                    "Bác sĩ: " + dName,
+                    getString(R.string.chat_doctor_title_fmt, displayName),
+                    getString(R.string.chat_doctor_subtitle_fmt, displayName),
                     locked
             ));
         });
         boolean canCancel = isCancellable(status);
+        boolean canCheckIn = isCheckInAllowed(status, date);
+
+        View checkInBtn = findViewById(R.id.ticket_check_in);
+        TextView statusLabel = findViewById(R.id.ticket_status_label);
+        statusLabel.setText(statusLabelFor(this, status));
+        checkInBtn.setVisibility(canCheckIn ? android.view.View.VISIBLE : android.view.View.GONE);
+        if (canCheckIn) {
+            checkInBtn.setOnClickListener(v -> doCheckIn(apptId));
+        }
+
         findViewById(R.id.ticket_cancel).setVisibility(canCancel ? android.view.View.VISIBLE : android.view.View.GONE);
         if (canCancel) {
             findViewById(R.id.ticket_cancel).setOnClickListener(v -> doCancel(apptId));
         }
+    }
+
+    private void loadDoctorAddress(int doctorId, TextView addressView) {
+        if (doctorId <= 0) return;
+        new DoctorRepository().fetchAllDoctors((list, err) -> runOnUiThread(() -> {
+            if (list == null) return;
+            for (DoctorDto d : list) {
+                if (d != null && d.doctorId != null && d.doctorId == doctorId
+                        && !TextUtils.isEmpty(d.clinicAddress)) {
+                    addressView.setText(getString(R.string.ticket_doctor_address_fmt, d.clinicAddress));
+                    return;
+                }
+            }
+        }));
+    }
+
+    private void loadQueueNumber(int apptId, TextView sttView) {
+        if (apptId <= 0) return;
+        SessionManager sm = new SessionManager(this);
+        if (sm.getSession() == null || TextUtils.isEmpty(sm.getSession().accessToken)) return;
+        new PatientAppointmentsRepository().fetchDetail("Bearer " + sm.getSession().accessToken, apptId,
+                (dto, err) -> runOnUiThread(() -> {
+                    if (dto != null && dto.queueNumber != null && dto.queueNumber > 0) {
+                        sttView.setText(String.valueOf(dto.queueNumber));
+                    }
+                }));
+    }
+
+    private static String statusLabelFor(android.content.Context ctx, @Nullable String status) {
+        if (status == null || status.trim().isEmpty()) return "";
+        switch (status.trim().toUpperCase(java.util.Locale.ROOT)) {
+            case "PENDING":
+                return ctx.getString(R.string.ticket_status_label_pending);
+            case "CONFIRMED":
+                return ctx.getString(R.string.ticket_status_label_confirmed);
+            case "CHECKED_IN":
+                return ctx.getString(R.string.ticket_status_label_checked_in);
+            case "COMPLETED":
+                return ctx.getString(R.string.ticket_status_label_completed);
+            case "CANCELLED":
+                return ctx.getString(R.string.ticket_status_label_cancelled);
+            case "NO_SHOW":
+                return ctx.getString(R.string.ticket_status_label_no_show);
+            default:
+                return ctx.getString(R.string.ticket_status_label_unknown_fmt, status);
+        }
+    }
+
+    private static boolean isCheckInAllowed(@Nullable String status, @Nullable String isoDate) {
+        if (status == null || status.trim().isEmpty()) return false;
+        if (!"CONFIRMED".equalsIgnoreCase(status.trim())) return false;
+        if (isoDate == null || isoDate.length() < 10) return false;
+        try {
+            java.time.LocalDate apptDay = java.time.LocalDate.parse(isoDate.substring(0, 10));
+            java.time.LocalDate today = java.time.LocalDate.now(BookingPolicy.CLINIC_ZONE);
+            return today.equals(apptDay);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static String statusBannerFor(android.content.Context ctx, @Nullable String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return ctx.getString(R.string.appt_status_booked);
+        }
+        switch (status.trim().toUpperCase(java.util.Locale.ROOT)) {
+            case "PENDING":
+                return ctx.getString(R.string.appt_status_pending);
+            case "CONFIRMED":
+                return ctx.getString(R.string.appt_status_confirmed);
+            case "CHECKED_IN":
+                return ctx.getString(R.string.appt_status_checked_in);
+            case "COMPLETED":
+                return ctx.getString(R.string.appt_status_completed);
+            case "CANCELLED":
+                return ctx.getString(R.string.appt_status_cancelled);
+            case "NO_SHOW":
+                return ctx.getString(R.string.appt_status_no_show);
+            default:
+                return status;
+        }
+    }
+
+    private void doCheckIn(int apptId) {
+        if (apptId <= 0) {
+            Toast.makeText(this, R.string.ticket_appt_not_found, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SessionManager sm = new SessionManager(this);
+        if (!sm.isLoggedIn() || sm.getSession() == null || TextUtils.isEmpty(sm.getSession().accessToken)) {
+            Toast.makeText(this, R.string.ticket_login_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        findViewById(R.id.ticket_check_in).setEnabled(false);
+        String bearer = "Bearer " + sm.getSession().accessToken;
+        new PatientAppointmentsRepository().checkIn(bearer, apptId, (ok, err) -> runOnUiThread(() -> {
+            findViewById(R.id.ticket_check_in).setEnabled(true);
+            if (!ok) {
+                Toast.makeText(this, err != null ? err : getString(R.string.ticket_check_in_failed), Toast.LENGTH_LONG).show();
+                return;
+            }
+            Toast.makeText(this, R.string.appt_check_in_success, Toast.LENGTH_LONG).show();
+            setResult(RESULT_OK);
+            finish();
+        }));
     }
 
     private static boolean isCancellable(@Nullable String status) {
@@ -174,20 +308,17 @@ public class AppointmentTicketActivity extends AppCompatActivity {
 
     private static boolean isChatLocked(@Nullable String status) {
         if (status == null || status.trim().isEmpty()) return false;
-        String s = status.trim().toLowerCase(java.util.Locale.ROOT);
-        // Locked chat = user đang có lịch hẹn còn hiệu lực (không phải thread support chung).
-        return "pending".equals(s)
-                || "confirmed".equals(s)
-                || "checked_in".equals(s);
+        String s = status.trim().toUpperCase(java.util.Locale.ROOT);
+        return "CANCELLED".equals(s) || "NO_SHOW".equals(s) || "COMPLETED".equals(s);
     }
 
     private boolean onToolbarItem(MenuItem item, int apptId, String date) {
         if (item.getItemId() == R.id.action_share) {
-            String code = buildAppointmentCode(apptId, date);
+            String code = AppointmentCodes.appointmentCode(apptId, date);
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_TEXT, "Phiếu khám: " + code);
-            startActivity(Intent.createChooser(send, "Chia sẻ"));
+            send.putExtra(Intent.EXTRA_TEXT, getString(R.string.ticket_share_fmt, code));
+            startActivity(Intent.createChooser(send, getString(R.string.share_chooser_title)));
             return true;
         }
         return false;
@@ -195,49 +326,42 @@ public class AppointmentTicketActivity extends AppCompatActivity {
 
     private void doCancel(int apptId) {
         if (apptId <= 0) {
-            Toast.makeText(this, "Không tìm thấy mã lịch hẹn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.ticket_appt_not_found, Toast.LENGTH_SHORT).show();
             return;
         }
         SessionManager sm = new SessionManager(this);
         if (!sm.isLoggedIn() || sm.getSession() == null || TextUtils.isEmpty(sm.getSession().accessToken)) {
-            Toast.makeText(this, "Bạn cần đăng nhập để huỷ lịch", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.ticket_cancel_login_required, Toast.LENGTH_SHORT).show();
             return;
         }
-        findViewById(R.id.ticket_cancel).setEnabled(false);
-        String bearer = "Bearer " + sm.getSession().accessToken;
-        new PatientAppointmentsRepository().cancel(bearer, apptId, "Bệnh nhân huỷ", (env, err) -> runOnUiThread(() -> {
-            findViewById(R.id.ticket_cancel).setEnabled(true);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.appt_cancel_confirm_title)
+                .setMessage(R.string.appt_cancel_confirm_message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.cancel_booking, (d, w) -> performCancel(apptId))
+                .show();
+    }
+
+    private void performCancel(int apptId) {
+        View cancelBtn = findViewById(R.id.ticket_cancel);
+        cancelBtn.setEnabled(false);
+        AuthSession session = new SessionManager(this).getSession();
+        if (session == null || TextUtils.isEmpty(session.accessToken)) {
+            cancelBtn.setEnabled(true);
+            Toast.makeText(this, R.string.ticket_cancel_login_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String bearer = "Bearer " + session.accessToken;
+        new PatientAppointmentsRepository().cancel(bearer, apptId, getString(R.string.appt_cancel_reason_patient), (env, err) -> runOnUiThread(() -> {
+            cancelBtn.setEnabled(true);
             if (err != null) {
-                Toast.makeText(this, "Huỷ lịch thất bại: " + err, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.ticket_cancel_failed_fmt, err), Toast.LENGTH_SHORT).show();
                 return;
             }
-            Toast.makeText(this, "Đã huỷ lịch", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.ticket_cancel_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish();
         }));
-    }
-
-    private static String buildAppointmentCode(int apptId, String yyyyMmDd) {
-        String yyMMdd = "000000";
-        try {
-            LocalDate d = LocalDate.parse(yyyyMmDd);
-            yyMMdd = d.format(DateTimeFormatter.ofPattern("yyMMdd"));
-        } catch (Exception ignored) {
-        }
-        return "YMA" + yyMMdd + String.format("%04d", Math.max(apptId, 0));
-    }
-
-    private static String buildPatientCode(int patientId, String yyyyMmDd) {
-        String yyMMdd = "000000";
-        try {
-            LocalDate d = LocalDate.parse(yyyyMmDd);
-            yyMMdd = d.format(DateTimeFormatter.ofPattern("yyMMdd"));
-        } catch (Exception ignored) {
-        }
-        if (patientId <= 0) {
-            return "YMP" + yyMMdd + "----";
-        }
-        return "YMP" + yyMMdd + String.format("%04d", patientId);
     }
 
     private static String formatDateDdMMyyyy(String yyyyMmDd) {
@@ -246,24 +370,6 @@ public class AppointmentTicketActivity extends AppCompatActivity {
             return d.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         } catch (Exception e) {
             return yyyyMmDd != null ? yyyyMmDd : "—";
-        }
-    }
-
-    private Bitmap makeQrBitmap(String content, int w, int h) {
-        QRCodeWriter writer = new QRCodeWriter();
-        try {
-            BitMatrix m = writer.encode(content, BarcodeFormat.QR_CODE, w, h);
-            Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    b.setPixel(x, y, m.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
-            }
-            return b;
-        } catch (WriterException e) {
-            Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            b.eraseColor(Color.LTGRAY);
-            return b;
         }
     }
 

@@ -34,6 +34,7 @@ import com.example.frontend_bookingcare.ui.doctor_directory.DoctorDetail;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorDetailActivity;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorListActivity;
 import com.example.frontend_bookingcare.ui.doctor_directory.DoctorMapper;
+import com.example.frontend_bookingcare.ui.notifications.NotificationsActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -80,12 +81,14 @@ public class HomeFragment extends Fragment {
                 startActivity(i);
             });
         }
+
+        View bell = view.findViewById(R.id.home_bell);
+        if (bell != null) {
+            bell.setOnClickListener(v -> startActivity(
+                    new Intent(requireContext(), NotificationsActivity.class)));
+        }
     }
 
-    /**
-     * Đẩy header xuống dưới status bar / camera cutout (WindowInsets) — giống cách
-     * AccountUiHelper áp dụng cho các màn hình trong Tài khoản.
-     */
     private void applyTopInsetToHeader(@NonNull View view) {
         View header = view.findViewById(R.id.home_header);
         if (header == null) return;
@@ -186,16 +189,34 @@ public class HomeFragment extends Fragment {
         TabLayout dots = view.findViewById(R.id.home_banner_dots);
 
         List<HomeBannerAdapter.Banner> banners = Arrays.asList(
-                new HomeBannerAdapter.Banner(R.drawable.home_banner_1),
-                new HomeBannerAdapter.Banner(R.drawable.home_banner_2),
-                new HomeBannerAdapter.Banner(R.drawable.home_banner_3),
-                new HomeBannerAdapter.Banner(R.drawable.home_banner_4),
-                new HomeBannerAdapter.Banner(R.drawable.home_banner_5)
+                new HomeBannerAdapter.Banner(R.drawable.home_banner_1, HomeBannerAdapter.ACTION_MESSAGES),
+                new HomeBannerAdapter.Banner(R.drawable.home_banner_2, HomeBannerAdapter.ACTION_MESSAGES),
+                new HomeBannerAdapter.Banner(R.drawable.home_banner_3, HomeBannerAdapter.ACTION_BOOK),
+                new HomeBannerAdapter.Banner(R.drawable.home_banner_4, HomeBannerAdapter.ACTION_SPECIALTY),
+                new HomeBannerAdapter.Banner(R.drawable.home_banner_5, HomeBannerAdapter.ACTION_BOOK)
         );
-        bannerPager.setAdapter(new HomeBannerAdapter(banners));
+        HomeBannerAdapter adapter = new HomeBannerAdapter(banners);
+        adapter.setOnBannerClickListener(this::onBannerClicked);
+        bannerPager.setAdapter(adapter);
 
         new TabLayoutMediator(dots, bannerPager, (tab, position) -> {
         }).attach();
+    }
+
+    private void onBannerClicked(int action) {
+        switch (action) {
+            case HomeBannerAdapter.ACTION_BOOK:
+                startActivity(new Intent(requireContext(), DoctorListActivity.class));
+                break;
+            case HomeBannerAdapter.ACTION_MESSAGES:
+                openMessagesTab();
+                break;
+            case HomeBannerAdapter.ACTION_SPECIALTY:
+                startActivity(new Intent(requireContext(), SpecialtyListActivity.class));
+                break;
+            default:
+                break;
+        }
     }
 
     private void startBannerAutoScroll() {
@@ -219,7 +240,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // ---------- Service grid (5 tiles, 3 columns) ----------
+    // ---------- Service grid (3 tiles) ----------
 
     private void buildServiceGrid(@NonNull View view) {
         GridLayout grid = view.findViewById(R.id.home_service_grid);
@@ -227,22 +248,19 @@ public class HomeFragment extends Fragment {
         LayoutInflater inf = LayoutInflater.from(requireContext());
 
         int[][] items = new int[][]{
-                {R.string.home_service_book_doctor, R.drawable.bg_tile_orange, 0},
-                {R.string.home_service_chat, R.drawable.bg_tile_blue, 1},
-                {R.string.home_service_video, R.drawable.bg_tile_purple, 2},
-                {R.string.home_service_records, R.drawable.bg_tile_green, 3},
-                {R.string.home_service_vaccine, R.drawable.bg_tile_pink, 4},
-                {R.string.home_service_specialty, R.drawable.bg_tile_teal, 5},
+                {R.string.home_service_book_doctor, R.drawable.bg_tile_orange, R.drawable.ic_service_stethoscope, 0},
+                {R.string.home_service_chat, R.drawable.bg_tile_blue, R.drawable.ic_service_chat, 1},
+                {R.string.home_service_specialty, R.drawable.bg_tile_teal, R.drawable.ic_service_microscope, 2},
         };
-        String[] glyphs = new String[]{"🩺", "💬", "📹", "💚", "💉", "🔬"};
 
         for (int i = 0; i < items.length; i++) {
             View tile = inf.inflate(R.layout.item_home_service, grid, false);
             ((FrameLayout) tile.findViewById(R.id.service_icon_bg)).setBackgroundResource(items[i][1]);
-            ((TextView) tile.findViewById(R.id.service_icon)).setText(glyphs[i]);
+            android.widget.ImageView iconView = tile.findViewById(R.id.service_icon_image);
+            iconView.setImageResource(items[i][2]);
             ((TextView) tile.findViewById(R.id.service_label)).setText(items[i][0]);
 
-            final int action = items[i][2];
+            final int action = items[i][3];
             tile.setOnClickListener(v -> onServiceTileClicked(action));
 
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
@@ -256,36 +274,38 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Điều hướng cho 6 ô dịch vụ trên Home:
-     *  0 - Đặt khám bác sĩ      → DoctorListActivity (xem & đặt lịch).
-     *  1 - Chat với bác sĩ      → tab Tin nhắn (MessagesFragment).
-     *  2 - Gọi video với bác sĩ → "sắp ra mắt" (chưa có module video).
-     *  3 - Hồ sơ sức khoẻ       → tab Tài khoản (AccountFragment có hồ sơ + tiền sử).
-     *  4 - Đặt lịch tiêm chủng  → "sắp ra mắt" (chưa có module tiêm chủng).
-     *  5 - Khám theo chuyên khoa → SpecialtyListActivity.
+     * Điều hướng cho 3 ô dịch vụ trên Home:
+     *  0 - Đặt khám bác sĩ      → DoctorListActivity
+     *  1 - Chat với bác sĩ      → tab Tin nhắn
+     *  2 - Khám theo chuyên khoa → SpecialtyListActivity
      */
     private void onServiceTileClicked(int action) {
         switch (action) {
             case 0:
                 startActivity(new Intent(requireContext(), DoctorListActivity.class));
-                return;
+                break;
             case 1:
-                if (requireActivity() instanceof MainActivity) {
-                    ((MainActivity) requireActivity()).switchToTab(R.id.nav_messages);
-                }
-                return;
-            case 3:
-                if (requireActivity() instanceof MainActivity) {
-                    ((MainActivity) requireActivity()).switchToTab(R.id.nav_account);
-                }
-                return;
-            case 5:
-                startActivity(new Intent(requireContext(), SpecialtyListActivity.class));
-                return;
+                openMessagesTab();
+                break;
             case 2:
-            case 4:
+                startActivity(new Intent(requireContext(), SpecialtyListActivity.class));
+                break;
             default:
-                Toast.makeText(requireContext(), R.string.doctor_detail_feature_coming, Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    private void openMessagesTab() {
+        SessionManager sm = new SessionManager(requireContext());
+        if (!sm.isLoggedIn()) {
+            Toast.makeText(requireContext(), R.string.messages_login_required, Toast.LENGTH_SHORT).show();
+            if (requireActivity() instanceof MainActivity) {
+                ((MainActivity) requireActivity()).switchToTab(R.id.nav_account);
+            }
+            return;
+        }
+        if (requireActivity() instanceof MainActivity) {
+            ((MainActivity) requireActivity()).switchToTab(R.id.nav_messages);
         }
     }
 
@@ -302,20 +322,56 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadDoctorsFromApi(@NonNull View view) {
+        ProgressBar progress = view.findViewById(R.id.home_doctors_progress);
+        TextView status = view.findViewById(R.id.home_doctors_status);
+        if (progress != null) progress.setVisibility(View.VISIBLE);
+        if (status != null) {
+            status.setVisibility(View.GONE);
+            status.setText("");
+        }
+
         new DoctorRepository().fetchAllDoctors((data, error) -> {
             if (!isAdded() || getView() == null) return;
-            java.util.List<DoctorDetail> doctors = error != null
-                    ? java.util.Collections.<DoctorDetail>emptyList()
-                    : DoctorMapper.groupByDoctor(data);
+            View root = getView();
+            ProgressBar p = root.findViewById(R.id.home_doctors_progress);
+            TextView st = root.findViewById(R.id.home_doctors_status);
+            if (p != null) p.setVisibility(View.GONE);
+
+            if (error != null) {
+                renderDoctorsEmpty(root);
+                if (st != null) {
+                    st.setVisibility(View.VISIBLE);
+                    st.setText(getString(R.string.specialty_list_error_fmt, error));
+                }
+                return;
+            }
+
+            java.util.List<DoctorDetail> doctors = DoctorMapper.groupByDoctor(data);
             if (doctors.isEmpty()) {
-                renderFallbackDoctors(view);
+                renderDoctorsEmpty(root);
             } else {
-                renderDoctors(view, doctors.size() > HOME_DOCTORS_LIMIT ? doctors.subList(0, HOME_DOCTORS_LIMIT) : doctors);
+                if (st != null) st.setVisibility(View.GONE);
+                renderDoctors(root, doctors.size() > HOME_DOCTORS_LIMIT
+                        ? doctors.subList(0, HOME_DOCTORS_LIMIT) : doctors);
             }
         });
     }
 
+    private void renderDoctorsEmpty(@NonNull View view) {
+        LinearLayout row = view.findViewById(R.id.home_doctors_row);
+        row.removeAllViews();
+        TextView status = view.findViewById(R.id.home_doctors_status);
+        if (status != null) {
+            status.setVisibility(View.VISIBLE);
+            status.setText(getString(R.string.home_doctors_empty));
+        }
+    }
+
     private void renderDoctors(@NonNull View view, @NonNull java.util.List<DoctorDetail> doctors) {
+        TextView status = view.findViewById(R.id.home_doctors_status);
+        if (status != null) {
+            status.setVisibility(View.GONE);
+        }
         LinearLayout row = view.findViewById(R.id.home_doctors_row);
         row.removeAllViews();
         LayoutInflater inf = LayoutInflater.from(requireContext());
@@ -332,26 +388,8 @@ public class HomeFragment extends Fragment {
         fitHomeDoctorsToThreePerViewport(view);
     }
 
-    private void renderFallbackDoctors(@NonNull View view) {
-        LinearLayout row = view.findViewById(R.id.home_doctors_row);
-        row.removeAllViews();
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        int[][] docs = new int[][]{
-                {R.string.home_demo_doctor_1, R.drawable.bg_tile_pink},
-                {R.string.home_demo_doctor_2, R.drawable.bg_tile_blue},
-                {R.string.home_demo_doctor_3, R.drawable.bg_tile_teal},
-                {R.string.home_demo_doctor_4, R.drawable.bg_tile_amber},
-        };
-        for (int[] d : docs) {
-            View card = inf.inflate(R.layout.item_home_doctor, row, false);
-            String name = getString(d[0]);
-            ((TextView) card.findViewById(R.id.doctor_name)).setText(name);
-            ((FrameLayout) card.findViewById(R.id.doctor_avatar_bg)).setBackgroundResource(d[1]);
-            ((TextView) card.findViewById(R.id.doctor_avatar_letter)).setText(avatarLetter(name));
-            card.setOnClickListener(v -> openDoctorList());
-            row.addView(card);
-        }
-        fitHomeDoctorsToThreePerViewport(view);
+    private void openDoctorList() {
+        startActivity(new Intent(requireContext(), DoctorListActivity.class));
     }
 
     /**
@@ -398,16 +436,6 @@ public class HomeFragment extends Fragment {
 
     private int dp(int dp) {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
-    }
-
-    private void openDoctorList() {
-        startActivity(new Intent(requireContext(), DoctorListActivity.class));
-    }
-
-    private String avatarLetter(String fullName) {
-        String[] parts = fullName.trim().split("\\s+");
-        String last = parts[parts.length - 1];
-        return last.isEmpty() ? "?" : last.substring(0, 1).toUpperCase();
     }
 
     // ---------- Specialty grid: chỉ dữ liệu từ API / DB (không fallback giả) ----------

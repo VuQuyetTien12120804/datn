@@ -1,6 +1,5 @@
 package com.example.frontend_bookingcare.ui.booking;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,6 +20,7 @@ import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.api.BookingRequest;
 import com.example.frontend_bookingcare.data.BookingRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
+import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
@@ -31,7 +31,7 @@ import com.google.android.material.button.MaterialButton;
 public class BookingStep2Activity extends AppCompatActivity {
 
     private BookingDraft draft;
-    @Nullable private ProgressDialog loadingDialog;
+    private View loadingOverlay;
     private MaterialButton confirmBtn;
 
     @Override
@@ -44,10 +44,24 @@ public class BookingStep2Activity extends AppCompatActivity {
 
         draft = BookingDraft.readFrom(getIntent());
 
+        if (draft.doctorId <= 0 || draft.slotId <= 0 || TextUtils.isEmpty(draft.slotDate)) {
+            Toast.makeText(this, R.string.booking_invalid_draft, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        SessionManager sm = new SessionManager(this);
+        if (!sm.isLoggedIn() || sm.getSession() == null || TextUtils.isEmpty(sm.getSession().accessToken)) {
+            Toast.makeText(this, R.string.booking_need_login, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         ImageButton back = findViewById(R.id.booking_back);
         back.setOnClickListener(v -> finish());
 
         confirmBtn = findViewById(R.id.booking_confirm);
+        loadingOverlay = findViewById(R.id.booking_loading_overlay);
         confirmBtn.setOnClickListener(v -> submitBooking());
 
         bindDoctor();
@@ -88,9 +102,9 @@ public class BookingStep2Activity extends AppCompatActivity {
         TextView date = findViewById(R.id.booking_summary_date);
 
         time.setText(BookingFormatters.timeRange(draft.startTime, draft.endTime));
-        session.setText("morning".equals(draft.session)
-                ? R.string.booking_session_morning : R.string.booking_session_afternoon);
-        date.setText(BookingFormatters.prettyDate(draft.slotDate));
+        session.setText(getString("morning".equals(draft.session)
+                ? R.string.booking_session_morning : R.string.booking_session_afternoon));
+        date.setText(BookingFormatters.prettyDate(this, draft.slotDate));
     }
 
     private void bindPatient() {
@@ -102,7 +116,7 @@ public class BookingStep2Activity extends AppCompatActivity {
 
         name.setText(TextUtils.isEmpty(draft.fullName)
                 ? getString(R.string.booking_not_available) : draft.fullName);
-        gender.setText(BookingFormatters.displayGender(draft.gender));
+        gender.setText(BookingFormatters.displayGender(this, draft.gender));
         dob.setText(TextUtils.isEmpty(draft.dob) ? getString(R.string.booking_not_updated) : draft.dob);
         phone.setText(TextUtils.isEmpty(draft.phone) ? getString(R.string.booking_not_updated) : draft.phone);
         address.setText(TextUtils.isEmpty(draft.address)
@@ -135,14 +149,20 @@ public class BookingStep2Activity extends AppCompatActivity {
             return;
         }
 
+        SessionManager sm = new SessionManager(this);
+        AuthSession s = sm.getSession();
+        ProfileExtras ex = sm.getProfileExtras();
+        if (!BookingPolicy.hasEnoughProfile(s, ex)) {
+            Toast.makeText(this, R.string.booking_need_complete_profile, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (BookingPolicy.violatesMinLead(draft.slotDate, draft.startTime)) {
             Toast.makeText(this, getString(R.string.booking_min_lead_time_fmt, BookingPolicy.MIN_LEAD_MINUTES),
                     Toast.LENGTH_LONG).show();
             return;
         }
 
-        SessionManager sm = new SessionManager(this);
-        AuthSession s = sm.getSession();
         if (s == null || TextUtils.isEmpty(s.accessToken)) {
             Toast.makeText(this, R.string.booking_need_login, Toast.LENGTH_SHORT).show();
             return;
@@ -161,11 +181,11 @@ public class BookingStep2Activity extends AppCompatActivity {
                 Toast.makeText(this, R.string.booking_book_error_generic, Toast.LENGTH_LONG).show();
                 return;
             }
-            openResult(data.appointmentId, data.appointmentDate, data.startTime, data.endTime);
+            openResult(data.appointmentId, data.queueNumber, data.appointmentDate, data.startTime, data.endTime);
         });
     }
 
-    private void openResult(int appointmentId, @Nullable String apiDate,
+    private void openResult(int appointmentId, @Nullable Integer queueNumber, @Nullable String apiDate,
                             @Nullable String apiStart, @Nullable String apiEnd) {
         Intent i = new Intent(this, BookingResultActivity.class);
         // Ưu tiên dữ liệu trả về từ backend (đã canonical hóa), fallback dùng draft.
@@ -174,36 +194,18 @@ public class BookingStep2Activity extends AppCompatActivity {
         draft.endTime = apiEnd != null ? apiEnd : draft.endTime;
         draft.writeTo(i);
         i.putExtra(BookingResultActivity.EXTRA_APPOINTMENT_ID, appointmentId);
+        if (queueNumber != null && queueNumber > 0) {
+            i.putExtra(BookingResultActivity.EXTRA_QUEUE_NUMBER, queueNumber);
+        }
         startActivity(i);
-        // Không finish() ngay để user có thể back lại review nếu muốn — nhưng UX tốt hơn
-        // là close cả Step1+Step2 khi ấn Home ở Step3. Ở đây finish để chain sạch.
         finish();
     }
 
     private void setLoading(boolean loading) {
-        if (loading) {
-            if (loadingDialog == null) {
-                loadingDialog = new ProgressDialog(this);
-                loadingDialog.setMessage(getString(R.string.booking_submitting));
-                loadingDialog.setCancelable(false);
-            }
-            confirmBtn.setEnabled(false);
-            loadingDialog.show();
-        } else {
-            confirmBtn.setEnabled(true);
-            if (loadingDialog != null && loadingDialog.isShowing()) {
-                loadingDialog.dismiss();
-            }
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(loading ? View.VISIBLE : View.GONE);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (loadingDialog != null) {
-            loadingDialog.dismiss();
-            loadingDialog = null;
-        }
+        confirmBtn.setEnabled(!loading);
     }
 
     // ---------- Utils ----------

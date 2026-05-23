@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.data.DoctorRepository;
+import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +77,7 @@ public class DoctorListActivity extends AppCompatActivity {
         progress = findViewById(R.id.doctor_list_progress);
         emptyView = findViewById(R.id.doctor_list_empty);
         searchInput = findViewById(R.id.doctor_list_search_input);
+        UnicodeInputHelper.enableSingleLineText(searchInput);
         searchClear = findViewById(R.id.doctor_list_search_clear);
 
         recycler.setLayoutManager(new LinearLayoutManager(this));
@@ -105,6 +107,7 @@ public class DoctorListActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 String q = s == null ? "" : s.toString();
                 searchClear.setVisibility(q.isEmpty() ? View.GONE : View.VISIBLE);
+                if (UnicodeInputHelper.isImeComposing(s)) return;
                 renderFiltered(q);
             }
         });

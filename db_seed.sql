@@ -1,23 +1,19 @@
 /*
-  BookingCare Clinic DB - SEED DATA (REALISTIC)
-  Run AFTER `db_main.sql`.
+  ClinicBooking — SEED DATA
+  File duy nhất cho dữ liệu mẫu. Chạy SAU `db_main.sql`.
 
-  Goals:
-  - No "demo" rows. Data resembles a real Vietnamese outpatient clinic.
-  - "Relatively many" rows so admin dashboards look populated:
-    - 1 clinic + legal docs
-    - 3 roles (admin/doctor/patient)
-    - 1 admin account
-    - 40 doctor accounts + 40 doctors
-    - 150 patient accounts + 150 patients
-    - 12 specialties, 30 services, 12 rooms
-    - weekly schedules for all doctors
-    - appointment slots for next 21 days
-    - ~260 appointments with invoices & payments for completed ones
+  Nội dung:
+  - Phòng khám Quyết Tiến, legal docs (TERMS/PRIVACY/FAQ)
+  - 40 bác sĩ (không trùng tên), BS. Bùi Hoàng Minh #7 đa chuyên khoa
+  - 150 bệnh nhân, slot 21 ngày, ~260 lịch hẹn mẫu
+  - Không seed hóa đơn/thanh toán (app không có luồng thanh toán)
 
-  Notes:
-  - Passwords are plaintext because your current backend login works with seeded plaintext.
-  - Script is designed for a fresh DB (DROP/CREATE). It does NOT try to be idempotent.
+  Tài khoản test:
+  - Admin:   admin@clinic.local / admin123
+  - Bệnh nhân: bn001@mail.vn / bn123456
+  - Bác sĩ:  bs07@antamclinic.vn / bs123456
+
+  Mật khẩu plaintext — chỉ dùng LOCAL DEV.
 */
 
 USE clinic_db;
@@ -48,13 +44,15 @@ BEGIN TRANSACTION;
 /* ===== 1) Clinic metadata ===== */
 INSERT INTO dbo.clinics(code, name, phone, email, address, timezone)
 VALUES
-(N'CLINIC-HN-01', N'Phòng khám đa khoa An Tâm', N'02473008899', N'lienhe@antamclinic.vn', N'25 P. Láng Hạ, Đống Đa, Hà Nội', N'Asia/Ho_Chi_Minh');
+(N'CLINIC-HN-01', N'Phòng khám đa khoa Quyết Tiến', N'02473008899', N'lienhe@quyettien.vn', N'25 P. Láng Hạ, Đống Đa, Hà Nội', N'Asia/Ho_Chi_Minh');
 
 /* ===== 2) Legal docs (for mobile app) ===== */
 INSERT INTO dbo.app_legal_documents(code, title, body_html, version)
 VALUES
-(N'TERMS', N'Điều khoản sử dụng', N'<p>Điều khoản sử dụng dịch vụ BookingCare Clinic.</p>', 1),
-(N'PRIVACY', N'Chính sách bảo mật', N'<p>Chúng tôi tôn trọng và bảo vệ dữ liệu cá nhân của bạn.</p>', 1);
+(N'TERMS', N'Điều khoản sử dụng', N'<h2>1. Phạm vi</h2><p>Ứng dụng ClinicBooking của Phòng khám Quyết Tiến hỗ trợ đặt lịch khám, tra cứu lịch hẹn và liên hệ CSKH.</p><h2>2. Tài khoản</h2><p>Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và thông báo kịp thời nếu phát hiện truy cập trái phép.</p><h2>3. Đặt lịch</h2><p>Lịch hẹn có hiệu lực sau khi bác sĩ/phòng khám xác nhận. Vui lòng đến đúng giờ hoặc huỷ trước nếu không thể tham gia.</p>', 1),
+(N'PRIVACY', N'Chính sách bảo mật', N'<h2>1. Dữ liệu thu thập</h2><p>Họ tên, email, số điện thoại, ngày sinh, giới tính, địa chỉ và thông tin lịch khám.</p><h2>2. Mục đích</h2><p>Phục vụ đặt lịch, khám chữa bệnh, liên hệ và cải thiện dịch vụ.</p><h2>3. Bảo vệ</h2><p>Dữ liệu được lưu trữ an toàn và chỉ chia sẻ khi có yêu cầu pháp luật hoặc cần thiết cho điều trị.</p>', 1),
+(N'SERVICE', N'Điều khoản dịch vụ', N'<h2>Phạm vi dịch vụ</h2><p>Ứng dụng ClinicBooking hỗ trợ đặt lịch khám, tra cứu lịch hẹn và liên hệ Phòng khám Quyết Tiến.</p><h2>Thanh toán</h2><p>Phí khám được thu tại phòng khám trừ khi có thông báo khác.</p>', 1),
+(N'FAQ', N'Câu hỏi thường gặp', N'<h2>Đặt lịch khám</h2><p><strong>Làm sao để đặt lịch?</strong> Chọn bác sĩ → chọn ngày/giờ → xác nhận thông tin → hoàn tất.</p><p><strong>Huỷ lịch?</strong> Vào tab Lịch khám, mở phiếu khám và chọn Huỷ (trước giờ hẹn).</p><h2>Check-in</h2><p>Check-in được bật trong ngày khám sau khi bác sĩ duyệt lịch.</p><h2>Liên hệ</h2><p>Hotline: 0247 300 8899 — Email: lienhe@quyettien.vn</p>', 1);
 
 /* ===== 3) Roles ===== */
 SET IDENTITY_INSERT dbo.roles ON;
@@ -151,31 +149,66 @@ FROM @svc v
 JOIN dbo.specialties s ON s.code = v.spec_code;
 
 /* ===== 7) Accounts: admin + doctors + patients ===== */
+/* NOTE: Plaintext passwords below are for LOCAL DEV ONLY (e.g. bs123456). Hash in production. */
 DECLARE @adminId int = 1;
 SET IDENTITY_INSERT dbo.accounts ON;
 INSERT INTO dbo.accounts(id, role_id, email, phone, password, full_name, status, is_email_verified)
 VALUES
 (@adminId, 1, N'admin@clinic.local', N'0901000001', N'admin123', N'Quản trị hệ thống', N'active', 1);
 
--- Doctors
+-- 40 bác sĩ — tên KHÔNG trùng (tránh lỗi CHOOSE lặp mỗi 10 ID như BS. Bùi Hoàng Minh x3).
+DECLARE @docNames TABLE(i int NOT NULL PRIMARY KEY, full_name nvarchar(255) NOT NULL);
+INSERT INTO @docNames(i, full_name) VALUES
+(1,  N'BS. Nguyễn Văn An'),
+(2,  N'BS. Trần Quang Bảo'),
+(3,  N'BS. Lê Đức Cường'),
+(4,  N'BS. Phạm Gia Dũng'),
+(5,  N'BS. Hoàng Văn Em'),
+(6,  N'BS. Vũ Thị Phương'),
+(7,  N'BS. Bùi Hoàng Minh'),
+(8,  N'BS. Đặng Khánh Nam'),
+(9,  N'BS. Đỗ Thu Oanh'),
+(10, N'BS. Ngô Minh Phúc'),
+(11, N'BS. Nguyễn Thị Quỳnh'),
+(12, N'BS. Trần Văn Sơn'),
+(13, N'BS. Lê Ngọc Tuyết'),
+(14, N'BS. Phạm Hữu Uy'),
+(15, N'BS. Hoàng Thị Vi'),
+(16, N'BS. Vũ Quốc Xuân'),
+(17, N'BS. Đặng Anh Yến'),
+(18, N'BS. Bùi Thu Linh'),
+(19, N'BS. Đỗ Văn Kiên'),
+(20, N'BS. Ngô Thị Lan'),
+(21, N'BS. Nguyễn Văn Hùng'),
+(22, N'BS. Trần Thị Hoa'),
+(23, N'BS. Lê Văn Khang'),
+(24, N'BS. Phạm Thị Mai'),
+(25, N'BS. Hoàng Văn Nghĩa'),
+(26, N'BS. Vũ Thị Oanh'),
+(27, N'BS. Đặng Văn Phong'),
+(28, N'BS. Bùi Thị Quyên'),
+(29, N'BS. Đỗ Văn Sáng'),
+(30, N'BS. Ngô Thị Thảo'),
+(31, N'BS. Nguyễn Văn Uy'),
+(32, N'BS. Trần Thị Vân'),
+(33, N'BS. Lê Văn Đạt'),
+(34, N'BS. Phạm Thị Yến'),
+(35, N'BS. Hoàng Văn Bình'),
+(36, N'BS. Vũ Thị Chi'),
+(37, N'BS. Đặng Văn Dũng'),
+(38, N'BS. Bùi Thị Ngọc'),
+(39, N'BS. Đỗ Văn Long'),
+(40, N'BS. Ngô Thị Hằng');
+
 DECLARE @doctorCount int = 40;
 DECLARE @i int = 1;
 WHILE @i <= @doctorCount
 BEGIN
   DECLARE @accId int = 1000 + @i;
-  DECLARE @isFemale bit = CASE WHEN (@i % 3) = 0 THEN 1 ELSE 0 END;
-  DECLARE @full nvarchar(255) =
-    CASE WHEN @isFemale = 1
-      THEN (N'BS. ' + CHOOSE((@i % 10) + 1, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô') + N' ' +
-            CHOOSE((@i % 10) + 1, N'Thị',N'Ngọc',N'Minh',N'Hồng',N'Lan',N'Anh',N'Phương',N'Thu',N'Hà',N'Yến') + N' ' +
-            CHOOSE((@i % 10) + 1, N'An',N'Bình',N'Châu',N'Dung',N'Giang',N'Hạnh',N'Khánh',N'Linh',N'Nga',N'Quỳnh'))
-      ELSE (N'BS. ' + CHOOSE((@i % 10) + 1, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô') + N' ' +
-            CHOOSE((@i % 10) + 1, N'Văn',N'Quang',N'Đức',N'Hữu',N'Gia',N'Thành',N'Trung',N'Hoàng',N'Khải',N'Phúc') + N' ' +
-            CHOOSE((@i % 10) + 1, N'Anh',N'Bảo',N'Cường',N'Duy',N'Hiếu',N'Khang',N'Long',N'Minh',N'Nam',N'Phát'))
-    END;
+  DECLARE @full nvarchar(255) = (SELECT full_name FROM @docNames WHERE i = @i);
 
   DECLARE @email nvarchar(255) = N'bs' + RIGHT(N'00' + CAST(@i AS nvarchar(10)), 2) + N'@antamclinic.vn';
-  DECLARE @phone nvarchar(30)  = N'09' + RIGHT(N'00000000' + CAST(10000000 + @i AS nvarchar(20)), 8); -- unique
+  DECLARE @phone nvarchar(30)  = N'09' + RIGHT(N'00000000' + CAST(10000000 + @i AS nvarchar(20)), 8);
 
   INSERT INTO dbo.accounts(id, role_id, email, phone, password, full_name, status, is_email_verified)
   VALUES (@accId, 2, @email, @phone, N'bs123456', @full, N'active', 1);
@@ -219,21 +252,23 @@ WHILE @i <= @doctorCount
 BEGIN
   DECLARE @dId int = @i;
   DECLARE @accId2 int = 1000 + @i;
+  DECLARE @dFull nvarchar(255) = (SELECT full_name FROM @docNames WHERE i = @i);
   DECLARE @gender nvarchar(20) = CASE WHEN (@i % 3)=0 THEN N'female' ELSE N'male' END;
   DECLARE @dob date = DATEFROMPARTS(1978 + (@i % 15), ((@i % 12) + 1), ((@i % 27) + 1));
   DECLARE @license nvarchar(100) = N'VN-' + RIGHT(N'0000' + CAST(@i AS nvarchar(10)), 4);
   DECLARE @bio nvarchar(max) = N'Khám và tư vấn theo hướng dẫn chuyên môn. Ưu tiên giải thích rõ ràng, theo dõi sát điều trị.';
+  DECLARE @roomLoc nvarchar(255) = CASE WHEN @i = 7 THEN N'Phòng 203, tầng 2' ELSE NULL END;
 
   INSERT INTO dbo.doctors(
     id, account_id, full_name, gender, dob, phone, email, license_no, bio, avatar_url,
     rating, visits_count, room_location, schedule_text, education_json, certificates_json
   )
   SELECT
-    @dId, a.id, a.full_name, @gender, @dob, a.phone, a.email, @license, @bio,
+    @dId, a.id, @dFull, @gender, @dob, a.phone, a.email, @license, @bio,
     CASE WHEN @gender = N'female' THEN @avatarFemale ELSE @avatarMale END,
     CAST(4.2 + ((@i % 8) * 0.1) AS decimal(2,1)),
     (30 + (@i * 7)) % 600,
-    NULL,
+    @roomLoc,
     NULL,
     N'["ĐH Y Hà Nội","Chứng chỉ hành nghề"]',
     N'["Chứng chỉ CME","Chứng chỉ chuyên khoa"]'
@@ -243,24 +278,39 @@ BEGIN
 END
 SET IDENTITY_INSERT dbo.doctors OFF;
 
--- Map each doctor to 1 primary specialty + sometimes 1 secondary
-DECLARE @specIds TABLE(id int);
-INSERT INTO @specIds(id) SELECT id FROM dbo.specialties ORDER BY id;
-
+-- Map specialties: doctor #7 = đa chuyên khoa; các bác sĩ khác = 1 chính (+ phụ mỗi 5 người)
 SET @i = 1;
 WHILE @i <= @doctorCount
 BEGIN
-  DECLARE @primarySpec int = ((@i - 1) % 12) + 1;
-  INSERT INTO dbo.doctor_specialties(doctor_id, specialty_id) VALUES (@i, @primarySpec);
-
-  IF (@i % 5) = 0
+  IF @i = 7
   BEGIN
-    DECLARE @secondarySpec int = ((@i + 3) % 12) + 1;
-    IF @secondarySpec <> @primarySpec
-      INSERT INTO dbo.doctor_specialties(doctor_id, specialty_id) VALUES (@i, @secondarySpec);
+    INSERT INTO dbo.doctor_specialties(doctor_id, specialty_id)
+    SELECT 7, s.id
+    FROM dbo.specialties s
+    WHERE s.code IN (N'EYE', N'INT', N'CARD');
+  END
+  ELSE
+  BEGIN
+    DECLARE @primarySpec int = ((@i - 1) % 12) + 1;
+    INSERT INTO dbo.doctor_specialties(doctor_id, specialty_id) VALUES (@i, @primarySpec);
+
+    IF (@i % 5) = 0
+    BEGIN
+      DECLARE @secondarySpec int = ((@i + 3) % 12) + 1;
+      IF @secondarySpec <> @primarySpec
+        INSERT INTO dbo.doctor_specialties(doctor_id, specialty_id) VALUES (@i, @secondarySpec);
+    END
   END
 
   SET @i += 1;
+END
+
+-- Sanity: không trùng tên bác sĩ trong seed
+IF EXISTS (
+  SELECT full_name FROM dbo.doctors GROUP BY full_name HAVING COUNT(*) > 1
+)
+BEGIN
+  RAISERROR(N'Seed error: duplicate doctor full_name detected.', 16, 1);
 END
 
 /* ===== 9) Patients table ===== */
@@ -431,50 +481,6 @@ BEGIN
   SET @k += 1;
 END
 
-/* ===== 13) Invoices & Payments for completed appointments ===== */
-DECLARE @completed TABLE(appt_id int, service_id int, price bigint);
-INSERT INTO @completed(appt_id, service_id, price)
-SELECT a.id, a.service_id, ISNULL(s.price_cents, 0)
-FROM dbo.appointments a
-LEFT JOIN dbo.services s ON s.id = a.service_id
-WHERE a.status = N'completed';
-
-DECLARE @aid int, @sid int, @price bigint;
-DECLARE cur2 CURSOR LOCAL FAST_FORWARD FOR SELECT appt_id, service_id, price FROM @completed;
-OPEN cur2;
-FETCH NEXT FROM cur2 INTO @aid, @sid, @price;
-WHILE @@FETCH_STATUS = 0
-BEGIN
-  INSERT INTO dbo.invoices(appointment_id, subtotal_cents, discount_cents, total_cents, currency, note)
-  VALUES (@aid, @price, 0, @price, N'VND', N'Hóa đơn khám bệnh');
-
-  DECLARE @invId int = SCOPE_IDENTITY();
-  DECLARE @svcName nvarchar(255) = (SELECT TOP 1 name FROM dbo.services WHERE id = @sid);
-
-  INSERT INTO dbo.invoice_items(invoice_id, service_id, name, qty, unit_price_cents, amount_cents)
-  VALUES (@invId, @sid, ISNULL(@svcName, N'Dịch vụ khám'), 1, @price, @price);
-
-  DECLARE @provider nvarchar(30);
-  DECLARE @m int = (ABS(CHECKSUM(NEWID())) % 3);
-  SET @provider = CASE @m WHEN 0 THEN N'cash' WHEN 1 THEN N'bank_transfer' ELSE N'momo' END;
-
-  INSERT INTO dbo.payments(invoice_id, provider, status, amount_cents, currency, provider_txn_id, paid_at, meta)
-  VALUES (
-    @invId,
-    @provider,
-    N'paid',
-    @price,
-    N'VND',
-    N'TXN-' + CAST(@invId AS nvarchar(20)),
-    SYSDATETIMEOFFSET(),
-    N'{"seed":true}'
-  );
-
-  FETCH NEXT FROM cur2 INTO @aid, @sid, @price;
-END
-CLOSE cur2;
-DEALLOCATE cur2;
-
 COMMIT TRANSACTION;
 GO
 
@@ -490,8 +496,6 @@ UNION ALL SELECT N'services', COUNT(*) FROM dbo.services
 UNION ALL SELECT N'rooms', COUNT(*) FROM dbo.rooms
 UNION ALL SELECT N'weekly_schedules', COUNT(*) FROM dbo.doctor_weekly_schedules
 UNION ALL SELECT N'slots', COUNT(*) FROM dbo.appointment_slots
-UNION ALL SELECT N'appointments', COUNT(*) FROM dbo.appointments
-UNION ALL SELECT N'invoices', COUNT(*) FROM dbo.invoices
-UNION ALL SELECT N'payments', COUNT(*) FROM dbo.payments;
+UNION ALL SELECT N'appointments', COUNT(*) FROM dbo.appointments;
 GO
 

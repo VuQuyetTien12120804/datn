@@ -2,7 +2,7 @@ import axios from 'axios'
 import { loadAdminSession } from '../auth/storage'
 import { clearAdminSession } from '../auth/storage'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8085'
 
 export const http = axios.create({
   baseURL,
@@ -22,8 +22,8 @@ http.interceptors.response.use(
   (res) => res,
   (err) => {
     const status = err?.response?.status
-    if (status === 401 || status === 403) {
-      // token hết hạn / không đủ quyền -> logout về login
+    if (status === 401) {
+      // token hết hạn -> logout về login (403 = lỗi quyền/nghiệp vụ, giữ phiên)
       clearAdminSession()
       if (window.location.pathname !== '/login') {
         window.location.href = '/login'

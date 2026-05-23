@@ -19,9 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.frontend_bookingcare.BuildConfig;
 import com.example.frontend_bookingcare.R;
 import com.example.frontend_bookingcare.account.AccountFlowListener;
 import com.example.frontend_bookingcare.data.AuthRepository;
+import com.example.frontend_bookingcare.ui.legal.LegalDocumentActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -66,7 +68,7 @@ public class RegisterEmailFragment extends Fragment {
         btn.setOnClickListener(v -> {
             String em = email.getText() != null ? email.getText().toString().trim() : "";
             if (TextUtils.isEmpty(em)) {
-                Toast.makeText(requireContext(), R.string.email, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.auth_email_required, Toast.LENGTH_SHORT).show();
                 return;
             }
             parent.registerDraft.email = em;
@@ -76,7 +78,7 @@ public class RegisterEmailFragment extends Fragment {
                 if (err != null) {
                     Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show();
                 } else {
-                    if (otpDto != null && otpDto.otp != null && !otpDto.otp.isEmpty()) {
+                    if (BuildConfig.DEBUG && otpDto != null && otpDto.otp != null && !otpDto.otp.isEmpty()) {
                         Toast.makeText(requireContext(), getString(R.string.auth_otp_dev_hint, otpDto.otp), Toast.LENGTH_LONG).show();
                     }
                     Snackbar sb = Snackbar.make(view, R.string.auth_otp_sent, Snackbar.LENGTH_SHORT);
@@ -100,11 +102,7 @@ public class RegisterEmailFragment extends Fragment {
         ss.setSpan(new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.auth_terms_link)
-                        .setMessage(R.string.account_placeholder_terms)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
+                LegalDocumentActivity.start(RegisterEmailFragment.this, LegalDocumentActivity.CODE_TERMS);
             }
 
             @Override

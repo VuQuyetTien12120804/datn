@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/doctor_surface_bg"
+    android:background="@drawable/bg_doctor_screen"
     android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/doctor_exam_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -16,66 +17,73 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_md"
-            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_sm"
             android:layout_marginEnd="@dimen/space_md"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp"
-            app:strokeColor="@color/doctor_stat_card_stroke"
-            app:strokeWidth="1dp">
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:background="@drawable/bg_doctor_hero_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_lg">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="4dp"
-                    android:background="@drawable/bg_doctor_header_top_accent" />
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_doctor_messages_icon_circle">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_nav_doctor_clinic"
+                        app:tint="@color/white" />
+                </FrameLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/space_lg">
+                    android:layout_marginStart="@dimen/space_md"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
-                        style="@style/Text.Screen.Title"
-                        android:layout_width="0dp"
+                        style="@style/DoctorHeroTitle"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:letterSpacing="-0.02"
                         android:text="@string/doctor_exam_title" />
 
                     <TextView
-                        android:id="@+id/doctor_exam_status"
-                        style="@style/Text.Caption"
+                        android:id="@+id/doctor_exam_header_hint"
+                        style="@style/DoctorHeroSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_doctor_status_wait"
-                        android:letterSpacing="0.02"
-                        android:paddingStart="@dimen/space_md"
-                        android:paddingTop="@dimen/space_xs"
-                        android:paddingEnd="@dimen/space_md"
-                        android:paddingBottom="@dimen/space_xs"
-                        android:text="@string/doctor_exam_status_idle"
-                        android:textAllCaps="true"
-                        android:textColor="@color/doctor_status_wait_fg"
-                        android:textSize="@dimen/text_small"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="@dimen/space_xxs"
+                        android:text="@string/doctor_exam_header_hint" />
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/doctor_exam_header_hint"
+                    android:id="@+id/doctor_exam_status"
                     style="@style/Text.Caption"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/space_lg"
-                    android:paddingEnd="@dimen/space_lg"
-                    android:paddingBottom="@dimen/space_md"
-                    android:text="@string/doctor_exam_header_hint"
-                    android:textColor="@color/text_secondary_dim" />
+                    android:background="@drawable/bg_doctor_hero_chip"
+                    android:letterSpacing="0.02"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingTop="@dimen/space_xs"
+                    android:paddingEnd="@dimen/space_md"
+                    android:paddingBottom="@dimen/space_xs"
+                    android:text="@string/doctor_exam_status_idle"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_small"
+                    android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -296,7 +304,46 @@
                         android:text="@string/doctor_exam_start"
                         android:textColor="@color/white"
                         app:backgroundTint="@color/doctor_brand_primary"
-                        app:cornerRadius="14dp" />
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/doctor_exam_save_notes_btn"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minHeight="48dp"
+                        android:text="@string/doctor_exam_save_notes"
+                        android:visibility="gone"
+                        app:cornerRadius="16dp"
+                        app:strokeColor="@color/doctor_brand_primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/doctor_exam_complete_btn"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minHeight="52dp"
+                        android:text="@string/doctor_exam_complete"
+                        android:textColor="@color/white"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/doctor_accept_green"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/doctor_exam_no_show_btn"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/doctor_exam_no_show"
+                        android:textColor="@color/doctor_reject_red"
+                        android:visibility="gone" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
@@ -305,35 +352,12 @@
             android:id="@+id/doctor_exam_empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/space_xl"
             android:visibility="gone">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:contentDescription="@null"
-                app:srcCompat="@android:drawable/ic_menu_today"
-                app:tint="@color/doctor_brand_primary" />
-
-            <TextView
-                style="@style/Text.Doctor.NameLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_md"
-                android:gravity="center"
-                android:text="@string/doctor_exam_empty_title"
-                android:textAlignment="center" />
-
-            <TextView
-                style="@style/Text.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_sm"
-                android:gravity="center"
-                android:text="@string/doctor_exam_empty_hint"
-                android:textAlignment="center" />
+            <include
+                layout="@layout/include_doctor_empty_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <View

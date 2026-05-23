@@ -21,17 +21,16 @@ export default function Login() {
           Đăng nhập quản trị
         </Typography.Title>
         <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>
-          BookingCare Clinic — hệ thống quản trị phòng khám.
+          ClinicBooking — Phòng khám đa khoa Quyết Tiến
         </Typography.Paragraph>
 
         <Form
           layout="vertical"
-          initialValues={{ email: 'admin@clinic.local', password: 'admin123' }}
           onFinish={async (v) => {
             try {
               const r = await adminLogin(v.email, v.password)
               if (!r?.accessToken) {
-                message.error('Login failed')
+                message.error('Đăng nhập thất bại')
                 return
               }
               // allow ADMIN only (đồ án không dùng STAFF)

@@ -1,6 +1,11 @@
 package com.example.frontend_bookingcare.ui.booking;
 
+import android.content.Context;
+
 import androidx.annotation.Nullable;
+
+import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.locale.LocaleStore;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -50,18 +55,57 @@ public final class BookingFormatters {
         }
     }
 
-    /** "yyyy-MM-dd" → "T{n} dd/MM/yyyy" (VN). */
-    public static String prettyDate(@Nullable String isoDate) {
+    /** "yyyy-MM-dd" → "T{n} dd/MM/yyyy" (VN) hoặc "Mon dd/MM/yyyy" (EN). */
+    public static String prettyDate(Context ctx, @Nullable String isoDate) {
         LocalDate d = parseIsoDate(isoDate);
         if (d == null) return isoDate == null ? "" : isoDate;
-        return dowLabel(d) + " " + d.format(DISPLAY_DATE);
+        return dowLabel(ctx, d) + " " + d.format(DISPLAY_DATE);
     }
 
-    /** Thứ trong tuần kiểu VN: T2..T7, CN. */
+    /** Thứ trong tuần theo locale app. */
+    public static String dowLabel(Context ctx, LocalDate d) {
+        if (LocaleStore.isEnglish(ctx)) {
+            return d.format(DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH));
+        }
+        int v = d.getDayOfWeek().getValue();
+        if (v == 7) return ctx.getString(R.string.dow_sun);
+        return ctx.getString(dowResFor(v));
+    }
+
+    @Deprecated
+    public static String prettyDate(@Nullable String isoDate) {
+        Context ctx = com.example.frontend_bookingcare.BookingCareApp.appContext();
+        return ctx != null ? prettyDate(ctx, isoDate) : prettyDateLegacy(isoDate);
+    }
+
+    @Deprecated
     public static String dowLabel(LocalDate d) {
+        Context ctx = com.example.frontend_bookingcare.BookingCareApp.appContext();
+        return ctx != null ? dowLabel(ctx, d) : dowLabelLegacy(d);
+    }
+
+    private static String prettyDateLegacy(@Nullable String isoDate) {
+        LocalDate d = parseIsoDate(isoDate);
+        if (d == null) return isoDate == null ? "" : isoDate;
+        return dowLabelLegacy(d) + " " + d.format(DISPLAY_DATE);
+    }
+
+    private static String dowLabelLegacy(LocalDate d) {
         int v = d.getDayOfWeek().getValue();
         if (v == 7) return "CN";
         return "T" + (v + 1);
+    }
+
+    private static int dowResFor(int dayOfWeekValue) {
+        switch (dayOfWeekValue) {
+            case 1: return R.string.dow_mon;
+            case 2: return R.string.dow_tue;
+            case 3: return R.string.dow_wed;
+            case 4: return R.string.dow_thu;
+            case 5: return R.string.dow_fri;
+            case 6: return R.string.dow_sat;
+            default: return R.string.dow_sun;
+        }
     }
 
     /** "HH:mm:ss" → "HH:mm". */
@@ -114,16 +158,40 @@ public final class BookingFormatters {
         return "OTHER";
     }
 
-    /** "MALE" → "Nam" để hiển thị lên UI. */
-    public static String displayGender(@Nullable String raw) {
+    /** "MALE" → nhãn hiển thị theo locale. */
+    public static String displayGender(Context ctx, @Nullable String raw) {
         String v = genderToEnum(raw);
         switch (v) {
             case "MALE":
-                return "Nam";
+                return ctx.getString(R.string.gender_male);
             case "FEMALE":
-                return "Nữ";
+                return ctx.getString(R.string.gender_female);
             default:
-                return "Khác";
+                return ctx.getString(R.string.gender_other);
+        }
+    }
+
+    public static String[] genderLabels(Context ctx) {
+        return new String[]{
+                ctx.getString(R.string.gender_male),
+                ctx.getString(R.string.gender_female),
+                ctx.getString(R.string.gender_other)
+        };
+    }
+
+    public static boolean isValidVnPhone(@Nullable String raw) {
+        if (raw == null) return false;
+        String p = raw.trim().replaceAll("\\s+", "");
+        return p.matches("0\\d{9}") || p.matches("\\+84\\d{9}");
+    }
+
+    public static boolean isValidDobDdMmYyyy(@Nullable String raw) {
+        if (raw == null || raw.trim().isEmpty()) return false;
+        try {
+            LocalDate d = LocalDate.parse(raw.trim(), DOB_VN);
+            return !d.isAfter(LocalDate.now());
+        } catch (Exception e) {
+            return false;
         }
     }
 }

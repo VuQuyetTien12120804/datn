@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DoctorHeroTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="DoctorHeroSubtitle">
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textColor">@color/doctor_on_primary_muted</item>
+    </style>
+
+    <style name="DoctorHeroEyebrow">
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textColor">@color/doctor_on_primary_muted</item>
+    </style>
+
+    <style name="Widget.Doctor.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">18dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="strokeColor">@color/doctor_stat_card_stroke</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Widget.Doctor.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@style/Widget.Doctor.BottomNav.ActiveIndicator</item>
+        <item name="itemRippleColor">@color/doctor_brand_ripple</item>
+    </style>
+
+    <style name="Widget.Doctor.BottomNav.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/doctor_brand_surface_tint</item>
+        <item name="android:width">56dp</item>
+        <item name="android:height">32dp</item>
+    </style>
+
+    <style name="Widget.Doctor.SegmentButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">14dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="Widget.Doctor.PrimaryButton" parent="Widget.Material3.Button">
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="backgroundTint">@color/doctor_brand_primary</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+</resources>

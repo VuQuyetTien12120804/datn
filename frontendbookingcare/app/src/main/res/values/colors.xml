@@ -46,34 +46,40 @@
     <color name="divider_line">#E5E7EB</color>
     <color name="chip_specialty_bg">#E5F1FF</color>
 
-    <!-- ===== DOCTOR PANEL ===== -->
-    <!-- Doctor brand (different from patient role) -->
-    <color name="doctor_brand_primary">#6D28D9</color>
+    <!-- ===== DOCTOR PANEL — Premium violet theme ===== -->
+    <color name="doctor_brand_primary">#7C3AED</color>
     <color name="doctor_brand_primary_dark">#5B21B6</color>
+    <color name="doctor_brand_primary_light">#A78BFA</color>
     <color name="doctor_brand_on_primary">#FFFFFFFF</color>
-    <color name="doctor_surface_bg">#F6F7FF</color>
-    <color name="doctor_nav_bg">#FFFFFFFF</color>
+    <color name="doctor_on_primary_muted">#D9FFFFFF</color>
+    <color name="doctor_brand_surface_tint">#F3E8FF</color>
+    <color name="doctor_brand_ripple">#337C3AED</color>
+    <color name="doctor_surface_bg">#F5F3FF</color>
+    <color name="doctor_surface_bg_end">#EEF2FF</color>
+    <color name="doctor_nav_bg">#FCFAFF</color>
+    <color name="doctor_nav_stroke">#E9D5FF</color>
 
     <color name="doctor_status_done_bg">#DCFCE7</color>
-    <color name="doctor_status_done_fg">#16A34A</color>
-    <color name="doctor_status_progress_bg">#DBEAFE</color>
-    <color name="doctor_status_progress_fg">#2563EB</color>
+    <color name="doctor_status_done_fg">#15803D</color>
+    <color name="doctor_status_progress_bg">#EDE9FE</color>
+    <color name="doctor_status_progress_fg">#6D28D9</color>
     <color name="doctor_status_wait_bg">#F1F5F9</color>
     <color name="doctor_status_wait_fg">#64748B</color>
     <color name="doctor_priority_orange">#F97316</color>
-    <color name="doctor_stat_blue_bg">#EFF6FF</color>
+    <color name="doctor_stat_blue_bg">#F5F3FF</color>
     <color name="doctor_stat_green_bg">#F0FDF4</color>
     <color name="doctor_stat_orange_bg">#FFF7ED</color>
     <color name="doctor_stat_amber_bg">#FEFCE8</color>
-    <color name="doctor_stat_card_stroke">#E9D5FF</color>
-    <color name="doctor_divider">#E5E7EB</color>
+    <color name="doctor_stat_card_stroke">#DDD6FE</color>
+    <color name="doctor_divider">#E9D5FF</color>
     <color name="doctor_accept_green">#16A34A</color>
     <color name="doctor_reject_red">#DC2626</color>
     <color name="doctor_logout_red">#DC2626</color>
-    <color name="doctor_tab_active_bg">#EFF6FF</color>
-    <color name="doctor_current_card_stroke">#2563EB</color>
-    <color name="doctor_work_shift_bg">#DCFCE7</color>
-    <color name="doctor_work_shift_fg">#16A34A</color>
+    <color name="doctor_tab_active_bg">#F3E8FF</color>
+    <color name="doctor_current_card_stroke">#8B5CF6</color>
+    <color name="doctor_work_shift_bg">#EDE9FE</color>
+    <color name="doctor_work_shift_fg">#6D28D9</color>
+    <color name="doctor_segment_track">#EDE9FE</color>
     <color name="doctor_request_section_need_bg">#F5F3FF</color>
     <color name="doctor_request_section_overdue_bg">#FEF2F2</color>
     <color name="doctor_request_section_stroke_need">#DDD6FE</color>

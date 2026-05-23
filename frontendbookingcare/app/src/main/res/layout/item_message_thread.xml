@@ -20,10 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="B"
             android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </FrameLayout>
 
     <TextView
@@ -31,7 +30,6 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:gravity="center"
-        android:text="1"
         android:textColor="@color/white"
         android:textSize="11sp"
         android:background="@drawable/bg_unread_badge"
@@ -44,27 +42,29 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:orientation="vertical">
-        app:layout_constraintStart_toEndOf="@id/thread_avatar_bg"
-        app:layout_constraintEnd_toStartOf="@id/thread_time"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/thread_time"
+        app:layout_constraintStart_toEndOf="@id/thread_avatar_bg"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/thread_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bác sĩ ..."
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/text_primary"
-            android:textStyle="bold"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/thread_sub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Tien"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/text_secondary_dim"
             android:textSize="12sp" />
 
@@ -73,9 +73,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:text="Bạn có lịch hẹn khám..."
+            android:maxLines="1"
             android:textColor="@color/text_secondary_dim"
             android:textSize="13sp" />
     </LinearLayout>
@@ -84,21 +83,19 @@
         android:id="@+id/thread_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5 ngày"
         android:textColor="@color/text_muted"
         android:textSize="11sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/thread_lock"
         android:layout_width="18dp"
         android:layout_height="18dp"
+        android:layout_marginTop="6dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_lock_small"
         android:visibility="gone"
-        android:contentDescription="@null"
-        app:layout_constraintTop_toBottomOf="@id/thread_time"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="6dp" />
+        app:layout_constraintTop_toBottomOf="@id/thread_time" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-

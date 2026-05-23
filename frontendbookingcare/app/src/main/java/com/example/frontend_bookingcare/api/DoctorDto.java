@@ -18,4 +18,10 @@ public class DoctorDto {
 
     @SerializedName("bio")
     public String bio;
+
+    @SerializedName("roomLocation")
+    public String roomLocation;
+
+    @SerializedName("clinicAddress")
+    public String clinicAddress;
 }

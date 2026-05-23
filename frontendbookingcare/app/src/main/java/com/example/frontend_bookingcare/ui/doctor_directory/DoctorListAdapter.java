@@ -21,20 +21,6 @@ public class DoctorListAdapter extends RecyclerView.Adapter<DoctorListAdapter.Ho
 
     private final List<DoctorDetail> doctors = new ArrayList<>();
 
-    /**
-     * Pool địa chỉ mẫu dùng cho các bác sĩ chưa có address từ backend.
-     * Giữ UI luôn có dòng địa chỉ (giống mockup YouMed) thay vì trống trải.
-     * Khi API trả về address thật thì nó sẽ ghi đè (logic trong onBindViewHolder).
-     */
-    private static final String[] SAMPLE_ADDRESSES = new String[] {
-            "215F Nguyễn Trãi, Phường Nguyễn Cư Trinh, Quận 1, Hồ Chí Minh",
-            "23 Nguyễn Văn Đậu, Phường 5, Quận Phú Nhuận, Hồ Chí Minh",
-            "242 Nguyễn Chí Thanh, Phường 2, Quận 10, Hồ Chí Minh",
-            "161B Nguyễn Văn Trỗi, Phường 11, Quận Phú Nhuận, Hồ Chí Minh",
-            "1E Trường Chinh, Phường Tây Thạnh, Quận Tân Phú, Hồ Chí Minh",
-            "456 Cách Mạng Tháng 8, Phường 11, Quận 3, Hồ Chí Minh"
-    };
-
     public DoctorListAdapter() {
     }
 
@@ -60,7 +46,6 @@ public class DoctorListAdapter extends RecyclerView.Adapter<DoctorListAdapter.Ho
         DoctorDetail d = doctors.get(position);
         Context ctx = holder.itemView.getContext();
 
-        // Click bất kỳ đâu trên card → mở màn chi tiết
         View.OnClickListener openDetail = v ->
                 ctx.startActivity(DoctorDetailActivity.newIntent(ctx, d));
         holder.itemView.setOnClickListener(openDetail);
@@ -85,12 +70,12 @@ public class DoctorListAdapter extends RecyclerView.Adapter<DoctorListAdapter.Ho
             holder.years.setVisibility(View.GONE);
         }
 
-        // Address luôn hiển thị — fallback sample address để UI giống mockup YouMed.
-        holder.addressRow.setVisibility(View.VISIBLE);
-        String addr = (d.address != null && !d.address.isEmpty())
-                ? d.address
-                : SAMPLE_ADDRESSES[position % SAMPLE_ADDRESSES.length];
-        holder.address.setText(addr);
+        if (d.address != null && !d.address.isEmpty()) {
+            holder.addressRow.setVisibility(View.VISIBLE);
+            holder.address.setText(d.address);
+        } else {
+            holder.addressRow.setVisibility(View.GONE);
+        }
 
         holder.specialtyRow.removeAllViews();
         if (d.specialties != null && !d.specialties.isEmpty()) {

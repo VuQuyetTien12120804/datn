@@ -7,8 +7,10 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,23 +19,31 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.frontend_bookingcare.MainActivity;
 import com.example.frontend_bookingcare.R;
+import com.example.frontend_bookingcare.data.PatientProfileRepository;
+import com.example.frontend_bookingcare.session.SessionManager;
+import com.example.frontend_bookingcare.ui.appointments.AppointmentCodes;
+import com.example.frontend_bookingcare.ui.common.QrCodeUtil;
 import com.example.frontend_bookingcare.ui.support.SupportBottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
  * Bước 3: màn hình kết quả sau khi booking thành công.
- * Hiển thị mã lịch khám, STT (demo), doctor + patient info, 2 nút: Về trang chủ / Hỗ trợ.
+ * Hiển thị mã lịch khám, số lịch, doctor + patient info, QR check-in, 2 nút: Về trang chủ / Hỗ trợ.
  */
 public class BookingResultActivity extends AppCompatActivity {
 
     public static final String EXTRA_APPOINTMENT_ID = "br_appointment_id";
+    public static final String EXTRA_QUEUE_NUMBER = "br_queue_number";
 
     private BookingDraft draft;
     private int appointmentId;
+    private int queueNumber;
+    private TextView patientCodeView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,6 +54,7 @@ public class BookingResultActivity extends AppCompatActivity {
 
         draft = BookingDraft.readFrom(getIntent());
         appointmentId = getIntent().getIntExtra(EXTRA_APPOINTMENT_ID, -1);
+        queueNumber = getIntent().getIntExtra(EXTRA_QUEUE_NUMBER, -1);
 
         ImageButton close = findViewById(R.id.booking_result_close);
         close.setOnClickListener(v -> goHome());
@@ -59,24 +70,73 @@ public class BookingResultActivity extends AppCompatActivity {
         bindDoctor();
         bindAppointment();
         bindPatient();
+        loadPatientCode();
+        loadQueueNumberIfNeeded();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                goHome();
+            }
+        });
+    }
+
+    private void loadQueueNumberIfNeeded() {
+        if (queueNumber > 0 || appointmentId <= 0) {
+            bindQueue();
+            return;
+        }
+        SessionManager sm = new SessionManager(this);
+        if (sm.getSession() == null || sm.getSession().accessToken == null || sm.getSession().accessToken.isEmpty()) {
+            bindQueue();
+            return;
+        }
+        new com.example.frontend_bookingcare.data.PatientAppointmentsRepository()
+                .fetchDetail("Bearer " + sm.getSession().accessToken, appointmentId, (dto, err) ->
+                        runOnUiThread(() -> {
+                            if (dto != null && dto.queueNumber != null && dto.queueNumber > 0) {
+                                queueNumber = dto.queueNumber;
+                            }
+                            bindQueue();
+                        }));
+    }
+
+    private void loadPatientCode() {
+        if (patientCodeView == null) return;
+        SessionManager sm = new SessionManager(this);
+        if (sm.getSession() == null || sm.getSession().accessToken == null || sm.getSession().accessToken.isEmpty()) {
+            return;
+        }
+        String bearer = "Bearer " + sm.getSession().accessToken;
+        new PatientProfileRepository().fetchPatientId(bearer, (patientId, err) -> runOnUiThread(() -> {
+            if (patientId != null && patientId > 0) {
+                patientCodeView.setText(AppointmentCodes.patientCode(patientId, draft.slotDate));
+            }
+        }));
     }
 
     private void bindSuccess() {
         TextView ts = findViewById(R.id.booking_result_timestamp);
-        String formatted = LocalDateTime.now().format(
+        String formatted = ZonedDateTime.now(BookingPolicy.CLINIC_ZONE).format(
                 DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy", Locale.getDefault()));
         ts.setText(formatted);
     }
 
     private void bindQueue() {
         TextView queue = findViewById(R.id.booking_result_queue);
-        TextView qrText = findViewById(R.id.booking_result_qr_text);
-        // STT đơn giản = appointmentId % 100 (backend chưa có trường queue number riêng).
-        int stt = appointmentId > 0 ? Math.max(1, appointmentId % 100) : 1;
-        queue.setText(String.valueOf(stt));
-        // "QR" placeholder: hiển thị text mã lịch khám ở giữa ô vuông. Sau này
-        // có thể thay bằng thư viện ZXing để render QR thật.
-        qrText.setText(buildAppointmentCode(appointmentId));
+        ImageView qrView = findViewById(R.id.booking_result_qr);
+        int displayNo = queueNumber > 0 ? queueNumber : 0;
+        queue.setText(displayNo > 0 ? String.valueOf(displayNo) : getString(R.string.appt_queue_pending));
+        String code = AppointmentCodes.appointmentCode(appointmentId, draft.slotDate);
+        if (qrView != null && appointmentId > 0) {
+            int size = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 110, getResources().getDisplayMetrics());
+            android.graphics.Bitmap qr = QrCodeUtil.encode(code, size, size);
+            if (qr != null) {
+                qrView.setImageBitmap(qr);
+                qrView.setContentDescription(code);
+            }
+        }
     }
 
     private void bindDoctor() {
@@ -99,8 +159,8 @@ public class BookingResultActivity extends AppCompatActivity {
         TextView date = findViewById(R.id.booking_result_date);
         TextView time = findViewById(R.id.booking_result_time);
 
-        code.setText(buildAppointmentCode(appointmentId));
-        date.setText(BookingFormatters.prettyDate(draft.slotDate));
+        code.setText(AppointmentCodes.appointmentCode(appointmentId, draft.slotDate));
+        date.setText(BookingFormatters.prettyDate(this, draft.slotDate));
 
         String range = BookingFormatters.timeRange(draft.startTime, draft.endTime);
         String session = getString("morning".equals(draft.session)
@@ -115,11 +175,12 @@ public class BookingResultActivity extends AppCompatActivity {
         TextView gender = findViewById(R.id.booking_result_patient_gender);
         TextView phone = findViewById(R.id.booking_result_patient_phone);
 
-        pCode.setText(buildPatientCode(draft.email));
+        patientCodeView = pCode;
+        pCode.setText(getString(R.string.patient_code_loading));
         name.setText(TextUtils.isEmpty(draft.fullName)
                 ? getString(R.string.booking_not_available) : draft.fullName);
         dob.setText(TextUtils.isEmpty(draft.dob) ? getString(R.string.booking_not_updated) : draft.dob);
-        gender.setText(BookingFormatters.displayGender(draft.gender));
+        gender.setText(BookingFormatters.displayGender(this, draft.gender));
         phone.setText(TextUtils.isEmpty(draft.phone)
                 ? getString(R.string.booking_not_updated) : draft.phone);
     }
@@ -130,25 +191,10 @@ public class BookingResultActivity extends AppCompatActivity {
         Intent i = new Intent(this, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(i);
-        finish();
+        finishAffinity();
     }
 
     // ---------- Utils ----------
-
-    /** Mã lịch khám dạng YMA + ngày tháng + id — để bệnh nhân tra cứu. */
-    private static String buildAppointmentCode(int appointmentId) {
-        String day = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHH"));
-        return "YMA" + day + String.format(Locale.US, "%04d", Math.max(0, appointmentId % 10000));
-    }
-
-    /** Mã bệnh nhân — hash nhanh từ email để ổn định giữa các lần đặt. */
-    private static String buildPatientCode(@Nullable String email) {
-        if (email == null || email.isEmpty()) return "YMP00000000";
-        long hash = 0;
-        for (int i = 0; i < email.length(); i++) hash = hash * 31 + email.charAt(i);
-        hash = Math.abs(hash);
-        return "YMP" + String.format(Locale.US, "%09d", hash % 1_000_000_000L);
-    }
 
     private static String firstLetter(@Nullable String s) {
         if (s == null || s.isEmpty()) return "?";

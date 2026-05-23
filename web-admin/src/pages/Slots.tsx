@@ -173,14 +173,14 @@ export default function SlotsPage() {
         <Space style={{ width: '100%', justifyContent: 'space-between' }} align="start">
           <div>
             <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-              Slot
+              Khung giờ khám
             </Typography.Title>
             <Typography.Text type="secondary">
-              Generate slot theo ngày/ca, xem danh sách slot còn trống và khóa slot
+              Tạo khung giờ theo ngày, xem slot còn trống và khóa slot không dùng
             </Typography.Text>
           </div>
           <Button type="primary" onClick={openGenerate}>
-            Generate slots
+            Tạo khung giờ
           </Button>
         </Space>
       </Card>
@@ -228,7 +228,7 @@ export default function SlotsPage() {
               scroll={{ x: 1100, y: 'calc(100vh - 480px)' as any }}
               sticky
               locale={{
-                emptyText: <EmptyState title="Chưa có slot" description="Chọn bác sĩ + ngày, rồi bấm “Generate slots” để tạo lịch khám." />,
+                emptyText: <EmptyState title="Chưa có khung giờ" description="Chọn bác sĩ + ngày, rồi bấm “Tạo khung giờ” để sinh lịch khám." />,
               }}
             />
           </TableShell>
@@ -236,7 +236,7 @@ export default function SlotsPage() {
       </Card>
 
       <Modal
-        title="Generate slots"
+        title="Tạo khung giờ"
         open={genOpen}
         onCancel={() => setGenOpen(false)}
         okText="Tạo"
@@ -269,7 +269,7 @@ export default function SlotsPage() {
             >
               <Input placeholder="2026-04-22" />
             </Form.Item>
-            <Form.Item name="roomId" label="Room ID (tuỳ chọn)" style={{ flex: 1 }}>
+            <Form.Item name="roomId" label="Mã phòng (tuỳ chọn)" style={{ flex: 1 }}>
               <InputNumber style={{ width: '100%' }} min={1} />
             </Form.Item>
           </Space>

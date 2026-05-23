@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,10 +31,10 @@ import com.example.frontend_bookingcare.data.BookingRepository;
 import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.ProfileExtras;
 import com.example.frontend_bookingcare.session.SessionManager;
+import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 import com.google.android.material.button.MaterialButton;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,6 +58,8 @@ public class BookingStep1Activity extends AppCompatActivity {
     public static final String EXTRA_DOCTOR_NAME = "bs1_doctor_name";
     public static final String EXTRA_DOCTOR_SPECIALTY = "bs1_doctor_specialty";
     public static final String EXTRA_DOCTOR_AVATAR_BG = "bs1_doctor_avatar_bg";
+    public static final String EXTRA_PRESELECT_DATE = "bs1_preselect_date";
+    public static final String EXTRA_PRESELECT_SLOT_ID = "bs1_preselect_slot_id";
 
     private final BookingRepository repo = new BookingRepository();
 
@@ -68,6 +72,8 @@ public class BookingStep1Activity extends AppCompatActivity {
     // Selection state
     @Nullable private String selectedDate;              // "yyyy-MM-dd"
     @Nullable private SlotDto selectedSlot;
+    @Nullable private String preselectDate;
+    @Nullable private Integer preselectSlotId;
     private String activeSessionTab = "afternoon";      // "morning" | "afternoon"
     private List<SlotDto> lastFetchedSlots = new ArrayList<>();
 
@@ -85,18 +91,33 @@ public class BookingStep1Activity extends AppCompatActivity {
     private MaterialButton completeProfileBtn;
     private TextView profileHint;
 
-    private static final int REQ_COMPLETE_PROFILE = 901;
+    private final ActivityResultLauncher<Intent> completeProfileLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> bindPatientCard());
+
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public static Intent newIntent(Context ctx, int doctorId, @Nullable String title,
                                    @Nullable String name, @Nullable String specialty,
                                    int avatarBg) {
+        return newIntent(ctx, doctorId, title, name, specialty, avatarBg, null, null);
+    }
+
+    public static Intent newIntent(Context ctx, int doctorId, @Nullable String title,
+                                   @Nullable String name, @Nullable String specialty,
+                                   int avatarBg, @Nullable String preselectDate,
+                                   @Nullable Integer preselectSlotId) {
         Intent i = new Intent(ctx, BookingStep1Activity.class);
         i.putExtra(EXTRA_DOCTOR_ID, doctorId);
         i.putExtra(EXTRA_DOCTOR_TITLE, title);
         i.putExtra(EXTRA_DOCTOR_NAME, name);
         i.putExtra(EXTRA_DOCTOR_SPECIALTY, specialty);
         i.putExtra(EXTRA_DOCTOR_AVATAR_BG, avatarBg);
+        if (preselectDate != null) {
+            i.putExtra(EXTRA_PRESELECT_DATE, preselectDate);
+        }
+        if (preselectSlotId != null) {
+            i.putExtra(EXTRA_PRESELECT_SLOT_ID, preselectSlotId);
+        }
         return i;
     }
 
@@ -114,6 +135,11 @@ public class BookingStep1Activity extends AppCompatActivity {
         doctorName = in.getStringExtra(EXTRA_DOCTOR_NAME);
         doctorSpecialty = in.getStringExtra(EXTRA_DOCTOR_SPECIALTY);
         doctorAvatarBg = in.getIntExtra(EXTRA_DOCTOR_AVATAR_BG, R.drawable.bg_tile_blue);
+        preselectDate = in.getStringExtra(EXTRA_PRESELECT_DATE);
+        if (in.hasExtra(EXTRA_PRESELECT_SLOT_ID)) {
+            int slotId = in.getIntExtra(EXTRA_PRESELECT_SLOT_ID, -1);
+            preselectSlotId = slotId > 0 ? slotId : null;
+        }
 
         wireHeader();
         bindDoctorCard();
@@ -130,6 +156,7 @@ public class BookingStep1Activity extends AppCompatActivity {
         continueBtn = findViewById(R.id.booking_continue);
         completeProfileBtn = findViewById(R.id.booking_complete_profile_btn);
         profileHint = findViewById(R.id.booking_profile_hint);
+        UnicodeInputHelper.enableMultilineText(findViewById(R.id.booking_notes));
 
         // patient card cần completeProfileBtn/profileHint nên phải bind sau khi findViewById
         bindPatientCard();
@@ -204,29 +231,21 @@ public class BookingStep1Activity extends AppCompatActivity {
                 ? s.fullName : getString(R.string.booking_not_available));
         gender.setText(TextUtils.isEmpty(ex.gender)
                 ? getString(R.string.booking_not_updated)
-                : BookingFormatters.displayGender(ex.gender));
+                : BookingFormatters.displayGender(this, ex.gender));
         dob.setText(TextUtils.isEmpty(ex.dob) ? getString(R.string.booking_not_updated) : ex.dob);
         phone.setText(TextUtils.isEmpty(ex.phone) ? getString(R.string.booking_not_updated) : ex.phone);
 
-        boolean ok = hasEnoughProfile(s, ex);
+        boolean ok = BookingPolicy.hasEnoughProfile(s, ex);
         completeProfileBtn.setVisibility(ok ? View.GONE : View.VISIBLE);
         profileHint.setVisibility(ok ? View.GONE : View.VISIBLE);
     }
 
     private static boolean hasEnoughProfile(@Nullable AuthSession s, @NonNull ProfileExtras ex) {
-        if (s == null) return false;
-        if (TextUtils.isEmpty(s.accessToken)) return false;
-        if (TextUtils.isEmpty(s.email)) return false;
-        if (TextUtils.isEmpty(s.fullName)) return false;
-        if (TextUtils.isEmpty(ex.phone)) return false;
-        if (TextUtils.isEmpty(ex.dob)) return false;
-        if (TextUtils.isEmpty(ex.gender)) return false;
-        if (TextUtils.isEmpty(ex.address)) return false;
-        return true;
+        return BookingPolicy.hasEnoughProfile(s, ex);
     }
 
     private void openCompleteProfile() {
-        startActivityForResult(CompleteProfileActivity.newIntent(this), REQ_COMPLETE_PROFILE);
+        completeProfileLauncher.launch(CompleteProfileActivity.newIntent(this));
     }
 
     private void bindTimeTabs() {
@@ -288,12 +307,20 @@ public class BookingStep1Activity extends AppCompatActivity {
             workingDateSet.add(iso);
             if (first == null || d.isBefore(first)) first = d;
         }
-        if (first != null) {
-            long millis = first.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            calendarView.setMinDate(millis);
-            calendarView.setDate(millis, false, true);
-            selectDate(first.format(ISO));
-        }
+            if (first != null) {
+                long millis = clinicDateToEpochMillis(first);
+                calendarView.setMinDate(millis);
+                if (preselectDate != null && workingDateSet.contains(preselectDate)) {
+                    LocalDate pre = BookingFormatters.parseIsoDate(preselectDate);
+                    if (pre != null) {
+                        calendarView.setDate(clinicDateToEpochMillis(pre), false, true);
+                        selectDate(preselectDate);
+                        return;
+                    }
+                }
+                calendarView.setDate(millis, false, true);
+                selectDate(first.format(ISO));
+            }
     }
 
     private void selectDate(String iso) {
@@ -310,8 +337,13 @@ public class BookingStep1Activity extends AppCompatActivity {
         if (selectedDate == null) return;
         LocalDate d = BookingFormatters.parseIsoDate(selectedDate);
         if (d == null) return;
-        long millis = d.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long millis = clinicDateToEpochMillis(d);
         calendarView.setDate(millis, false, true);
+    }
+
+    /** CalendarView dùng epoch millis; chuyển ngày phòng khám (VN) sang millis ổn định. */
+    private static long clinicDateToEpochMillis(@NonNull LocalDate day) {
+        return day.atStartOfDay(BookingPolicy.CLINIC_ZONE).toInstant().toEpochMilli();
     }
 
     // ---------- Load slots ----------
@@ -324,6 +356,7 @@ public class BookingStep1Activity extends AppCompatActivity {
         slotsContainer.removeAllViews();
 
         repo.fetchSlots(doctorId, iso, (data, error) -> {
+            if (!iso.equals(selectedDate)) return;
             slotsProgress.setVisibility(View.GONE);
             if (error != null) {
                 lastFetchedSlots = new ArrayList<>();
@@ -354,7 +387,26 @@ public class BookingStep1Activity extends AppCompatActivity {
                 }
             }
             setActiveSessionTab(anyMorning ? "morning" : "afternoon");
+            applyPreselectIfNeeded();
         });
+    }
+
+    private void applyPreselectIfNeeded() {
+        if (preselectSlotId == null || preselectDate == null || !preselectDate.equals(selectedDate)) {
+            return;
+        }
+        for (SlotDto s : lastFetchedSlots) {
+            if (s.slotId == null || !s.slotId.equals(preselectSlotId)) continue;
+            if (!Boolean.TRUE.equals(s.isAvailable)) continue;
+            if (BookingPolicy.violatesMinLead(selectedDate, s.startTime)) continue;
+            selectedSlot = s;
+            setActiveSessionTab(BookingFormatters.sessionOf(s.startTime));
+            continueBtn.setEnabled(true);
+            continueBtn.setAlpha(1f);
+            break;
+        }
+        preselectSlotId = null;
+        preselectDate = null;
     }
 
     private void renderSlots(List<SlotDto> slots) {
@@ -483,7 +535,7 @@ public class BookingStep1Activity extends AppCompatActivity {
             return;
         }
         ProfileExtras ex = sm.getProfileExtras();
-        if (!hasEnoughProfile(s, ex)) {
+        if (!BookingPolicy.hasEnoughProfile(s, ex)) {
             Toast.makeText(this, R.string.booking_need_complete_profile, Toast.LENGTH_LONG).show();
             openCompleteProfile();
             return;
@@ -521,20 +573,17 @@ public class BookingStep1Activity extends AppCompatActivity {
         Intent i = new Intent(this, BookingStep2Activity.class);
         d.writeTo(i);
         startActivity(i);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQ_COMPLETE_PROFILE) {
-            bindPatientCard();
-        }
+        finish();
     }
 
     // ---------- Utils ----------
 
     private String textOf(int id) {
         View v = findViewById(id);
+        if (v instanceof android.widget.EditText) {
+            CharSequence c = ((android.widget.EditText) v).getText();
+            return c == null ? "" : c.toString().trim();
+        }
         if (v instanceof TextView) {
             CharSequence c = ((TextView) v).getText();
             return c == null ? "" : c.toString().trim();

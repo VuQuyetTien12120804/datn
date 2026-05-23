@@ -16,7 +16,6 @@ import com.example.frontend_bookingcare.session.RoleRouter;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.account.AccountFragment;
 import com.example.frontend_bookingcare.ui.appointments.AppointmentsFragment;
-import com.example.frontend_bookingcare.ui.consult.ConsultFragment;
 import com.example.frontend_bookingcare.ui.home.HomeFragment;
 import com.example.frontend_bookingcare.ui.messages.MessagesFragment;
 import com.example.frontend_bookingcare.ui.support.SupportBottomSheetDialogFragment;
@@ -144,22 +143,32 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment createFragment(int menuId) {
         if (menuId == R.id.nav_appointments) return new AppointmentsFragment();
-        if (menuId == R.id.nav_consult) return new ConsultFragment();
         if (menuId == R.id.nav_messages) return new MessagesFragment();
         if (menuId == R.id.nav_account) return new AccountFragment();
         return new HomeFragment();
     }
 
+    /** Sau đăng nhập / đăng xuất / session hết hạn: làm mới header và các tab phụ thuộc session. */
+    public void refreshAfterAuthChange() {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment home = fm.findFragmentByTag(TAG_HOME);
+        if (home instanceof HomeFragment) {
+            ((HomeFragment) home).refreshUserHeader();
+        }
+        Fragment appts = fm.findFragmentByTag(TAG_APPOINTMENTS);
+        if (appts instanceof AppointmentsFragment) {
+            ((AppointmentsFragment) appts).reloadForSessionChange();
+        }
+        Fragment msgs = fm.findFragmentByTag(TAG_MESSAGES);
+        if (msgs instanceof MessagesFragment) {
+            ((MessagesFragment) msgs).reloadForSessionChange();
+        }
+    }
+
     /** Sau đăng nhập / đăng ký: chuyển tab Trang chủ và làm mới phần chào + tên. */
     public void navigateToHomeAfterAuth() {
         bottomNav.setSelectedItemId(R.id.nav_home);
-        bottomNav.post(() -> {
-            FragmentManager fm = getSupportFragmentManager();
-            Fragment home = fm.findFragmentByTag(TAG_HOME);
-            if (home instanceof HomeFragment) {
-                ((HomeFragment) home).refreshUserHeader();
-            }
-        });
+        bottomNav.post(this::refreshAfterAuthChange);
     }
 
     /**
