@@ -15,6 +15,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -110,7 +113,25 @@ public class BookingRepository {
             }
         });
     }
+    /**
+     * Trả về message thân thiện theo loại exception, giúp người dùng và lập trình viên
+     * phân biệt nguyên nhân (backend chưa chạy / sai địa chỉ / timeout / parse lỗi).
+     */
     private static String safeMessage(Exception e) {
+        android.util.Log.e("BookingRepository", "Booking call failed", e);
+        if (e instanceof ConnectException) {
+            return "Không kết nối được tới máy chủ. Kiểm tra backend đang chạy ở cổng 8085.";
+        }
+        if (e instanceof UnknownHostException) {
+            return "Không tìm thấy địa chỉ máy chủ. Kiểm tra cấu hình API_BASE_URL.";
+        }
+        if (e instanceof SocketTimeoutException) {
+            return "Máy chủ phản hồi quá chậm (timeout). Vui lòng thử lại.";
+        }
+        String msg = e.getMessage();
+        if (msg != null && !msg.isEmpty()) {
+            return RepoMessages.networkError() + " — " + msg;
+        }
         return RepoMessages.networkError();
     }
 }

@@ -2,14 +2,11 @@ package com.example.frontend_bookingcare.ui.appointments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.EditText;
 
 import android.content.Intent;
 
@@ -29,7 +26,6 @@ import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.booking.BookingFormatters;
 import com.example.frontend_bookingcare.ui.common.HeaderInsets;
 import com.example.frontend_bookingcare.ui.common.PatientEmptyUi;
-import com.example.frontend_bookingcare.ui.common.UnicodeInputHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 
@@ -44,10 +40,8 @@ public class AppointmentsFragment extends Fragment {
     private View emptyState;
     private SwipeRefreshLayout refresh;
     private TabLayout tabs;
-    private EditText search;
     private final PatientAppointmentsRepository repository = new PatientAppointmentsRepository();
     private int selectedTab = 0;
-    private String query = "";
     private List<PatientAppointmentDto> last = new ArrayList<>();
     private ActivityResultLauncher<Intent> ticketLauncher;
 
@@ -69,17 +63,6 @@ public class AppointmentsFragment extends Fragment {
         emptyState = view.findViewById(R.id.appointments_empty);
         refresh = view.findViewById(R.id.appointments_refresh);
         tabs = view.findViewById(R.id.appointments_tabs);
-        search = view.findViewById(R.id.appointments_search);
-        UnicodeInputHelper.enableSingleLineText(search);
-        search.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-                if (UnicodeInputHelper.isImeComposing(s)) return;
-                query = s != null ? s.toString().trim() : "";
-                fillCards(last, null);
-            }
-        });
         tabs.addTab(tabs.newTab().setText(R.string.tab_upcoming));
         tabs.addTab(tabs.newTab().setText(R.string.tab_completed));
         tabs.addTab(tabs.newTab().setText(R.string.tab_cancelled));
@@ -190,17 +173,6 @@ public class AppointmentsFragment extends Fragment {
         String patientName = sm.getSession() != null && !TextUtils.isEmpty(sm.getSession().fullName) ? sm.getSession().fullName : "—";
 
         for (PatientAppointmentDto a : list) {
-            if (!TextUtils.isEmpty(query)) {
-                String needle = query.toLowerCase();
-                String code = AppointmentCodes.appointmentCode(
-                        a.appointmentId != null ? a.appointmentId : 0, a.appointmentDate);
-                String hay = (a.doctorName != null ? a.doctorName : "") + " " + patientName
-                        + " " + (a.appointmentDate != null ? a.appointmentDate : "")
-                        + " " + (a.appointmentId != null ? a.appointmentId : "")
-                        + " " + code;
-                if (!hay.toLowerCase().contains(needle)) continue;
-            }
-
             View v = inf.inflate(R.layout.item_appointment_card, cards, false);
             TextView name = v.findViewById(R.id.appt_doctor_name);
             TextView spec = v.findViewById(R.id.appt_specialty);
@@ -208,11 +180,20 @@ public class AppointmentsFragment extends Fragment {
             TextView st = v.findViewById(R.id.appt_status_text);
             TextView stt = v.findViewById(R.id.appt_stt);
             TextView p = v.findViewById(R.id.appt_patient);
+            TextView avatar = v.findViewById(R.id.appt_doctor_avatar);
+            View accent = v.findViewById(R.id.appt_accent_bar);
             v.findViewById(R.id.appt_cancel).setVisibility(View.GONE);
             v.findViewById(R.id.appt_detail).setVisibility(View.GONE);
 
-            name.setText(a.doctorName != null ? a.doctorName : "—");
-            spec.setText(!TextUtils.isEmpty(a.specialty) ? a.specialty : "");
+            String doctorName = a.doctorName != null ? a.doctorName : "—";
+            name.setText(doctorName);
+            AppointmentCardUi.bindDoctorAvatar(avatar, doctorName, requireContext());
+            if (!TextUtils.isEmpty(a.specialty)) {
+                spec.setText(a.specialty);
+                spec.setVisibility(View.VISIBLE);
+            } else {
+                spec.setVisibility(View.GONE);
+            }
             String lineTime = BookingFormatters.timeRange(a.startTime, a.endTime);
             String lineDate = BookingFormatters.prettyDate(requireContext(), a.appointmentDate);
             time.setText(lineTime + " · " + lineDate);
@@ -225,11 +206,12 @@ public class AppointmentsFragment extends Fragment {
             p.setText(getString(R.string.appt_patient_fmt, patientName));
             String tabText = statusDisplay(a.status, selectedTab);
             st.setText(tabText);
+            AppointmentCardUi.bindStatus(st, accent, a.status, requireContext());
             cards.addView(v);
 
             v.setOnClickListener(vv -> {
                 int apptId = a.appointmentId != null ? a.appointmentId : 0;
-                String doctorName = a.doctorName != null ? a.doctorName : "";
+                String docName = a.doctorName != null ? a.doctorName : "";
                 String d = a.appointmentDate != null ? a.appointmentDate : "";
                 String stTime = a.startTime != null ? a.startTime : "";
                 String enTime = a.endTime != null ? a.endTime : "";
@@ -240,7 +222,7 @@ public class AppointmentsFragment extends Fragment {
                             requireContext(),
                             apptId,
                             docId,
-                            doctorName,
+                            docName,
                             d,
                             stTime,
                             enTime,
@@ -251,7 +233,7 @@ public class AppointmentsFragment extends Fragment {
                             requireContext(),
                             apptId,
                             docId,
-                            doctorName,
+                            docName,
                             d,
                             stTime,
                             enTime,
@@ -259,15 +241,6 @@ public class AppointmentsFragment extends Fragment {
                     ));
                 }
             });
-        }
-
-        if (cards.getChildCount() == 0 && !TextUtils.isEmpty(query)) {
-            cards.setVisibility(View.GONE);
-            if (emptyState != null) {
-                emptyState.setVisibility(View.VISIBLE);
-                PatientEmptyUi.bind(emptyState, android.R.drawable.ic_menu_search,
-                        R.string.search_no_results_title, R.string.search_no_results_hint);
-            }
         }
     }
 

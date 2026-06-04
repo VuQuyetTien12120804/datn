@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,9 @@ public class PatientService {
     private final DoctorRepository doctorRepository;
     private final AppointmentSlotService appointmentSlotService;
     private final AppointmentQueueService appointmentQueueService;
+    private final AppointmentExpiryService appointmentExpiryService;
+
+    private static final ZoneOffset VN = ZoneOffset.ofHours(7);
 
     @PersistenceContext
     private EntityManager em;
@@ -77,16 +81,19 @@ public class PatientService {
         return toProfileMap(patient);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Map<String, Object>> listAppointments(int accountId, String group) {
+        appointmentExpiryService.expireUnconfirmedPastPending();
+
         Patient patient = patientRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new ApiException(404, "Chưa có hồ sơ bệnh nhân"));
 
         String normalizedGroup = group != null ? group.trim().toUpperCase(Locale.ROOT) : "UPCOMING";
+        OffsetDateTime now = OffsetDateTime.now(VN);
         List<Appointment> all = appointmentRepository.findByPatientIdOrderByStartsAtDesc(patient.getId());
         List<Map<String, Object>> out = new ArrayList<>();
         for (Appointment a : all) {
-            if (!matchesGroup(a.getStatus(), normalizedGroup)) {
+            if (!matchesGroup(a, normalizedGroup, now)) {
                 continue;
             }
             out.add(toAppointmentMap(a));
@@ -161,12 +168,14 @@ public class PatientService {
         return m;
     }
 
-    private boolean matchesGroup(String dbStatus, String group) {
-        String s = dbStatus != null ? dbStatus.toLowerCase(Locale.ROOT) : "pending";
+    private boolean matchesGroup(Appointment a, String group, OffsetDateTime now) {
+        String s = a.getStatus() != null ? a.getStatus().toLowerCase(Locale.ROOT) : "pending";
         return switch (group) {
             case "COMPLETED" -> "completed".equals(s);
             case "CANCELLED" -> CANCELLED_GROUP.contains(s);
-            default -> UPCOMING.contains(s);
+            default -> UPCOMING.contains(s)
+                    && a.getEndsAt() != null
+                    && !a.getEndsAt().isBefore(now);
         };
     }
 
@@ -181,6 +190,7 @@ public class PatientService {
         m.put("endTime", DateTimeFormatUtil.toTimeHm(a.getEndsAt()));
         m.put("status", StatusMapper.toApi(a.getStatus()));
         m.put("reason", a.getReason());
+        m.put("cancelReason", a.getCancelReason());
         m.put("clinicalNote", a.getNote());
         Integer queueNo = appointmentQueueService.queueNumberFor(a.getId());
         if (queueNo != null) {

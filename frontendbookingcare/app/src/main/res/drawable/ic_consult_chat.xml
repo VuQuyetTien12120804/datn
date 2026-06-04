@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Icon "Tư vấn qua chat" cho FAB tab Tin nhắn.
+  Cùng ngôn ngữ với tab Consult (headset) nhưng thêm chat bubble nhỏ ở góc dưới
+  để phân biệt: nhấn vào không phải gọi điện mà mở cuộc hội thoại với CSKH.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Headset (cùng pattern với ic_nav_consult, thu nhỏ để nhường chỗ cho bubble) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,2C6.58,2 3,5.58 3,10v6c0,1.1 0.9,2 2,2h2v-7H5v-1c0,-3.31 2.69,-6 6,-6s6,2.69 6,6v1h-2v7h1v-2.5h2.5v-3h-2.5V10c0,-4.42 -3.58,-8 -8,-8z" />
+
+    <!-- Chat bubble nhỏ ở góc dưới phải — biểu thị "chat" -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M22,16.5h-7c-0.55,0 -1,0.45 -1,1v4c0,0.55 0.45,1 1,1h0.5l1.5,1.5v-1.5H22c0.55,0 1,-0.45 1,-1v-4C23,16.95 22.55,16.5 22,16.5z" />
+
+    <!-- 2 chấm trong chat bubble (sử dụng màu primary để đối lập với nền trắng FAB) -->
+    <path
+        android:fillColor="#0B84FF"
+        android:pathData="M17,19.5m-0.7,0a0.7,0.7 0 1,1 1.4,0a0.7,0.7 0 1,1 -1.4,0" />
+    <path
+        android:fillColor="#0B84FF"
+        android:pathData="M19.5,19.5m-0.7,0a0.7,0.7 0 1,1 1.4,0a0.7,0.7 0 1,1 -1.4,0" />
+</vector>

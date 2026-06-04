@@ -1,0 +1,36 @@
+================================================================================
+CẤU TRÚC WEB-ADMIN/SRC — CHÈN BÁO CÁO (CHUYÊN NGHIỆP)
+================================================================================
+
+CÁCH 1 — Chụp ảnh đẹp nhất (khuyên dùng)
+  1. Mở file: d:\datn\assets\web-admin-src-structure.html (double-click → trình duyệt)
+  2. Zoom 100–110%, chụp màn hình vùng khung trắng
+  3. Chèn vào Word → Hình 3.x. Cấu trúc thư mục mã nguồn Web Admin
+
+CÁCH 2 — Mermaid (draw.io / mermaid.live)
+  1. Mở https://mermaid.live
+  2. Dán nội dung file: d:\datn\assets\web-admin-src-structure.mmd
+  3. Export PNG hoặc SVG → chèn Word
+
+CÁCH 3 — Bảng Word 3 cột (copy trực tiếp)
+
+| Thư mục / Tệp | Vai trò | Mô tả ngắn |
+|---------------|---------|------------|
+| web-admin/src/ | Gốc mã nguồn | Thư mục chính website quản trị React + TypeScript |
+| main.tsx | Entry point | Khởi tạo React, QueryClientProvider, BrowserRouter |
+| App.tsx | Routing | Khai báo route, bọc RequireAdmin guard |
+| layout/AdminLayout.tsx | Layout | Sidebar, header, vùng Outlet hiển thị trang con |
+| pages/ | UI module | 10 trang: Dashboard, Appointments, Doctors, Patients, Accounts, Specialties, Services, Rooms, Slots, Messages, Login |
+| api/http.ts | HTTP client | Axios instance, base URL, JWT interceptor (401 → logout) |
+| api/auth.ts | Auth API | Gọi adminLogin |
+| api/admin.ts | Admin API | CRUD master data, lịch hẹn, báo cáo, chat CSKH |
+| api/types.ts | Types | Kiểu TypeScript dùng chung |
+| auth/storage.ts | Session | Lưu/đọc token admin từ localStorage |
+| ui/ | Shared UI | TableCard, TableShell, EmptyState, appointmentStatus, validators… |
+| theme/theme.ts | Theme | Token màu, CSS variables, override Ant Design |
+
+Ghi chú dưới hình/bảng (1 dòng):
+  Biến môi trường VITE_API_BASE_URL (mặc định http://localhost:8085) trỏ tới backend;
+  ghi đè bằng file .env trong web-admin/. Lệnh: npm run dev | npm run build.
+
+================================================================================

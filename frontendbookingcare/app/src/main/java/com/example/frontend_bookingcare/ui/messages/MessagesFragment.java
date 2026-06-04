@@ -1,8 +1,6 @@
 package com.example.frontend_bookingcare.ui.messages;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -83,11 +81,27 @@ public class MessagesFragment extends Fragment {
             }
         });
 
+        // FAB tư vấn: mở thẳng chat với CSKH (cùng thread "support:cskh" với
+        // SupportBottomSheetDialogFragment) — thay vì gọi điện như phiên bản trước.
         FloatingActionButton fab = view.findViewById(R.id.messages_fab);
-        fab.setOnClickListener(v -> {
-            Intent dial = new Intent(Intent.ACTION_DIAL, Uri.parse(getString(R.string.account_support_phone_uri)));
-            startActivity(dial);
-        });
+        fab.setOnClickListener(v -> openSupportChat());
+    }
+
+    /** Mở chat CSKH; nếu chưa đăng nhập thì điều hướng sang tab Tài khoản. */
+    private void openSupportChat() {
+        SessionManager sm = new SessionManager(requireContext());
+        if (!sm.isLoggedIn() || sm.getSession() == null
+                || TextUtils.isEmpty(sm.getSession().accessToken)) {
+            Toast.makeText(requireContext(), R.string.chat_login_required, Toast.LENGTH_SHORT).show();
+            openAccountTab();
+            return;
+        }
+        startActivity(CustomerCareChatActivity.newIntent(
+                requireContext(),
+                "support:cskh",
+                getString(R.string.support_cskh_title),
+                null,
+                false));
     }
 
     @Override

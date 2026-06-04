@@ -24,15 +24,4 @@
             android:scrollbars="vertical" />
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/account_fab_call"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:contentDescription="@string/account_support_call"
-        app:backgroundTint="@color/account_fab_orange"
-        android:src="@android:drawable/ic_menu_call"
-        app:tint="@color/white" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

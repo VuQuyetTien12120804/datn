@@ -81,8 +81,9 @@ public class BookingResultActivity extends AppCompatActivity {
         });
     }
 
+    /** Luôn lấy STT từ server sau khi đặt — tránh STT=1 cố định khi response book chưa khớp danh sách lịch. */
     private void loadQueueNumberIfNeeded() {
-        if (queueNumber > 0 || appointmentId <= 0) {
+        if (appointmentId <= 0) {
             bindQueue();
             return;
         }
@@ -187,11 +188,18 @@ public class BookingResultActivity extends AppCompatActivity {
 
     // ---------- Navigation ----------
 
+    /**
+     * Quay về MainActivity (Home) và đóng toàn bộ stack đặt lịch.
+     * <p>Dùng {@code CLEAR_TOP | SINGLE_TOP} để mang MainActivity đang có sẵn lên top,
+     * các activity nằm giữa (DoctorList, DoctorDetail, BookingStep1/2) sẽ bị finish.
+     * Sau đó chỉ {@code finish()} riêng activity hiện tại — tránh dùng
+     * {@code finishAffinity()} vì sẽ đóng cả MainActivity vừa được resume → crash app.
+     */
     private void goHome() {
         Intent i = new Intent(this, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(i);
-        finishAffinity();
+        finish();
     }
 
     // ---------- Utils ----------

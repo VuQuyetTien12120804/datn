@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/brand_primary"
-        app:navigationIcon="@drawable/ic_auth_back"
+        app:navigationIcon="@drawable/ic_nav_back"
         app:navigationIconTint="@color/white"
         app:title="@string/complete_profile_title"
         app:titleTextColor="@color/white" />
@@ -38,23 +38,24 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="12dp"
+                android:hint="@string/phone">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cp_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/phone" />
+                    android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:hint="@string/complete_profile_dob_hint">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cp_dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/complete_profile_dob_hint"
                     android:focusable="false"
                     android:clickable="true"
                     android:inputType="none" />
@@ -76,12 +77,12 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:hint="@string/address">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cp_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/address"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 

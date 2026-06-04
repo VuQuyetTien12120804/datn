@@ -16,9 +16,9 @@ import com.example.frontend_bookingcare.session.RoleRouter;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.account.AccountFragment;
 import com.example.frontend_bookingcare.ui.appointments.AppointmentsFragment;
+import com.example.frontend_bookingcare.ui.chatbot.ChatbotActivity;
 import com.example.frontend_bookingcare.ui.home.HomeFragment;
 import com.example.frontend_bookingcare.ui.messages.MessagesFragment;
-import com.example.frontend_bookingcare.ui.support.SupportBottomSheetDialogFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -104,10 +104,17 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean onBottomItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.nav_consult) {
-            // YouMed-like: open support bottom sheet, keep current tab
-            SupportBottomSheetDialogFragment.newInstance()
-                    .show(getSupportFragmentManager(), "support_sheet_bottom_nav");
-            // returning false keeps previous selected item
+            // Mở ChatbotActivity (rule-based assistant). Yêu cầu đăng nhập trước —
+            // nếu chưa, chuyển sang tab Tài khoản để user login.
+            SessionManager sm = new SessionManager(this);
+            if (!sm.isLoggedIn() || sm.getSession() == null
+                    || sm.getSession().accessToken == null
+                    || sm.getSession().accessToken.isEmpty()) {
+                bottomNav.setSelectedItemId(R.id.nav_account);
+                return true;
+            }
+            startActivity(ChatbotActivity.newIntent(this));
+            // Giữ tab cũ — không chuyển sang tab Tư vấn
             bottomNav.setSelectedItemId(lastNonConsultMenuId);
             return false;
         }

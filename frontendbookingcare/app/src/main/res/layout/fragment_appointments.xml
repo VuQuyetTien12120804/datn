@@ -4,7 +4,6 @@
     android:id="@+id/appointments_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/home_page_bg">
 
     <LinearLayout
@@ -13,83 +12,103 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/appointments_toolbar"
-            style="@style/Widget.Frontendbookingcare.HeaderToolbar"
+        <!-- Header gradient -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/brand_primary"
-            app:title="@string/appointments_title"
-            app:titleTextColor="@color/white"
-            app:titleCentered="true" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/appointments_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:tabIndicatorColor="@color/brand_primary"
-            app:tabSelectedTextColor="@color/text_primary"
-            app:tabTextColor="@color/text_secondary_dim"
-            app:tabMode="scrollable" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="999dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/divider_line"
-            app:cardBackgroundColor="@color/white">
+            android:background="@drawable/bg_profile_header"
+            android:paddingBottom="28dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="14dp"
-                android:paddingVertical="10dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:tint="@color/text_secondary_dim"
-                    android:src="@android:drawable/ic_menu_search"
-                    android:contentDescription="@null" />
-
-                <EditText
-                    android:id="@+id/appointments_search"
-                    android:layout_width="0dp"
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/appointments_toolbar"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:background="@null"
-                    android:hint="@string/search_hint_appointments"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_muted" />
+                    android:background="@android:color/transparent"
+                    android:elevation="0dp"
+                    app:title=""
+                    app:titleCentered="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/appointments_title"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_headline"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:alpha="0.92"
+                    android:text="@string/appointments_header_subtitle"
+                    android:textColor="@color/text_on_brand_dim"
+                    android:textSize="@dimen/text_caption" />
             </LinearLayout>
+        </FrameLayout>
+
+        <!-- Tab 3D -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="-18dp"
+            android:layout_marginEnd="16dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/appointments_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_appointments_tabs_card"
+                android:minHeight="48dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="@color/brand_primary"
+                app:tabIndicatorFullWidth="false"
+                app:tabIndicatorHeight="3dp"
+                app:tabMode="fixed"
+                app:tabRippleColor="@color/chip_specialty_bg"
+                app:tabSelectedTextColor="@color/brand_primary"
+                app:tabTextColor="@color/text_secondary_dim" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Danh sách lịch (không có ô search — paddingTop nhỏ) -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:fillViewport="true">
+            android:clipToPadding="true"
+            android:fillViewport="true"
+            android:overScrollMode="never">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:minHeight="200dp">
 
                 <LinearLayout
                     android:id="@+id/appointments_cards"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingHorizontal="12dp"
-                    android:paddingBottom="12dp" />
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="24dp" />
 
                 <include
                     android:id="@+id/appointments_empty"

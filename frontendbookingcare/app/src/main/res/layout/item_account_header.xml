@@ -1,12 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_account_header"
     android:orientation="vertical"
-    android:paddingBottom="28dp">
+    android:paddingBottom="36dp">
 
+    <!-- Top bar: chỉ có nút back; chiếm chiều cao cố định để cân với status bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,38 +23,42 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/back"
-            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="@string/cd_navigate_up"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_nav_back"
             app:tint="@color/white" />
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="88dp"
-        android:layout_height="88dp"
+    <!-- Avatar: bo tròn 100% bằng ShapeableImageView; viền trắng 3dp + shadow nhẹ -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/account_header_avatar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/bg_avatar_ring"
-        android:padding="4dp">
+        android:layout_marginTop="4dp"
+        android:background="@android:color/white"
+        android:contentDescription="@null"
+        android:elevation="4dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_account_avatar_default"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.AvatarCircle"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="3dp" />
 
-        <ImageView
-            android:id="@+id/account_header_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/surface_muted"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_myplaces" />
-    </FrameLayout>
-
+    <!-- Tên hiển thị (logged in) hoặc placeholder "Khách" (guest) -->
     <TextView
         android:id="@+id/account_header_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_title"
-        android:textStyle="bold" />
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.01" />
 
+    <!-- Hai nút Đăng nhập / Đăng ký (chỉ hiển thị khi guest) -->
     <LinearLayout
         android:id="@+id/account_header_guest_actions"
         android:layout_width="match_parent"
@@ -92,13 +97,18 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <!-- Email (chỉ hiển thị khi đã đăng nhập) — dùng pill nền trắng mờ để dễ đọc -->
     <TextView
         android:id="@+id/account_header_subtitle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_account_subtitle_pill"
         android:gravity="center"
-        android:textColor="#E6FFFFFF"
-        android:textSize="@dimen/text_small"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="6dp"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
         android:visibility="gone" />
 </LinearLayout>

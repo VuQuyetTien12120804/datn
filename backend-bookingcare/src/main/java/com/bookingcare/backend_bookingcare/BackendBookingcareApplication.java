@@ -5,8 +5,10 @@ import com.bookingcare.backend_bookingcare.security.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 @EnableConfigurationProperties({JwtProperties.class, MailProperties.class})
 public class BackendBookingcareApplication {
 

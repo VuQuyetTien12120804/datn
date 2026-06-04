@@ -25,4 +25,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     long countBySlotIdAndStatusIn(Integer slotId, Collection<String> statuses);
 
     boolean existsByPatientIdAndDoctorIdAndStatusNotIn(Integer patientId, Integer doctorId, Collection<String> statuses);
+
+    List<Appointment> findByStatusAndEndsAtBefore(String status, OffsetDateTime endsAt);
 }

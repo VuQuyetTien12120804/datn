@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -30,7 +30,7 @@
             android:contentDescription="@string/cd_navigate_up"
             android:padding="14dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_auth_back" />
+            android:src="@drawable/ic_nav_back" />
     </FrameLayout>
 
     <ScrollView
@@ -70,14 +70,6 @@
                     android:textColor="@color/auth_brand_green"
                     android:textSize="@dimen/text_display"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/auth_id_suffix"
-                    android:textColor="@color/auth_brand_blue"
-                    android:textSize="@dimen/text_display"
-                    android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
@@ -94,13 +86,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/email">
+                android:hint="@string/auth_hint_email">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/auth_hint_email"
                     android:inputType="textEmailAddress"
                     android:minHeight="52dp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -110,14 +101,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:hint="@string/password"
+                android:hint="@string/auth_hint_password"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/auth_hint_password"
                     android:inputType="textPassword"
                     android:minHeight="52dp" />
             </com.google.android.material.textfield.TextInputLayout>

@@ -28,12 +28,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MessagingService {
 
+    /** Chỉ chặn nhắn tin khi mọi lịch với BS đó đều thuộc nhóm này (hủy / không đến). */
     private static final Set<String> CHAT_BLOCK_STATUSES = Set.of("cancelled", "no_show");
-    private static final Set<String> CHAT_ACTIVE_STATUSES = Set.of(
-            AppointmentStatus.PENDING,
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN
-    );
     private static final String THREAD_DOCTOR = "doctor";
     private static final String THREAD_SUPPORT = "support";
 
@@ -281,15 +277,14 @@ public class MessagingService {
             throw new ApiException(400, "Invalid doctor thread");
         }
         if (!patientCanChatWithDoctor(patientId, thread.getDoctorId())) {
-            throw new ApiException(403, "Không thể nhắn tin khi lịch hẹn đã kết thúc hoặc đã hủy");
+            throw new ApiException(403, "Không tìm thấy bác sĩ");
         }
     }
 
+    /** Bệnh nhân được nhắn mọi bác sĩ (kể cả chưa đặt lịch, lịch đã khám xong). */
     private boolean patientCanChatWithDoctor(int patientId, int doctorId) {
         List<Integer> siblingIds = siblingDoctorIds(doctorId);
-        return appointmentRepository.findByPatientIdOrderByStartsAtDesc(patientId).stream()
-                .filter(a -> a.getDoctorId() != null && siblingIds.contains(a.getDoctorId()))
-                .anyMatch(a -> CHAT_ACTIVE_STATUSES.contains(AppointmentStatus.normalize(a.getStatus())));
+        return doctorRepository.findById(siblingIds.get(0)).isPresent();
     }
 
     private List<Integer> siblingDoctorIds(int doctorId) {

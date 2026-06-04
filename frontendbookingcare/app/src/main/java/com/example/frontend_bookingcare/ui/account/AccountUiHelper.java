@@ -7,6 +7,7 @@ import android.view.ViewParent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -106,7 +107,9 @@ public final class AccountUiHelper {
                 return;
             }
         }
-        toolbar.setNavigationIcon(AppCompatResources.getDrawable(fragment.requireContext(), R.drawable.ic_auth_back));
+        toolbar.setNavigationIcon(AppCompatResources.getDrawable(fragment.requireContext(), R.drawable.ic_nav_back));
+        toolbar.setNavigationIconTint(
+                ContextCompat.getColor(fragment.requireContext(), R.color.white));
         toolbar.setNavigationContentDescription(fragment.getString(R.string.cd_navigate_up));
         toolbar.setNavigationOnClickListener(v -> navigateUp(fragment));
     }

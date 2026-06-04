@@ -3,6 +3,7 @@ package com.bookingcare.backend_bookingcare.controller;
 import com.bookingcare.backend_bookingcare.common.ApiEnvelope;
 import com.bookingcare.backend_bookingcare.dto.BookingRequestDto;
 import com.bookingcare.backend_bookingcare.security.CurrentAccountService;
+import com.bookingcare.backend_bookingcare.service.AppointmentQueueService;
 import com.bookingcare.backend_bookingcare.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final AppointmentQueueService appointmentQueueService;
     private final CurrentAccountService currentAccountService;
 
     @GetMapping("/working-dates")
@@ -40,6 +42,15 @@ public class BookingController {
     @PostMapping("/book")
     public ApiEnvelope<Map<String, Object>> book(@Valid @RequestBody BookingRequestDto body) {
         int accountId = currentAccountService.requireUser().getAccountId();
-        return ApiEnvelope.ok(bookingService.book(accountId, body));
+        Map<String, Object> result = bookingService.book(accountId, body);
+        // Tính queue sau khi transaction đặt lịch đã commit — khớp tab Lịch hẹn.
+        Object id = result.get("appointmentId");
+        if (id instanceof Number num) {
+            Integer queueNo = appointmentQueueService.queueNumberFor(num.intValue());
+            if (queueNo != null) {
+                result.put("queueNumber", queueNo);
+            }
+        }
+        return ApiEnvelope.ok(result);
     }
 }

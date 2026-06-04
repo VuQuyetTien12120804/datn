@@ -55,7 +55,7 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.VH> {
         h.preview.setText(t.preview);
         h.time.setText(t.timeLabel);
         h.lock.setVisibility(t.locked ? View.VISIBLE : View.GONE);
-        PatientAvatarUi.styleLetterAvatar(h.avatarLetter, t.title, h.itemView.getContext());
+        PatientAvatarUi.styleLetterAvatar3D(h.avatarLetter, t.title, h.itemView.getContext());
         h.avatarLetter.setText(firstLetter(t.title));
         if (t.unreadCount > 0) {
             h.unread.setVisibility(View.VISIBLE);

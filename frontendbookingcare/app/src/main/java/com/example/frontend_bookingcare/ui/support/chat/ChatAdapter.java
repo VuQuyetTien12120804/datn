@@ -33,6 +33,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VH> {
         notifyItemInserted(items.size() - 1);
     }
 
+    /** Xoá item cuối cùng (dùng cho placeholder "đang trả lời"). */
+    public void removeLast() {
+        if (items.isEmpty()) return;
+        int idx = items.size() - 1;
+        items.remove(idx);
+        notifyItemRemoved(idx);
+    }
+
+    /** Trả về item cuối cùng hoặc null nếu rỗng. */
+    public ChatMessage lastItem() {
+        return items.isEmpty() ? null : items.get(items.size() - 1);
+    }
+
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

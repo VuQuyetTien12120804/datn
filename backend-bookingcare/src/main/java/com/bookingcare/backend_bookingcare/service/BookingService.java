@@ -4,6 +4,7 @@ import com.bookingcare.backend_bookingcare.common.ApiException;
 import com.bookingcare.backend_bookingcare.common.StatusMapper;
 import com.bookingcare.backend_bookingcare.dto.BookingRequestDto;
 import com.bookingcare.backend_bookingcare.entity.Account;
+import com.bookingcare.backend_bookingcare.entity.Appointment;
 import com.bookingcare.backend_bookingcare.entity.AppointmentSlot;
 import com.bookingcare.backend_bookingcare.entity.Patient;
 import com.bookingcare.backend_bookingcare.repository.AccountRepository;
@@ -133,33 +134,34 @@ public class BookingService {
 
         appointmentSlotService.syncBookedCount(slot.getId());
 
-        // Đảm bảo giờ lưu khớp slot (+07:00) — phòng JDBC/legacy ghi sai offset.
-        appointmentRepository.findById(newId).ifPresent(a -> {
-            OffsetDateTime slotStarts = DateTimeFormatUtil.toClinicOffset(slot.getStartsAt());
-            OffsetDateTime slotEnds = DateTimeFormatUtil.toClinicOffset(slot.getEndsAt());
-            if (!slotStarts.equals(a.getStartsAt()) || !slotEnds.equals(a.getEndsAt())) {
-                a.setStartsAt(slotStarts);
-                a.setEndsAt(slotEnds);
-                appointmentRepository.save(a);
-            }
-        });
+        // Luôn chuẩn hóa giờ từ slot (+07) trước khi tính queue — tránh STT = 1 sai trên phiếu kết quả.
+        Appointment saved = appointmentRepository.findById(newId)
+                .orElseThrow(() -> new ApiException(500, "Không tạo được lịch hẹn"));
+        OffsetDateTime slotStarts = DateTimeFormatUtil.toClinicOffset(slot.getStartsAt());
+        OffsetDateTime slotEnds = DateTimeFormatUtil.toClinicOffset(slot.getEndsAt());
+        saved.setStartsAt(slotStarts);
+        saved.setEndsAt(slotEnds);
+        appointmentRepository.saveAndFlush(saved);
 
-        return appointmentRepository.findById(newId).map(a -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("appointmentId", a.getId());
-            m.put("doctorId", a.getDoctorId());
-            m.put("appointmentDate", DateTimeFormatUtil.toIsoDate(a.getStartsAt()));
-            m.put("startTime", DateTimeFormatUtil.toTimeHm(a.getStartsAt()));
-            m.put("endTime", DateTimeFormatUtil.toTimeHm(a.getEndsAt()));
-            m.put("status", StatusMapper.toApi(a.getStatus()));
-            m.put("notes", a.getNote());
-            m.put("createdAt", a.getCreatedAt() != null ? a.getCreatedAt().toString() : null);
-            Integer queueNo = appointmentQueueService.queueNumberFor(a.getId());
-            if (queueNo != null) {
-                m.put("queueNumber", queueNo);
-            }
-            return m;
-        }).orElseThrow(() -> new ApiException(500, "Không tạo được lịch hẹn"));
+        return buildBookingResponse(saved);
+    }
+
+    /** Gọi sau khi lịch đã flush — queue đếm đủ các lịch cùng BS trong ngày. */
+    public Map<String, Object> buildBookingResponse(Appointment a) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("appointmentId", a.getId());
+        m.put("doctorId", a.getDoctorId());
+        m.put("appointmentDate", DateTimeFormatUtil.toIsoDate(a.getStartsAt()));
+        m.put("startTime", DateTimeFormatUtil.toTimeHm(a.getStartsAt()));
+        m.put("endTime", DateTimeFormatUtil.toTimeHm(a.getEndsAt()));
+        m.put("status", StatusMapper.toApi(a.getStatus()));
+        m.put("notes", a.getNote());
+        m.put("createdAt", a.getCreatedAt() != null ? a.getCreatedAt().toString() : null);
+        Integer queueNo = appointmentQueueService.queueNumberFor(a.getId());
+        if (queueNo != null) {
+            m.put("queueNumber", queueNo);
+        }
+        return m;
     }
 
     private void syncPatientFromBooking(Patient patient, int accountId, BookingRequestDto req) {

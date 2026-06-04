@@ -148,6 +148,8 @@
     <string name="doctor_detail_schedule_cta_hint">⏱ Lịch khám ở đây chỉ minh hoạ. Vui lòng bấm “Đặt khám” để chọn lịch thật.</string>
     <string name="doctor_detail_address_default">Chưa có thông tin phòng mạch</string>
     <string name="doctor_detail_open_map">📍 Mở bản đồ</string>
+    <string name="doctor_detail_work_hours_label">Giờ làm việc</string>
+    <string name="doctor_detail_work_hours_default">Thứ 2 - Thứ 6 · 7:00 - 11:30, 13:30 - 17:30</string>
     <string name="doctor_detail_section_intro">👤 Giới thiệu</string>
     <string name="doctor_detail_bio_default">Bác sĩ hiện đang công tác tại phòng khám. Thông tin chi tiết sẽ được cập nhật sớm.</string>
     <string name="doctor_detail_bio_benefits_title">Các tiện ích khi đặt khám qua ClinicBooking:</string>
@@ -288,11 +290,12 @@
     <string name="book_slot">Đặt lịch</string>
 
     <string name="appointments_title">Lịch khám của tôi</string>
+    <string name="appointments_header_subtitle">Theo dõi lịch sắp tới, đã khám và đã hủy</string>
     <string name="appointments_empty_hint">Chưa có lịch khám nào trong mục này.</string>
     <string name="appointments_empty_title">Chưa có lịch khám</string>
     <string name="appointments_error_title">Không tải được lịch khám</string>
     <string name="session_expired">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</string>
-    <string name="chat_locked_hint">Cuộc trò chuyện đã kết thúc — không thể gửi tin nhắn.</string>
+    <string name="chat_locked_hint">Lịch hẹn đã hủy hoặc không đến — không thể gửi tin nhắn.</string>
     <string name="chat_doctor_title_fmt">Bác sĩ %1$s</string>
     <string name="patient_code_loading">Đang tải mã bệnh nhân…</string>
     <string name="messages_login_title">Đăng nhập để xem tin nhắn</string>
@@ -305,10 +308,17 @@
     <string name="profile_dob_hint">dd/MM/yyyy</string>
     <string name="profile_dob_invalid">Ngày sinh không hợp lệ (dd/MM/yyyy).</string>
     <string name="messages_title">Tin nhắn</string>
+    <string name="messages_header_subtitle">Trao đổi với bác sĩ &amp; chăm sóc khách hàng</string>
     <string name="messages_search_hint">Tìm theo tên bác sĩ, nội dung…</string>
     <string name="support_cskh_title">Chăm Sóc Khách Hàng</string>
     <string name="chat_login_required">Vui lòng đăng nhập để nhắn tin.</string>
     <string name="chat_input_hint">Gửi tin nhắn</string>
+    <string name="chatbot_title">Trợ lý ClinicBooking</string>
+    <string name="chatbot_subtitle">Hỗ trợ tư vấn đặt lịch, chuyên khoa, FAQ</string>
+    <string name="chatbot_badge_ai">🤖 AI</string>
+    <string name="chatbot_input_hint">Hỏi tôi bất cứ điều gì…</string>
+    <string name="chatbot_thinking">Trợ lý đang trả lời…</string>
+    <string name="chatbot_login_required">Vui lòng đăng nhập để dùng trợ lý.</string>
     <string name="home_bell_cd">Thông báo</string>
     <string name="home_bell_hint">Xem thông báo lịch khám</string>
 
@@ -375,7 +385,6 @@
     <!-- Auth / đăng ký kiểu YouMed (email + OTP) -->
     <string name="auth_brand_part1">Clinic</string>
     <string name="auth_brand_part2">Booking</string>
-    <string name="auth_id_suffix"> ID</string>
     <string name="auth_login_section_title">Thông tin đăng nhập</string>
     <string name="auth_hint_email">Nhập email của bạn</string>
     <string name="auth_hint_password">Nhập mật khẩu</string>
@@ -541,6 +550,12 @@
     <string name="profile_row_dob">📅 Ngày sinh: %1$s</string>
     <string name="profile_row_gender">👤 Giới tính: %1$s</string>
     <string name="profile_row_address">📍 Địa chỉ: %1$s</string>
+    <string name="profile_label_phone">Số điện thoại</string>
+    <string name="profile_label_dob">Ngày sinh</string>
+    <string name="profile_label_gender">Giới tính</string>
+    <string name="profile_label_address">Địa chỉ</string>
+    <string name="profile_health_subtitle">Lịch sử các lần khám đã hoàn thành</string>
+    <string name="profile_section_security">Bảo mật</string>
 
     <string name="edit_profile_saved_toast">Đã lưu hồ sơ</string>
     <string name="change_pwd_fill_all">Nhập đủ các trường</string>

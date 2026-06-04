@@ -92,7 +92,9 @@ public class TokenAuthInterceptor implements Interceptor {
 
     private boolean shouldAttemptRefresh(Request request, Response response) {
         int code = response.code();
-        if (code != 401) return false;
+        // Refresh khi 401 (token hết hạn) HOẶC 403 (anonymous truy cập endpoint cần role
+        // — thường là token sai chữ ký / accountId không tồn tại sau khi reset DB).
+        if (code != 401 && code != 403) return false;
         if (request.header(AUTH_HEADER) == null) return false;
         if (request.header(RETRY_MARK) != null) return false;
         String path = request.url().encodedPath();

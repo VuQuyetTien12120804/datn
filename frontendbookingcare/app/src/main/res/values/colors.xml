@@ -7,6 +7,7 @@
     <color name="text_secondary">#FF666666</color>
 
     <!-- Brand theme tokens (dùng chung cho toàn app) -->
+    <color name="logo_navy">#1E4FA3</color>
     <color name="brand_primary">#0B84FF</color>
     <color name="brand_primary_dark">#0668CC</color>
     <color name="brand_on_primary">#FFFFFFFF</color>

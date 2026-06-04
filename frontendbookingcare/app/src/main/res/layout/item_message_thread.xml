@@ -1,101 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:padding="12dp">
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:rippleColor="@color/chip_specialty_bg"
+    app:strokeColor="#E8F0FA"
+    app:strokeWidth="1dp">
 
-    <FrameLayout
-        android:id="@+id/thread_avatar_bg"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/bg_detail_chat_pill"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Avatar 3D: vòng nền + chữ nổi -->
+        <View
+            android:id="@+id/thread_avatar_shadow"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:background="@drawable/bg_thread_avatar_shadow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/thread_avatar_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:elevation="6dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </FrameLayout>
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/thread_avatar_shadow"
+            app:layout_constraintEnd_toEndOf="@id/thread_avatar_shadow"
+            app:layout_constraintStart_toStartOf="@id/thread_avatar_shadow"
+            app:layout_constraintTop_toTopOf="@id/thread_avatar_shadow"
+            tools:text="M" />
 
-    <TextView
-        android:id="@+id/thread_unread_badge"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="11sp"
-        android:background="@drawable/bg_unread_badge"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/thread_avatar_bg"
-        app:layout_constraintEnd_toEndOf="@id/thread_avatar_bg" />
+        <TextView
+            android:id="@+id/thread_unread_badge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/bg_unread_badge_3d"
+            android:elevation="8dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/thread_avatar_letter"
+            app:layout_constraintEnd_toEndOf="@id/thread_avatar_letter"
+            tools:text="3"
+            tools:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/thread_texts"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/thread_time"
-        app:layout_constraintStart_toEndOf="@id/thread_avatar_bg"
-        app:layout_constraintTop_toTopOf="parent">
+        <TextView
+            android:id="@+id/thread_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_thread_time_pill"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/brand_primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="19 phút" />
 
         <TextView
             android:id="@+id/thread_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/text_body_lg"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/thread_time"
+            app:layout_constraintStart_toEndOf="@id/thread_avatar_shadow"
+            app:layout_constraintTop_toTopOf="@id/thread_avatar_shadow"
+            tools:text="Bác sĩ BS. Bùi Hoàng Minh" />
 
         <TextView
             android:id="@+id/thread_sub"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
             android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/text_secondary_dim"
-            android:textSize="12sp" />
+            android:textSize="@dimen/text_caption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/thread_avatar_shadow"
+            app:layout_constraintTop_toBottomOf="@id/thread_title"
+            tools:text="Vu Tien" />
 
         <TextView
             android:id="@+id/thread_preview"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_thread_preview_bubble"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary_dim"
-            android:textSize="13sp" />
-    </LinearLayout>
+            android:maxLines="2"
+            android:paddingStart="10dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small"
+            app:layout_constraintEnd_toStartOf="@id/thread_lock"
+            app:layout_constraintStart_toEndOf="@id/thread_avatar_shadow"
+            app:layout_constraintTop_toBottomOf="@id/thread_sub"
+            tools:text="hello" />
 
-    <TextView
-        android:id="@+id/thread_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_muted"
-        android:textSize="11sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/thread_lock"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="6dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_lock_small"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/thread_time" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/thread_lock"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="6dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_lock_small"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/thread_preview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/thread_preview"
+            app:tint="@color/doctor_logout_red"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -5,7 +5,7 @@
   Nội dung:
   - Phòng khám Quyết Tiến, legal docs (TERMS/PRIVACY/FAQ)
   - 40 bác sĩ (không trùng tên), BS. Bùi Hoàng Minh #7 đa chuyên khoa
-  - 150 bệnh nhân, slot 21 ngày, ~260 lịch hẹn mẫu
+  - 10 bệnh nhân, slot 21 ngày, ~60 lịch hẹn mẫu
   - Không seed hóa đơn/thanh toán (app không có luồng thanh toán)
 
   Tài khoản test:
@@ -217,18 +217,27 @@ BEGIN
 END
 
 -- Patients
-DECLARE @patientCount int = 150;
+DECLARE @patientCount int = 10;
 SET @i = 1;
 WHILE @i <= @patientCount
 BEGIN
   DECLARE @pAccId int = 2000 + @i;
   DECLARE @pFemale bit = CASE WHEN (@i % 2) = 0 THEN 1 ELSE 0 END;
+  -- Dùng 2 index khác nhau cho họ và tên để không trùng họ tên đầy đủ.
+  -- firstIdx chạy nhanh (đổi mỗi patient), lastIdx đổi mỗi 15 patient.
+  -- → Hỗ trợ cả 10 patient (10 tên unique) và 150 patient (11 × 15 = 165 combo).
+  DECLARE @lastIdx int = (((@i - 1) / 15) % 11) + 1;
+  DECLARE @firstIdx int = ((@i - 1) % 15) + 1;
   DECLARE @pfull nvarchar(255) =
     CASE WHEN @pFemale = 1
-      THEN (CHOOSE((@i % 10) + 1, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô') + N' ' +
-            N'Thị ' + CHOOSE((@i % 10) + 1, N'An',N'Bích',N'Chi',N'Diệp',N'Giang',N'Hà',N'Khánh',N'Lan',N'Nga',N'Quỳnh'))
-      ELSE (CHOOSE((@i % 10) + 1, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô') + N' ' +
-            N'Văn ' + CHOOSE((@i % 10) + 1, N'An',N'Bình',N'Chính',N'Dũng',N'Giáp',N'Hải',N'Khôi',N'Lâm',N'Nam',N'Quân'))
+      THEN (CHOOSE(@lastIdx, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô',N'Phan') + N' ' +
+            N'Thị ' + CHOOSE(@firstIdx,
+              N'An',N'Bích',N'Chi',N'Diệp',N'Giang',N'Hà',N'Khánh',N'Lan',N'Nga',N'Quỳnh',
+              N'Hương',N'Mai',N'Thảo',N'Trang',N'Vân'))
+      ELSE (CHOOSE(@lastIdx, N'Nguyễn',N'Trần',N'Lê',N'Phạm',N'Hoàng',N'Vũ',N'Đặng',N'Bùi',N'Đỗ',N'Ngô',N'Phan') + N' ' +
+            N'Văn ' + CHOOSE(@firstIdx,
+              N'An',N'Bình',N'Chính',N'Dũng',N'Giáp',N'Hải',N'Khôi',N'Lâm',N'Nam',N'Quân',
+              N'Sơn',N'Tuấn',N'Việt',N'Xuân',N'Phong'))
     END;
 
   DECLARE @pemail nvarchar(255) = N'bn' + RIGHT(N'000' + CAST(@i AS nvarchar(10)), 3) + N'@mail.vn';
@@ -343,6 +352,14 @@ BEGIN
 END
 SET IDENTITY_INSERT dbo.patients OFF;
 
+-- Sanity: không trùng họ tên bệnh nhân trong seed
+IF EXISTS (
+  SELECT full_name FROM dbo.patients GROUP BY full_name HAVING COUNT(*) > 1
+)
+BEGIN
+  RAISERROR(N'Seed error: duplicate patient full_name detected.', 16, 1);
+END
+
 /* ===== 10) Weekly schedules for all doctors ===== */
 DECLARE @roomIds TABLE(id int);
 INSERT INTO @roomIds(id) SELECT id FROM dbo.rooms ORDER BY id;
@@ -431,7 +448,7 @@ BEGIN
 END
 
 /* ===== 12) Create appointments (use random slots) ===== */
-DECLARE @apptCount int = 260;
+DECLARE @apptCount int = 60;
 DECLARE @k int = 1;
 
 WHILE @k <= @apptCount

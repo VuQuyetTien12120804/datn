@@ -24,6 +24,7 @@ public final class RetrofitClient {
     private static volatile PatientProfileApiService patientProfileApi;
     private static volatile PatientChatApiService patientChatApi;
     private static volatile DoctorChatApiService doctorChatApi;
+    private static volatile ChatbotApiService chatbotApi;
     private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
     private RetrofitClient() {
@@ -164,5 +165,16 @@ public final class RetrofitClient {
             }
         }
         return doctorChatApi;
+    }
+
+    public static ChatbotApiService chatbotApi() {
+        if (chatbotApi == null) {
+            synchronized (RetrofitClient.class) {
+                if (chatbotApi == null) {
+                    chatbotApi = retrofit().create(ChatbotApiService.class);
+                }
+            }
+        }
+        return chatbotApi;
     }
 }

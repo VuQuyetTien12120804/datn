@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pill nền trắng mờ để hiển thị email dưới tên trong account header.
+  Tăng tương phản trên gradient xanh và tách email khỏi tên cho gọn mắt.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#33FFFFFF" />
+    <corners android:radius="999dp" />
+</shape>

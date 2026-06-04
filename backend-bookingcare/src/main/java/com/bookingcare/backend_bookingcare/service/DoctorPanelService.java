@@ -35,6 +35,7 @@ public class DoctorPanelService {
     private final PatientRepository patientRepository;
     private final AdminAppointmentService adminAppointmentService;
     private final AppointmentSlotService appointmentSlotService;
+    private final AppointmentExpiryService appointmentExpiryService;
 
     @PersistenceContext
     private EntityManager em;
@@ -56,8 +57,11 @@ public class DoctorPanelService {
         return m;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Map<String, Object>> byStatus(int accountId, String apiStatus) {
+        if ("PENDING".equalsIgnoreCase(apiStatus)) {
+            appointmentExpiryService.expireUnconfirmedPastPending();
+        }
         Doctor doctor = requireDoctor(accountId);
         List<Appointment> rows;
         if ("CANCELLED".equalsIgnoreCase(apiStatus)) {

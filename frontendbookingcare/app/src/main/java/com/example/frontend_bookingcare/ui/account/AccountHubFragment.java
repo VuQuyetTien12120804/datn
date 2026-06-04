@@ -27,8 +27,6 @@ import com.example.frontend_bookingcare.session.AuthSession;
 import com.example.frontend_bookingcare.session.SessionManager;
 import com.example.frontend_bookingcare.ui.legal.LegalDocumentActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +61,6 @@ public class AccountHubFragment extends Fragment implements AccountHubAdapter.Li
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new AccountHubAdapter(this);
         rv.setAdapter(adapter);
-
-        FloatingActionButton fab = view.findViewById(R.id.account_fab_call);
-        fab.setOnClickListener(v -> dialSupport());
 
         refreshAll(view);
     }

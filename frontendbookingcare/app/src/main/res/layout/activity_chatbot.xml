@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Activity Chatbot — UI tương tự CustomerCareChatActivity nhưng có:
+  - Header với badge "AI Trợ lý"
+  - ChipGroup gợi ý nhanh phía trên input bar (cập nhật theo từng phản hồi)
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/home_page_bg">
+
+    <LinearLayout
+        android:id="@+id/cb_header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/brand_primary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/cb_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_navigate_up"
+            android:padding="10dp"
+            android:src="@drawable/ic_nav_back"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/chatbot_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_subtitle"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/chatbot_subtitle"
+                android:textColor="#DBEEFF"
+                android:textSize="@dimen/text_caption" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_chatbot_badge"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="@string/chatbot_badge_ai"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cb_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:clipToPadding="false" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/cb_suggestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="6dp"
+        app:chipSpacingHorizontal="6dp"
+        app:singleLine="false"
+        app:singleSelection="false" />
+
+    <LinearLayout
+        android:id="@+id/cb_input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <EditText
+            android:id="@+id/cb_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_chat_input"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
+            android:hint="@string/chatbot_input_hint"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:importantForAutofill="no"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted" />
+
+        <ImageButton
+            android:id="@+id/cb_send"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@null"
+            android:src="@android:drawable/ic_menu_send"
+            app:tint="@color/brand_primary" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/cb_bottom_inset"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Avatar mặc định khi user chưa upload ảnh.
+  Hình tròn nền xanh nhạt + icon person trắng đậm — đồng bộ với theme brand_primary.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- Nền tròn xanh nhạt -->
+    <path
+        android:pathData="M48,48m-48,0a48,48 0 1,1 96,0a48,48 0 1,1 -96,0"
+        android:fillColor="#DCEEFF" />
+
+    <!-- Hình người (đầu + thân) -->
+    <path
+        android:fillColor="#0B84FF"
+        android:pathData="M48,52c8.84,0 16,-7.16 16,-16s-7.16,-16 -16,-16s-16,7.16 -16,16S39.16,52 48,52zM48,58c-13.33,0 -28,6.67 -28,20v8h56v-8C76,64.67 61.33,58 48,58z" />
+</vector>

@@ -232,7 +232,6 @@
 
     <string name="auth_brand_part1">Clinic</string>
     <string name="auth_brand_part2">Booking</string>
-    <string name="auth_id_suffix"> ID</string>
     <string name="auth_login_section_title">Sign-in details</string>
     <string name="auth_hint_email">Enter your email</string>
     <string name="auth_hint_password">Enter your password</string>
@@ -309,9 +308,9 @@
 
     <string name="login">Sign in</string>
     <string name="register">Register</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-    <string name="full_name">Full name</string>
+    <string name="email">Enter your email</string>
+    <string name="password">Enter your password</string>
+    <string name="full_name">Display name</string>
     <string name="phone">Phone number</string>
     <string name="otp">OTP code</string>
     <string name="send_otp">Send OTP</string>

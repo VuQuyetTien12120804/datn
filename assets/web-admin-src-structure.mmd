@@ -1,0 +1,55 @@
+%% Mermaid — import tại https://mermaid.live hoặc draw.io (Insert > Advanced > Mermaid)
+%% Xuất PNG/SVG chèn Word
+
+flowchart TB
+    subgraph SRC["web-admin/src/"]
+        direction TB
+        MAIN["main.tsx<br/><i>Entry: QueryClientProvider, BrowserRouter</i>"]
+        APP["App.tsx<br/><i>Routes + RequireAdmin guard</i>"]
+
+        subgraph LAYOUT["layout/"]
+            ADMIN_LAYOUT["AdminLayout.tsx<br/><i>Sidebar · Header · Outlet</i>"]
+        end
+
+        subgraph PAGES["pages/ — 10 trang chức năng"]
+            P1["Dashboard · Appointments · Doctors"]
+            P2["Patients · Accounts · Specialties"]
+            P3["Services · Rooms · Slots · Messages · Login"]
+        end
+
+        subgraph API["api/"]
+            HTTP["http.ts<br/><i>Axios + JWT interceptor</i>"]
+            AUTH_API["auth.ts<br/><i>adminLogin</i>"]
+            ADMIN_API["admin.ts<br/><i>CRUD + báo cáo + chat</i>"]
+            TYPES["types.ts<br/><i>Shared TS types</i>"]
+        end
+
+        subgraph AUTH["auth/"]
+            STORAGE["storage.ts<br/><i>localStorage session</i>"]
+        end
+
+        subgraph UI["ui/ — components & helpers"]
+            UI1["TableCard · TableShell · EmptyState"]
+            UI2["appointmentStatus · pageTitles · validators · confirm"]
+        end
+
+        subgraph THEME["theme/"]
+            THEME_TS["theme.ts<br/><i>Ant Design tokens & overrides</i>"]
+        end
+    end
+
+    MAIN --> APP
+    APP --> LAYOUT
+    APP --> PAGES
+    PAGES --> API
+    API --> AUTH
+    APP --> UI
+    APP --> THEME
+
+    classDef folder fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#1a1d21
+    classDef file fill:#f8fafc,stroke:#64748b,stroke-width:1px,color:#1a1d21
+    classDef root fill:#eff6ff,stroke:#0b84ff,stroke-width:2px,color:#0b84ff
+
+    class SRC root
+    class LAYOUT,PAGES,API,AUTH,UI,THEME folder
+    class MAIN,APP,ADMIN_LAYOUT,HTTP,AUTH_API,ADMIN_API,TYPES,STORAGE,THEME_TS file

@@ -10,6 +10,18 @@
 
     <style name="Theme.Frontendbookingcare" parent="Base.Theme.Frontendbookingcare" />
 
+    <!-- Màn hình mở app: nền navy + chữ trắng, chuyển sang Onboarding -->
+    <style name="Theme.Frontendbookingcare.Launcher" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/logo_navy</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_img</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/logo_navy</item>
+        <item name="postSplashScreenTheme">@style/Theme.Frontendbookingcare.Onboarding</item>
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:statusBarColor">@color/logo_navy</item>
+        <item name="android:navigationBarColor">@color/logo_navy</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
     <style name="Theme.Frontendbookingcare.Onboarding" parent="Base.Theme.Frontendbookingcare">
         <item name="android:statusBarColor">@color/brand_primary</item>
         <item name="android:navigationBarColor">@color/brand_primary</item>
@@ -32,5 +44,11 @@
         <item name="android:minHeight">@dimen/header_toolbar_height</item>
         <item name="android:paddingHorizontal">@dimen/header_toolbar_padding_horizontal</item>
         <item name="android:paddingBottom">@dimen/header_toolbar_padding_bottom</item>
+    </style>
+
+    <!-- ShapeAppearance: bo tròn 100% — dùng cho avatar tròn (ShapeableImageView) -->
+    <style name="ShapeAppearance.App.AvatarCircle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

@@ -5,12 +5,14 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.frontend_bookingcare.MainActivity;
@@ -32,6 +34,7 @@ import java.util.List;
 public class ProfileFragment extends Fragment {
 
     private LinearLayout healthList;
+    private View healthEmptyWrap;
     private TextView healthEmpty;
 
     @Nullable
@@ -46,7 +49,9 @@ public class ProfileFragment extends Fragment {
         MaterialToolbar toolbar = view.findViewById(R.id.profile_toolbar);
         AccountUiHelper.bindToolbarBack(this, toolbar);
         healthList = view.findViewById(R.id.profile_health_list);
+        healthEmptyWrap = view.findViewById(R.id.profile_health_empty_wrap);
         healthEmpty = view.findViewById(R.id.profile_health_empty);
+        setupInfoRows(view);
         bindProfile(view);
         syncProfileFromServer(view);
         loadHealthRecords();
@@ -87,6 +92,29 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    private void setupInfoRows(View root) {
+        setupInfoRow(root.findViewById(R.id.profile_phone_row),
+                R.drawable.bg_profile_icon_blue, R.drawable.ic_doctor_phone, R.color.brand_primary,
+                R.string.profile_label_phone);
+        setupInfoRow(root.findViewById(R.id.profile_dob_row),
+                R.drawable.bg_profile_icon_teal, R.drawable.ic_profile_calendar, R.color.teal_primary,
+                R.string.profile_label_dob);
+        setupInfoRow(root.findViewById(R.id.profile_gender_row),
+                R.drawable.bg_profile_icon_purple, R.drawable.ic_nav_account, R.color.home_tile_purple,
+                R.string.profile_label_gender);
+        setupInfoRow(root.findViewById(R.id.profile_address_row),
+                R.drawable.bg_profile_icon_peach, R.drawable.ic_profile_location, R.color.account_fab_orange,
+                R.string.profile_label_address);
+    }
+
+    private void setupInfoRow(@NonNull View row, int iconBgRes, int iconRes, int iconTintColorRes, int labelRes) {
+        row.findViewById(R.id.profile_row_icon_bg).setBackgroundResource(iconBgRes);
+        ImageView icon = row.findViewById(R.id.profile_row_icon);
+        icon.setImageResource(iconRes);
+        icon.setColorFilter(ContextCompat.getColor(requireContext(), iconTintColorRes));
+        ((TextView) row.findViewById(R.id.profile_row_label)).setText(labelRes);
+    }
+
     private void bindProfile(View view) {
         AccountFragment parent = (AccountFragment) getParentFragment();
         if (parent == null) return;
@@ -97,11 +125,15 @@ public class ProfileFragment extends Fragment {
         ((TextView) view.findViewById(R.id.profile_name)).setText(s != null && s.fullName != null ? s.fullName : "—");
         ((TextView) view.findViewById(R.id.profile_email)).setText(s != null && s.email != null ? s.email : "—");
 
-        ((TextView) view.findViewById(R.id.profile_phone_row)).setText(getString(R.string.profile_row_phone, nz(ex.phone)));
-        ((TextView) view.findViewById(R.id.profile_dob_row)).setText(getString(R.string.profile_row_dob, nz(ex.dob)));
-        ((TextView) view.findViewById(R.id.profile_gender_row)).setText(
-                getString(R.string.profile_row_gender, nz(BookingFormatters.displayGender(requireContext(), ex.gender))));
-        ((TextView) view.findViewById(R.id.profile_address_row)).setText(getString(R.string.profile_row_address, nz(ex.address)));
+        setInfoValue(view.findViewById(R.id.profile_phone_row), nz(ex.phone));
+        setInfoValue(view.findViewById(R.id.profile_dob_row), nz(ex.dob));
+        setInfoValue(view.findViewById(R.id.profile_gender_row),
+                nz(BookingFormatters.displayGender(requireContext(), ex.gender)));
+        setInfoValue(view.findViewById(R.id.profile_address_row), nz(ex.address));
+    }
+
+    private static void setInfoValue(@NonNull View row, String value) {
+        ((TextView) row.findViewById(R.id.profile_row_value)).setText(value);
     }
 
     private void syncProfileFromServer(View view) {
@@ -129,13 +161,13 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadHealthRecords() {
-        if (healthList == null || healthEmpty == null || !isAdded()) return;
+        if (healthList == null || healthEmptyWrap == null || !isAdded()) return;
         AccountFragment parent = (AccountFragment) getParentFragment();
         if (parent == null) return;
         AuthSession s = parent.getSessionManager().getSession();
         if (s == null || TextUtils.isEmpty(s.accessToken)) {
             healthList.removeAllViews();
-            healthEmpty.setVisibility(View.VISIBLE);
+            healthEmptyWrap.setVisibility(View.VISIBLE);
             healthEmpty.setText(R.string.health_records_login_required);
             return;
         }
@@ -148,16 +180,16 @@ public class ProfileFragment extends Fragment {
     private void renderHealthRecords(@Nullable List<PatientAppointmentDto> list, @Nullable String err) {
         healthList.removeAllViews();
         if (err != null) {
-            healthEmpty.setVisibility(View.VISIBLE);
+            healthEmptyWrap.setVisibility(View.VISIBLE);
             healthEmpty.setText(err);
             return;
         }
         if (list == null || list.isEmpty()) {
-            healthEmpty.setVisibility(View.VISIBLE);
+            healthEmptyWrap.setVisibility(View.VISIBLE);
             healthEmpty.setText(R.string.health_records_empty);
             return;
         }
-        healthEmpty.setVisibility(View.GONE);
+        healthEmptyWrap.setVisibility(View.GONE);
         LayoutInflater inf = LayoutInflater.from(requireContext());
         int limit = Math.min(list.size(), 10);
         for (int i = 0; i < limit; i++) {

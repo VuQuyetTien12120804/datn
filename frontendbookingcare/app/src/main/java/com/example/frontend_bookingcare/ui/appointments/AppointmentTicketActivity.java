@@ -308,8 +308,8 @@ public class AppointmentTicketActivity extends AppCompatActivity {
 
     private static boolean isChatLocked(@Nullable String status) {
         if (status == null || status.trim().isEmpty()) return false;
-        String s = status.trim().toUpperCase(java.util.Locale.ROOT);
-        return "CANCELLED".equals(s) || "NO_SHOW".equals(s) || "COMPLETED".equals(s);
+        String s = status.trim().toLowerCase(java.util.Locale.ROOT);
+        return "cancelled".equals(s) || "no_show".equals(s);
     }
 
     private boolean onToolbarItem(MenuItem item, int apptId, String date) {

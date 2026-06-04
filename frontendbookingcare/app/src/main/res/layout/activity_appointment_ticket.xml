@@ -18,7 +18,8 @@
         app:titleCentered="true"
         app:contentInsetStartWithNavigation="0dp"
         app:contentInsetEndWithActions="0dp"
-        app:navigationIcon="@android:drawable/ic_media_previous" />
+        app:navigationIcon="@drawable/ic_nav_back"
+        app:navigationIconTint="@color/white" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

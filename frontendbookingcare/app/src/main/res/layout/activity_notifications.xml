@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="@color/brand_primary"
         android:paddingTop="8dp"
-        app:navigationIcon="@drawable/ic_auth_back"
+        app:navigationIcon="@drawable/ic_nav_back"
         app:navigationIconTint="@color/white"
         app:title="@string/notifications_title"
         app:titleCentered="true"

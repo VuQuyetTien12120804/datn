@@ -21,7 +21,7 @@
         <activity
             android:name=".onboarding.OnboardingActivity"
             android:exported="true"
-            android:theme="@style/Theme.Frontendbookingcare.Onboarding">
+            android:theme="@style/Theme.Frontendbookingcare.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -72,6 +72,10 @@
             android:exported="false" />
         <activity
             android:name=".ui.support.chat.CustomerCareChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.chatbot.ChatbotActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

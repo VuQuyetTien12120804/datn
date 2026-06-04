@@ -24,15 +24,15 @@
 
         <ImageButton
             android:id="@+id/auth_manual_back"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="start|center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_navigate_up"
-            android:padding="14dp"
+            android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@android:drawable/ic_menu_revert"
-            android:tint="@color/white" />
+            android:src="@drawable/ic_nav_back"
+            app:tint="@color/white" />
     </FrameLayout>
 
     <ScrollView
@@ -63,13 +63,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="@string/dob">
+                android:hint="@string/profile_dob_hint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/profile_dob_hint" />
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
